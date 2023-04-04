@@ -1,0 +1,24 @@
+{
+  "name": "mmthours",
+  "version": "1.0.0",
+  "description": "idk",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KartikUppalapati/mmtHours.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express.js": "^1.0.0",
+    "firebase": "^9.19.1",
+    "nodemon": "^2.0.22"
+  },
+  "bugs": {
+    "url": "https://github.com/KartikUppalapati/mmtHours/issues"
+  },
+  "homepage": "https://github.com/KartikUppalapati/mmtHours#readme"
+}

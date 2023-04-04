@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>MMT Finances</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="loginBox">
+                <h1 style="font-size: 40px;">MMT Login</h1>
+                <div class="loginDiv">
+                    <form id="loginForm" class="loginForm" action="formPost">
+                        <input name="Email" placeholder="Email" required="" type="text">
+                        <input name="Password" placeholder="Password" required="" type="text">
+                        <div class="loginFormButtons">
+                            <button type="submit">Login</button>
+                            <button onclick="reset_password()">Reset Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            // Get form
+            var form = document.getElementById("loginForm");
+            form.addEventListener("submit", async (e) => 
+            {
+                //Prevent browser default behavior
+                e.preventDefault();
+
+                // Get inputs
+                var inputs = document.getElementById("loginForm").elements;
+
+                // Create Post request
+                var request = new XMLHttpRequest();
+                request.open("POST", form.action, false);
+
+                // If ok then redirect
+                request.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) 
+                    {
+                        window.location.href = "dashboard=?" + this.responseText;
+                    }
+                };
+
+                // Send
+                request.setRequestHeader('Content-type', 'application/json');
+                request.send(JSON.stringify({"Email": inputs["Email"].value, "Password": inputs["Password"].value}));
+            });
+
+            // Reset password function
+            function reset_password()
+            {
+                window.location.href = "resetPassword";
+            }
+        </script>
+    </body>
+</html>
