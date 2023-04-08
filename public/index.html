@@ -36,11 +36,18 @@
                 var request = new XMLHttpRequest();
                 request.open("POST", form.action, false);
 
-                // If ok then redirect
-                request.onreadystatechange = function() {
+                // Check response from server
+                request.onreadystatechange = function() 
+                {
+                    // Successful login response
                     if (this.readyState == 4 && this.status == 200) 
                     {
                         window.location.href = "dashboard=?" + this.responseText;
+                    }
+                    // Unsuccessful login response
+                    else
+                    {
+                        alert("Your email or password was incorrect");
                     }
                 };
 
