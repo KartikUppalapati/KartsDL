@@ -81,6 +81,41 @@ const checkAuthToken = async (Token) =>
     })
 }
 
+// Function to update auth token after login
+const updateAuthToken = async (Token) =>
+{
+    // Randomly generate new token
+    var randomToken = Math.floor(Math.random() * 1000000);
+
+    // Check that new token doesn't already exist
+    checkAuthToken(randomToken).then(dbresult =>
+    {
+        // If rolling code doesn't match then continue
+        if (dbresult.length != 1)
+        {
+            const QUERY = `UPDATE Tutors SET TOKEN = '${randomToken}' WHERE Token = '${Token}'`;
+            return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+            {
+                if (err) 
+                {
+                    reject(err)
+                } 
+                else 
+                {
+                    console.log("Updating auth token");
+                    console.table(results);
+                    resolve(results);
+                    return results;
+                }
+            }))
+            .then(function(result) 
+            {
+                return result
+            })
+        }
+    })
+}
+
 // URL director for get
 app.get('/:placeholder', (req, res) => 
 {
@@ -90,7 +125,7 @@ app.get('/:placeholder', (req, res) =>
         console.log("redirecting to password reset");
         res.sendFile(path.join(initalPath, "resetPassword.html"));
     }
-    // Else if redirect to dashboard
+    // Else if dashboard request
     else if (req.originalUrl.split("=?")[0] == "/dashboard")
     {
         // Use database function to check if token matches
@@ -104,8 +139,12 @@ app.get('/:placeholder', (req, res) =>
             // Else rolling code matches then redirect to dashboard
             else
             {
-                console.log("redirecting to dashboard");
-                res.sendFile(path.join(initalPath, "dashboard.html"));
+                // Update token in databse
+                updateAuthToken(req.originalUrl.split("=?")[1]).then(dbresult =>
+                {
+                    console.log("redirecting to dashboard");
+                    res.sendFile(path.join(initalPath, "dashboard.html"));  
+                })
             }
         })
     }

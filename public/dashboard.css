@@ -1,20 +1,185 @@
-html 
-{
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-}
-
-body 
+html, body 
 {
     margin: 0;
     padding: 0;
-    height: 100vh;
-    scroll-snap-type: y mandatory;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
-.container
+.container 
 {
     width: 100%;
     height: 100%;
+    background: white;
+}
+
+/* For top navigation bar */
+.navbar 
+{
+    z-index: 10;
+    height: 6.75%;
+    width: 89.65%;
+    position: fixed;
+    margin-left: 10.35%;
+    background-color: lightblue;
+}
+
+.navbar a 
+{
+    float: right;
+    color: black;
+    padding: 15px;
+    text-decoration: none;
+}
+
+.navbar a:hover 
+{
+    background: #ddd;
+}
+
+/* Side Bar */
+.sideMenu 
+{
+    float: left;
+    height: 100%;
+    width: 10.35%;
+    color: black;
+    background: #f8f4e5;
+}
+
+.sideMenu h1
+{
+    height: 6.75%;
+    font-size: 35px;
     display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu
+{
+    padding: 0;
+    padding-top: 15px;
+}
+
+.menuItem
+{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    font-size: 13px;
+    font-weight: 200;
+    position: relative;
+}
+
+.menuItem:not(.activeMenu):hover 
+{
+    color: #ffa580;
+}
+
+.activeMenu
+{
+    height: 35px;
+    line-height: 35px;
+    font-size: 25px;
+    font-weight: 400;
+    background: #ffa580;
+}
+
+#titleBar 
+{
+    height: 36px;
+    margin-bottom: 30px;
+}
+
+#profilePic
+{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: grey;
+    overflow: hidden;
+}
+
+#profilePic img 
+{
+    height: 100%;
+    width: 100%;
+}
+
+.controls 
+{
+    display: block;
+    width: 70px;
+    height: 20px;
+    color: black;
+    font-size: 10px;
+    font-weight: 300;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 20px;
+    float: right;
+    border-radius: 20px;
+}
+
+.controls:not(.activeControl):hover 
+{
+    color: #ffa580;
+}
+
+.activeControl 
+{
+    font-weight: 600;
+    background: #f8f4e5;
+}
+
+/* Icons */
+.notification 
+{
+    top: 0;
+    bottom: 0;
+    right: 50%;
+    margin: auto;
+    display: block;
+    width: 20px;
+    height: 20px;
+    color: #202b33;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+}
+
+
+/* Headers */
+h1 
+{
+    font-size: 13px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+h2 
+{
+    float: left;
+    font-size: 19px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+h3 
+{
+    float: left;
+    font-size: 32px;
+    font-weight: 300;
+    margin: 0;
+    margin-top: 8%;
+    margin-left: 20px;
+    margin-bottom: 6px;
 }

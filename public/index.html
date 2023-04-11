@@ -11,7 +11,7 @@
                 <div class="loginDiv">
                     <form id="loginForm" class="loginForm" action="formPost">
                         <input name="Email" placeholder="Email" required="" type="text">
-                        <input name="Password" placeholder="Password" required="" type="text">
+                        <input name="Password" placeholder="Password" type = "Password" required="" type="text">
                         <div class="loginFormButtons">
                             <button type="submit">Login</button>
                             <button onclick="reset_password()">Reset Password</button>
@@ -51,7 +51,7 @@
                     }
                 };
 
-                // Send
+                // Send login request to server
                 request.setRequestHeader('Content-type', 'application/json');
                 request.send(JSON.stringify({"Email": inputs["Email"].value, "Password": inputs["Password"].value}));
             });

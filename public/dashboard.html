@@ -1,14 +1,60 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title>Your Dashboard</title>
+        <title>Dashboard</title>
         <link rel="stylesheet" href="dashboard.css">
     </head>
     <body>
+        <div class="navbar">
+            <a>
+                <div id="profilePic">
+                    <img src="userLogin.jpg" />
+                </div>
+            </a>
+        </div>
+
         <div class="container">
-            <div>
-                <h1>Dashboard stuff here</h1>
+            <div class="sideMenu">
+                <h1>MMT</h1>
+                <ul class="menu">
+                    <li onclick="menuNav(this)" class="menuItem activeMenu">Dashboard</li>
+                    <li onclick="menuNav(this)" class="menuItem">Add Hours</li>
+                    <li onclick="menuNav(this)" class="menuItem">Admin <span class="notification">8</span></li>
+                </ul>
             </div>
+
+            <div class="mainArea">
+                <h1>hello</h1>
+            </div>
+            <!-- <div id="titleBar">
+                <div id="profilePic">
+                    <img src="http://s3-us-west-2.amazonaws.com/s.cdpn.io/153917/profile/profile-512_1.jpg" />
+                </div>
+                <span onclick="filterNav(this)" class="controls activeControl">Daily</span>
+                <span onclick="filterNav(this)" class="controls">Weekly</span>
+                <span onclick="filterNav(this)" class="controls">Monthly</span>
+            </div> -->
         </div>
     </body>
+
+    <script>
+        // Function to run when menu item is clicked
+        function menuNav(item)
+        {
+            // Check if item can be clicked
+            if (item.className != "menuItem activeMenu")
+            {
+                alert(item.textContent);
+            }
+        }
+        // Function to run when filter item is clicked
+        function filterNav(item)
+        {
+            // Check if item can be clicked
+            if (item.className != "controls activeControl")
+            {
+                alert(item.textContent);
+            }
+        }
+    </script>
 </html>
