@@ -29,10 +29,11 @@ con.connect(function(err)
     console.log("Database Connected!");
 });
 
+
 // Function to get auth token from database using username and password
-const getAuthToken = async (username, password) =>
+const getLoginToken = async (username, password) =>
 {
-    const QUERY = `SELECT Token FROM Tutors WHERE Email = '${username}' and Password = '${password}'`;
+    const QUERY = `SELECT LoginToken FROM Tutors WHERE Email = '${username}' and Password = '${password}'`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err) 
@@ -41,12 +42,12 @@ const getAuthToken = async (username, password) =>
         } 
         else 
         {
-            console.log("Getting auth token");
+            console.log("Getting login token");
             console.table(results);
             resolve(results);
             if (results.length > 0)
             {
-                return results[0]["Token"];
+                return results[0]["LoginToken"];
             }
             return 0;
         }
@@ -57,10 +58,10 @@ const getAuthToken = async (username, password) =>
     })
 }
 
-// Function to get check if auth tokens exists
-const checkAuthToken = async (Token) =>
+// Function to check if tokens exists
+const checkToken = async (inputToken) =>
 {
-    const QUERY = `SELECT * FROM Tutors WHERE Token = '${Token}'`;
+    const QUERY = `SELECT * FROM Tutors WHERE LoginToken = '${inputToken}' OR AuthToken = '${inputToken}'`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err) 
@@ -69,7 +70,31 @@ const checkAuthToken = async (Token) =>
         } 
         else 
         {
-            console.log("Getting auth token");
+            console.log("Checking token");
+            console.table(results);
+            resolve(results);
+            return results;
+        }
+    }))
+    .then(function(result) 
+    {
+        return result
+    })
+}
+
+// Function to check if login token exists
+const checkLoginToken = async (inputToken) =>
+{
+    const QUERY = `SELECT * FROM Tutors WHERE LoginToken = '${inputToken}'`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err) 
+        {
+            reject(err)
+        } 
+        else 
+        {
+            console.log("Checking login token");
             console.table(results);
             resolve(results);
             return results;
@@ -82,18 +107,18 @@ const checkAuthToken = async (Token) =>
 }
 
 // Function to update auth token after login
-const updateAuthToken = async (Token) =>
+const updateAuthToken = async (inputToken) =>
 {
     // Randomly generate new token
     var randomToken = Math.floor(Math.random() * 1000000);
 
     // Check that new token doesn't already exist
-    checkAuthToken(randomToken).then(dbresult =>
+    checkToken(randomToken).then(dbresult =>
     {
         // If rolling code doesn't match then continue
         if (dbresult.length != 1)
         {
-            const QUERY = `UPDATE Tutors SET TOKEN = '${randomToken}' WHERE Token = '${Token}'`;
+            const QUERY = `UPDATE Tutors SET LoginToken = '${randomToken}', AuthToken = '${inputToken}' WHERE LoginToken = '${inputToken}'`;
             return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
             {
                 if (err) 
@@ -126,10 +151,11 @@ app.get('/:placeholder', (req, res) =>
         res.sendFile(path.join(initalPath, "resetPassword.html"));
     }
     // Else if dashboard request
-    else if (req.originalUrl.split("=?")[0] == "/dashboard")
+    else if (req.originalUrl.split("?ref=")[0] == "/dashboard")
     {
         // Use database function to check if token matches
-        checkAuthToken(req.originalUrl.split("=?")[1]).then(dbresult => 
+        var tok = req.originalUrl.split("?ref=")[1];
+        checkLoginToken(tok).then(dbresult => 
         {
             // If rolling code doesn't match then redirect back to login
             if (dbresult.length != 1)
@@ -140,7 +166,7 @@ app.get('/:placeholder', (req, res) =>
             else
             {
                 // Update token in databse
-                updateAuthToken(req.originalUrl.split("=?")[1]).then(dbresult =>
+                updateAuthToken(tok).then(dbresult =>
                 {
                     console.log("redirecting to dashboard");
                     res.sendFile(path.join(initalPath, "dashboard.html"));  
@@ -163,7 +189,7 @@ app.post('/:placeholder', (req, res) =>
     {
         // Get auth token from database
         console.log("\n\n\nreceived login attempt");
-        getAuthToken(req.body["Email"], req.body["Password"]).then(authToken => 
+        getLoginToken(req.body["Email"], req.body["Password"]).then(authToken => 
         {
             // Check if anything is returned and accordingly send return response
             if (authToken.length == 0)
@@ -172,7 +198,7 @@ app.post('/:placeholder', (req, res) =>
             }
             else
             {
-                res.status(200).end((authToken[0]["Token"]).toString());
+                res.status(200).end((authToken[0]["LoginToken"]).toString());
             }
         })
     }

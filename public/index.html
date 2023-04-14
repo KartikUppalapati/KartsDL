@@ -22,7 +22,7 @@
         </div>
 
         <script type="text/javascript">
-            // Get form
+            // When user presses login on form post to server and get response
             var form = document.getElementById("loginForm");
             form.addEventListener("submit", async (e) => 
             {
@@ -42,7 +42,7 @@
                     // Successful login response
                     if (this.readyState == 4 && this.status == 200) 
                     {
-                        window.location.href = "dashboard=?" + this.responseText;
+                        window.location.href = "dashboard?ref=" + this.responseText;
                     }
                     // Unsuccessful login response
                     else

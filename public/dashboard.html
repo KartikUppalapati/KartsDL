@@ -6,26 +6,25 @@
     </head>
     <body>
         <div class="navbar">
-            <a>
-                <div id="profilePic">
-                    <img src="userLogin.jpg" />
-                </div>
-            </a>
+            <a onclick="homeButtonDropdown()" class="userHomeButton"><img src="userLogin.jpg"/></a>
         </div>
 
         <div class="container">
             <div class="sideMenu">
                 <h1>MMT</h1>
-                <ul class="menu">
+                <ul id="sidemenu" class="menu">
                     <li onclick="menuNav(this)" class="menuItem activeMenu">Dashboard</li>
                     <li onclick="menuNav(this)" class="menuItem">Add Hours</li>
-                    <li onclick="menuNav(this)" class="menuItem">Admin <span class="notification">8</span></li>
+                    <li onclick="menuNav(this)" class="menuItem">Admin</li>
                 </ul>
             </div>
 
-            <div class="mainArea">
-                <h1>hello</h1>
-            </div>
+            <!-- <div class="mainArea">
+                <div class="dashboardArea">
+                    Hi dude
+                </div>
+            </div> -->
+
             <!-- <div id="titleBar">
                 <div id="profilePic">
                     <img src="http://s3-us-west-2.amazonaws.com/s.cdpn.io/153917/profile/profile-512_1.jpg" />
@@ -38,15 +37,34 @@
     </body>
 
     <script>
+        // Function to run when user presses on home button
+        function homeButtonDropdown()
+        {
+            alert("hi cuh");
+        }
+
         // Function to run when menu item is clicked
         function menuNav(item)
         {
             // Check if item can be clicked
             if (item.className != "menuItem activeMenu")
             {
-                alert(item.textContent);
+                // Go through menu items and deactivate current selection
+                let menuItems = document.getElementById("sidemenu").children;
+                for (i = 0; i < menuItems.length; i++)
+                {
+                    if (menuItems[i].className == "menuItem activeMenu")
+                    {
+                        menuItems[i].className = "menuItem";
+                    }
+                }
+
+                // Make new selection active
+                item.className = ("menuItem activeMenu");
             }
         }
+
+
         // Function to run when filter item is clicked
         function filterNav(item)
         {
