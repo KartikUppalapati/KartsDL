@@ -1,102 +1,101 @@
-html 
+html
 {
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
 }
 
-body 
+body
 {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    background-color: lightblue;
+  margin: 0;
+  padding: 0;
+  background-color: lightblue;
 }
 
 .container
 {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  text-align: center;
 }
 
 .loginBox
 {
-    width: 30%;
-    margin: auto;
-    text-align: center;
+  width: 50%;
+  margin: auto;
+  padding-bottom: 15px;
 }
 
 .loginDiv
 {
-    padding-top: 10%;
-    padding-bottom: 10%;
-    border: 2px solid black;
-    background-color: #f8f4e5;
+  padding-top: 10%;
+  padding-bottom: 10%;
+  border: 2px solid black;
+  background-color: #f8f4e5;
 }
 
-input 
+input
 {
-    width: 70%;
-    border: none;
-    outline: none;
-    color: black;
-    font-size: 14pt;
-    line-height: 28pt;
-    margin-bottom: 28pt;
-    background: #f8f4e5;
-    border-bottom: 5px solid black;
+  width: 70%;
+  border: none;
+  outline: none;
+  color: black;
+  font-size: 14pt;
+  line-height: 28pt;
+  margin-bottom: 28pt;
+  background: #f8f4e5;
+  border-bottom: 5px solid black;
 }
 
-input:-webkit-autofill:focus 
+input:-webkit-autofill:focus
 {
-    border-bottom: 5px solid #95a4ff;
-    -webkit-text-fill-color: #2A293E;
-    transition: background-color 5000s ease-in-out 0s;
+  border-bottom: 5px solid #95a4ff;
+  -webkit-text-fill-color: #2A293E;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .loginFormButtons
 {
-    text-align: center;
+  text-align: center;
 }
 
-.loginForm button 
+.loginForm button
 {
-    margin: 0;
-    outline: none;
-    margin-top: 15px;
-    margin-bottom: -10px;
-    line-height: 28pt;
-    letter-spacing: 2px;
-    background: #ffa580;
-    border: 1px solid black;
-    transition: 0.1s all ease-in-out;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
+  margin: 0;
+  outline: none;
+  margin-top: 15px;
+  margin-bottom: -10px;
+  line-height: 28pt;
+  letter-spacing: 2px;
+  background: #ffa580;
+  border: 1px solid black;
+  transition: 0.1s all ease-in-out;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
 }
 
-.loginForm button:active 
+.loginForm button:active
 {
-    top: 3px;
-    box-shadow: none;
+  top: 3px;
+  box-shadow: none;
 }
 
-.loginForm button:hover 
+.loginForm button:hover
 {
-    cursor:pointer;
-    color: white;
-    background: black;
-    border: 1px solid black;
+  cursor: pointer;
+  color: white;
+  background: black;
+  border: 1px solid black;
 }
 
-.error 
+.error
 {
-    background: #F2DEDE;
-    color: #0c0101;
-    padding: 10px;
-    width: 95%;
-    border-radius: 5px;
-    margin: 20px auto;
+  background: #F2DEDE;
+  color: #0c0101;
+  padding: 10px;
+  width: 95%;
+  border-radius: 5px;
+  margin: 20px auto;
 }

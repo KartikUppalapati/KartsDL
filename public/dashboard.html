@@ -3,27 +3,140 @@
     <head>
         <title>Dashboard</title>
         <link rel="stylesheet" href="dashboard.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script src="palette.js"></script>
     </head>
     <body>
         <div class="navbar">
-            <a onclick="homeButtonDropdown()" class="userHomeButton"><img src="userLogin.jpg"/></a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="userLogin.jpg"/>
+                </button>
+                <div class="dropdown-content" id="myDropdown">
+                    <a onclick="menuNav(this, 0)">View Profile</a>
+                    <a onclick="menuNav(this, 1)">Reset Password</a>
+                    <a onclick="window.location.href = '/';">Logout</a>
+                </div>
+            </div>
         </div>
 
         <div class="container">
             <div class="sideMenu">
                 <h1>MMT</h1>
                 <ul id="sidemenu" class="menu">
-                    <li onclick="menuNav(this)" class="menuItem activeMenu">Dashboard</li>
-                    <li onclick="menuNav(this)" class="menuItem">Add Hours</li>
-                    <li onclick="menuNav(this)" class="menuItem">Admin</li>
+                    <li onclick="menuNav(this, 2)" class="menuItem activeMenu">My Dashboard</li>
+                    <li onclick="menuNav(this, 3)" class="menuItem">Add Hours</li>
+                    <li onclick="menuNav(this, 4)" class="menuItem">Admin</li>
                 </ul>
             </div>
-
-            <!-- <div class="mainArea">
-                <div class="dashboardArea">
-                    Hi dude
+            <br>
+            <br>
+            <br>
+            <div class="dashboardArea">
+                <div id="profileArea" class="profileArea">
+                    <div class="formDiv">
+                        <form id="updateUserProfileForm" class="idkform" action="updateUserProfileFormPost"></form>
+                            <h1>User Profile</h1>
+                            <input id="userProfileFirstName" name="FirstName" placeholder="First Name" required="" type="text">
+                            <input id="userProfileLastName" name="LastName" placeholder="Last Name" required="" type="text">
+                            <input id="userProfileEmail" name="Email" placeholder="Email" required="" type="text" disabled>
+                            <div class="adminFormButtons">
+                                <button class="submitButton">Update</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div> -->
+                <div id="resetPasswordArea" class="resetPasswordArea">
+                    <div class="formDiv">
+                        <form id="resetPasswordForm" class="adminForm" action="resetPasswordFormPost"></form>
+                            <h1>Reset Password</h1>
+                            <input name="OldPassword" placeholder="Old Password" required="" type="text">
+                            <input name="NewPassword" placeholder="New Password" required="" type="text">
+                            <input name="NewPasswordAgain" placeholder="New Password Again" required="" type="text">
+                            <div class="adminFormButtons">
+                                <button class="submitButton" type="submit">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="mainDashboard" class="mainDashboard">
+                    <div>
+                        <div class="chartContainer">
+                            <canvas id="totalPieChart"></canvas>
+                        </div>
+                        <div class="chartContainer">
+                            <canvas id="hoursChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chartContainer">
+                            <div class="centerMe">
+                                <h1>Total Money Earned: $0</h1>
+                            </div>
+                        </div>
+                        <div class="chartContainer">
+                            <canvas id="moneyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div id="addHoursDashboard" class="addHoursDashboard">
+                    <div>
+                        <h1>Add hours dashboard<h1>
+                        <h1>Hey cuh<h1>
+                    </div>
+                </div>
+                <div id="adminDashboard" class="adminDashboard">
+                    <button onclick="adminButton(0)" class="adminButton fill">Add Tutor/Student/Class</button>
+                    <button onclick="adminButton(1)" class="adminButton fill">View All Finances</button>
+
+                    <div id="addModal" class="modal">
+                        <div class="modal-content">
+                            <nav role="navigation" class="primary-navigation">
+                                <ul>
+                                    <li><a id="addModalTitle">Adding Tutor</a>
+                                    <ul class="dropdown">
+                                        <li onclick="addModalSelection(0)"><a>Add Tutor</a></li>
+                                        <li onclick="addModalSelection(1)"><a>Add Student</a></li>
+                                        <li onclick="addModalSelection(2)"><a>Add Class</a></li>
+                                    </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <form id="addTutorForm" class="adminForm" action="addTutorFormPost">
+                                <input name="FirstName" placeholder="Tutor First Name" required="" type="text">
+                                <input name="LastName" placeholder="Tutor Last Name" required="" type="text">
+                                <input name="Email" placeholder="Tutor Email" required="" type="text">
+                                <input name="TempPassword" placeholder="Tutor Temporary Password" required="" type="text">
+                                <div class="adminFormButtons">
+                                    <button type="submit">Add Tutor</button>
+                                </div>
+                            </form>
+                            <form id="addStudentForm" class="adminForm" action="addStudentFormPost">
+                                <input name="FirstName" placeholder="Student First Name" required="" type="text">
+                                <input name="LastName" placeholder="Student Last Name" required="" type="text">
+                                <input name="Email" placeholder="Student Email" required="" type="text">
+                                <input name="PhoneNumber" placeholder="Student Phone Number" required="" type="tel">
+                                <div class="adminFormButtons">
+                                    <button type="submit">Add Student</button>
+                                </div>
+                            </form>
+                            <form id="addClassForm" class="adminForm" action="addClassFormPost">
+                                <input name="Name" placeholder="Class Name" required="" type="text">
+                                <input name="Price" placeholder="Class Price" required="" type="text">
+                                <div class="adminFormButtons">
+                                    <button type="submit">Add Class</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="viewFinancesModal" class="modal">
+                        <div class="modal-content">
+                            <a class="companyFinancesTitle">Company Finances</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- <div id="titleBar">
                 <div id="profilePic">
@@ -36,18 +149,309 @@
         </div>
     </body>
 
-    <script>
-        // Function to run when user presses on home button
-        function homeButtonDropdown()
+    <script type="text/javascript">
+        // Get chart data from server
+        var timePeriod = "Week"
+        var xValues = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+        var ctx = document.getElementById("hoursChart").getContext("2d");
+        var myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+            labels: xValues,
+            datasets: 
+            [
+                {
+                    label: "Hours Tutored Last " + timePeriod,
+                    data: [4, 2, 3.5, 5, 1, 3, 7],
+                    backgroundColor:
+                        // "rgba(255, 99, 132, 0.2)",
+                        "rgba(54, 162, 235, 0.75)",
+                        // "rgba(255, 206, 86, 0.2)",
+                        // "rgba(75, 192, 192, 0.2)",
+                        // "rgba(153, 102, 255, 0.2)",
+                        // "rgba(255, 159, 64, 0.2)",
+                        // "rgba(255, 99, 132, 0.2)"
+                },
+            ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Hours Tutored Last " + timePeriod,
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true   // minimum value will be 0.
+                        }
+                    }]
+                }
+            }
+        });
+        
+        var ctx = document.getElementById("moneyChart").getContext("2d");
+        var myChart2 = new Chart(ctx, {
+            type: "bar",
+            data: {
+            labels: xValues,
+            datasets: 
+            [
+                {
+                    data: [40, 20, 35, 50, 10, 30, 70],
+                    backgroundColor: 
+                        // "rgba(255, 99, 132, 0.2)",
+                        // "rgba(54, 162, 235, 0.2)",
+                        "rgba(255, 206, 86, .75)",
+                        // "rgba(75, 192, 192, 0.2)",
+                        // "rgba(153, 102, 255, 0.2)",
+                        // "rgba(255, 159, 64, 0.2)",
+                        // "rgba(255, 99, 132, 0.2)"
+                },
+            ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Money Earned Last " + timePeriod
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true   // minimum value will be 0.
+                        }
+                    }]
+                }
+            }
+        });
+        
+        var ctx = document.getElementById("totalPieChart").getContext("2d");
+        var myChart3 = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: palette('tol', xValues.length).map(function(hex) {return '#' + hex;}),
+                    data: [55, 49, 44, 24, 15, 33, 72]
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Money Earned by Class"
+                },
+                legend: {
+                    display: false
+                },
+            }
+        });
+
+        // Submit action for reset password form
+        document.getElementById("resetPasswordForm").addEventListener("submit", async (e) => 
         {
-            alert("hi cuh");
+            //Prevent browser default behavior
+            e.preventDefault();
+
+            // Get inputs
+            var inputs = document.getElementById("resetPasswordForm").elements;
+
+            // Create Post request
+            var request = new XMLHttpRequest();
+            request.open("POST", document.getElementById("resetPasswordForm").action, false);
+
+            // Check response from server
+            request.onreadystatechange = function() 
+            {
+                // Successful login response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    alert("Password Successfully Changed!")
+                }
+                // Unsuccessful login response
+                else
+                {
+                    alert("Unable to change password, try again.");
+                }
+            };
+
+            // Send login request to server
+            request.setRequestHeader('Content-type', 'application/json');
+            request.send(JSON.stringify({"OldPassword": inputs["OldPassword"].value, "NewPassword": inputs["NewPassword"].value, "NewPasswordAgain": inputs["NewPasswordAgain"].value, "AuthToken": window.location.href.split("dashboard?ref=")[1]}));
+        });
+        
+        // Submit action for add tutor modal
+        
+        // Submit action for add student modal
+        document.getElementById("addStudentForm").addEventListener("submit", async (e) => 
+        {
+            //Prevent browser default behavior
+            e.preventDefault();
+
+            // Get inputs
+            var inputs = document.getElementById("addStudentForm").elements;
+
+            // Create Post request
+            var request = new XMLHttpRequest();
+            request.open("POST", document.getElementById("addStudentForm").action, false);
+
+            // Check response from server
+            request.onreadystatechange = function() 
+            {
+                // Successful login response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    var modal = document.getElementById("addStudentModal");
+                    modal.style.display = "none";
+                    alert("Student Successfully Added!")
+                }
+                // Unsuccessful login response
+                else
+                {
+                    var modal = document.getElementById("addStudentModal");
+                    modal.style.display = "none";
+                    alert("Unable to add student, try again.");
+                }
+            };
+
+            // Send login request to server
+            request.setRequestHeader('Content-type', 'application/json');
+            request.send(JSON.stringify({"FirstName": inputs["FirstName"].value, "LastName": inputs["LastName"].value, "Email": inputs["Email"].value, "PhoneNumber": inputs["PhoneNumber"].value}));
+        });
+
+        // Submit action for add class modal
+        document.getElementById("addClassForm").addEventListener("submit", async (e) => 
+        {
+            //Prevent browser default behavior
+            e.preventDefault();
+
+            // Get inputs
+            var inputs = document.getElementById("addClassForm").elements;
+
+            // Create Post request
+            var request = new XMLHttpRequest();
+            request.open("POST", document.getElementById("addClassForm").action, false);
+
+            // Check response from server
+            request.onreadystatechange = function() 
+            {
+                // Successful login response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    var modal = document.getElementById("addClassModal");
+                    modal.style.display = "none";
+                    alert("Class Successfully Added!")
+                }
+                // Unsuccessful login response
+                else
+                {
+                    var modal = document.getElementById("addClassModal");
+                    modal.style.display = "none";
+                    alert("Unable to add class, try again.");
+                }
+            };
+
+            // Send login request to server
+            request.setRequestHeader('Content-type', 'application/json');
+            request.send(JSON.stringify({"Name": inputs["Name"].value, "Price": inputs["Price"].value}));
+        });
+       
+        // Function to run when user presses one of admin buttons
+        function adminButton(buttonIndex)
+        {
+            // Open modal based on button index
+            if (buttonIndex == 0)
+            {
+                // Get the modal and body
+                var modal = document.getElementById("addModal");
+
+                // Open the modal
+                modal.style.display = "block";
+                document.getElementById("addClassForm").style.display = "none";
+                document.getElementById("addStudentForm").style.display = "none";
+                document.getElementById("addTutorForm").style.display = "block";
+                document.getElementById("addModalTitle").innerHTML = "Adding Tutor"
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) 
+                {
+                    if (event.target == modal) 
+                    {
+                        modal.style.display = "none";
+                    }
+                }
+            }
+            // Open modal based on button index
+            else if (buttonIndex == 1)
+            {
+                // Get the modal and body
+                var modal = document.getElementById("viewFinancesModal");
+
+                // Open the modal
+                modal.style.display = "block";
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) 
+                {
+                    if (event.target == modal) 
+                    {
+                        modal.style.display = "none";
+                    }
+                }
+            }
+            
         }
 
+        // Function to run when user presses dropdown in add modal
+        function addModalSelection(selectionIndex)
+        {
+            if (selectionIndex == 0)
+            {
+                document.getElementById("addClassForm").style.display = "none";
+                document.getElementById("addStudentForm").style.display = "none";
+                document.getElementById("addTutorForm").reset();
+                document.getElementById("addTutorForm").style.display = "block";
+                document.getElementById("addModalTitle").innerHTML = "Adding Tutor"
+            }
+            else if (selectionIndex == 1)
+            {
+                document.getElementById("addClassForm").style.display = "none";
+                document.getElementById("addTutorForm").style.display = "none";
+                document.getElementById("addStudentForm").reset();
+                document.getElementById("addStudentForm").style.display = "block";
+                document.getElementById("addModalTitle").innerHTML = "Adding Student"
+            }
+            else if (selectionIndex == 2)
+            {
+                document.getElementById("addStudentForm").style.display = "none";
+                document.getElementById("addTutorForm").style.display = "none";
+                document.getElementById("addClassForm").reset();
+                document.getElementById("addClassForm").style.display = "block";
+                document.getElementById("addModalTitle").innerHTML = "Adding Class"
+            }
+        }
+        
         // Function to run when menu item is clicked
-        function menuNav(item)
+        function menuNav(item, index)
         {
             // Check if item can be clicked
-            if (item.className != "menuItem activeMenu")
+            if (index == 0 || index == 1)
+            {
+                // Go through menu items and deactivate all
+                let menuItems = document.getElementById("sidemenu").children;
+                for (i = 0; i < menuItems.length; i++)
+                {
+                    menuItems[i].className = "menuItem";
+                }
+            }
+            else if (item.className != "menuItem activeMenu" && (index != 0 || index != 1))
             {
                 // Go through menu items and deactivate current selection
                 let menuItems = document.getElementById("sidemenu").children;
@@ -62,8 +466,74 @@
                 // Make new selection active
                 item.className = ("menuItem activeMenu");
             }
-        }
 
+            // Toggle visibility based on index
+            if (index == 0)
+            {
+                document.getElementById("profileArea").style.display = "flex";
+                document.getElementById("resetPasswordArea").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "none";
+                document.getElementById("addHoursDashboard").style.display = "none";
+                document.getElementById("adminDashboard").style.display = "none";
+
+                // Create Post request to get user info
+                var request = new XMLHttpRequest();
+                request.open("POST", "getUserInfo", false);
+
+                // Check response from server
+                request.onreadystatechange = function() 
+                {
+                    // Successful retrieval
+                    if (this.readyState == 4 && this.status == 200) 
+                    {
+                        document.getElementById("userProfileFirstName").value = JSON.parse(this.responseText)["FirstName"];
+                        document.getElementById("userProfileLastName").value = JSON.parse(this.responseText)["LastName"];
+                        document.getElementById("userProfileEmail").value = JSON.parse(this.responseText)["Email"];
+                    }
+                    // Unsuccessful retrieval
+                    else
+                    {
+                        alert("Error getting user info");
+                    }
+                };
+
+                // Send login request to server
+                request.setRequestHeader('Content-type', 'application/json');
+                request.send(JSON.stringify({"AuthToken": window.location.href.split("dashboard?ref=")[1]}));
+            }
+            else if (index == 1)
+            {
+                document.getElementById("profileArea").style.display = "none";
+                document.getElementById("resetPasswordArea").style.display = "flex";
+                document.getElementById("mainDashboard").style.display = "none";
+                document.getElementById("addHoursDashboard").style.display = "none";
+                document.getElementById("adminDashboard").style.display = "none";
+            }
+            else if (index == 2)
+            {
+                document.getElementById("profileArea").style.display = "none";
+                document.getElementById("resetPasswordArea").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "flex";
+                document.getElementById("addHoursDashboard").style.display = "none";
+                document.getElementById("adminDashboard").style.display = "none";
+            }
+            else if (index == 3)
+            {
+                document.getElementById("profileArea").style.display = "none";
+                document.getElementById("resetPasswordArea").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "none";
+                document.getElementById("addHoursDashboard").style.display = "flex";
+                document.getElementById("adminDashboard").style.display = "none";
+            }
+            else
+            {
+                document.getElementById("profileArea").style.display = "none";
+                document.getElementById("resetPasswordArea").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "none";
+                document.getElementById("addHoursDashboard").style.display = "none";
+                document.getElementById("adminDashboard").style.display = "flex";
+            }
+        }
 
         // Function to run when filter item is clicked
         function filterNav(item)

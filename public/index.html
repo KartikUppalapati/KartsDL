@@ -7,60 +7,26 @@
     <body>
         <div class="container">
             <div class="loginBox">
-                <h1 style="font-size: 40px;">MMT Login</h1>
+                <h1 style="font-size: 40px; padding-top: 15px;">MMT Login</h1>
                 <div class="loginDiv">
-                    <form id="loginForm" class="loginForm" action="formPost">
+                    <form id="loginForm" class="loginForm" action="loginFormPost" method="post">
                         <input name="Email" placeholder="Email" required="" type="text">
                         <input name="Password" placeholder="Password" type = "Password" required="" type="text">
                         <div class="loginFormButtons">
                             <button type="submit">Login</button>
-                            <button onclick="reset_password()">Reset Password</button>
                         </div>
                     </form>
                 </div>
             </div>
+            <label style="cursor: pointer;" onclick="resetPassword()">Forgot Password?</label>
         </div>
-
-        <script type="text/javascript">
-            // When user presses login on form post to server and get response
-            var form = document.getElementById("loginForm");
-            form.addEventListener("submit", async (e) => 
-            {
-                //Prevent browser default behavior
-                e.preventDefault();
-
-                // Get inputs
-                var inputs = document.getElementById("loginForm").elements;
-
-                // Create Post request
-                var request = new XMLHttpRequest();
-                request.open("POST", form.action, false);
-
-                // Check response from server
-                request.onreadystatechange = function() 
-                {
-                    // Successful login response
-                    if (this.readyState == 4 && this.status == 200) 
-                    {
-                        window.location.href = "dashboard?ref=" + this.responseText;
-                    }
-                    // Unsuccessful login response
-                    else
-                    {
-                        alert("Your email or password was incorrect");
-                    }
-                };
-
-                // Send login request to server
-                request.setRequestHeader('Content-type', 'application/json');
-                request.send(JSON.stringify({"Email": inputs["Email"].value, "Password": inputs["Password"].value}));
-            });
-
-            // Reset password function
-            function reset_password()
-            {
-                window.location.href = "resetPassword";
-            }
-        </script>
     </body>
+
+    <script>
+        // When user presses _ button
+        function resetPassword()
+        {
+            window.location.href = "resetPassword";
+        }
+    </script>
 </html>

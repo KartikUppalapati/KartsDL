@@ -1,20 +1,18 @@
 // Import stuff
+const port = 3000;
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
 const mysql = require('mysql');
 const { error } = require('console');
-
 let initalPath = path.join(__dirname, "public");
-
-// Configure the app to use bodyParser()
 const app = express();
 app.use(express.json());
 app.use(express.static(initalPath));
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
 
 // Connect to database
+var tutorData = [];
 var con = mysql.createConnection(
 {
     host: "database-1.c021kjx8ndry.us-east-2.rds.amazonaws.com",
@@ -23,158 +21,48 @@ var con = mysql.createConnection(
     port: 3306,
     database: "testdb"
 });
-con.connect(function(err) 
+
+// Sql query stuff
+// const tempQuery = `select * from Students`;
+// con.query(tempQuery, (err, results) =>
+// {
+//     console.table(results);
+// })
+
+// Function to get auth token from database using email and password
+const checkLoginCredentials = async (email, password) =>
 {
-    if (err) throw err;
-    console.log("Database Connected!");
-});
-
-
-// Function to get auth token from database using username and password
-const getLoginToken = async (username, password) =>
-{
-    const QUERY = `SELECT LoginToken FROM Tutors WHERE Email = '${username}' and Password = '${password}'`;
-    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+  const QUERY = `SELECT * FROM Tutors WHERE Email = "${email}" and Password = "${password}"`;
+  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+  {
+    if (err)
     {
-        if (err) 
-        {
-            reject(err)
-        } 
-        else 
-        {
-            console.log("Getting login token");
-            console.table(results);
-            resolve(results);
-            if (results.length > 0)
-            {
-                return results[0]["LoginToken"];
-            }
-            return 0;
-        }
-    }))
-    .then(function(result) 
+      reject(err);
+    }
+    else
     {
-        return result
-    })
-}
-
-// Function to check if tokens exists
-const checkToken = async (inputToken) =>
-{
-    const QUERY = `SELECT * FROM Tutors WHERE LoginToken = '${inputToken}' OR AuthToken = '${inputToken}'`;
-    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-    {
-        if (err) 
-        {
-            reject(err)
-        } 
-        else 
-        {
-            console.log("Checking token");
-            console.table(results);
-            resolve(results);
-            return results;
-        }
-    }))
-    .then(function(result) 
-    {
-        return result
-    })
-}
-
-// Function to check if login token exists
-const checkLoginToken = async (inputToken) =>
-{
-    const QUERY = `SELECT * FROM Tutors WHERE LoginToken = '${inputToken}'`;
-    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-    {
-        if (err) 
-        {
-            reject(err)
-        } 
-        else 
-        {
-            console.log("Checking login token");
-            console.table(results);
-            resolve(results);
-            return results;
-        }
-    }))
-    .then(function(result) 
-    {
-        return result
-    })
-}
-
-// Function to update auth token after login
-const updateAuthToken = async (inputToken) =>
-{
-    // Randomly generate new token
-    var randomToken = Math.floor(Math.random() * 1000000);
-
-    // Check that new token doesn't already exist
-    checkToken(randomToken).then(dbresult =>
-    {
-        // If rolling code doesn't match then continue
-        if (dbresult.length != 1)
-        {
-            const QUERY = `UPDATE Tutors SET LoginToken = '${randomToken}', AuthToken = '${inputToken}' WHERE LoginToken = '${inputToken}'`;
-            return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-            {
-                if (err) 
-                {
-                    reject(err)
-                } 
-                else 
-                {
-                    console.log("Updating auth token");
-                    console.table(results);
-                    resolve(results);
-                    return results;
-                }
-            }))
-            .then(function(result) 
-            {
-                return result
-            })
-        }
-    })
+      resolve(results);
+      if (results.length > 0)
+      {
+        return results[0];
+      }
+      return 0;
+    }
+  }));
 }
 
 // URL director for get
 app.get('/:placeholder', (req, res) => 
 {
-    // If user requests to reset password
     if (req.originalUrl == "/resetPassword")
     {
-        console.log("redirecting to password reset");
-        res.sendFile(path.join(initalPath, "resetPassword.html"));
+        res.status(200).sendFile(path.join(initalPath, "resetPassword.html"));
     }
-    // Else if dashboard request
-    else if (req.originalUrl.split("?ref=")[0] == "/dashboard")
+    else if (req.originalUrl == "/login")
     {
-        // Use database function to check if token matches
-        var tok = req.originalUrl.split("?ref=")[1];
-        checkLoginToken(tok).then(dbresult => 
-        {
-            // If rolling code doesn't match then redirect back to login
-            if (dbresult.length != 1)
-            {
-                res.sendFile(path.join(initalPath, "index.html"));
-            }
-            // Else rolling code matches then redirect to dashboard
-            else
-            {
-                // Update token in databse
-                updateAuthToken(tok).then(dbresult =>
-                {
-                    console.log("redirecting to dashboard");
-                    res.sendFile(path.join(initalPath, "dashboard.html"));  
-                })
-            }
-        })
+        res.status(200).sendFile(path.join(initalPath, "index.html"));  
     }
-    // Else user requested invalid page
+    // Not found
     else
     {
         res.json("404 file not found");
@@ -184,28 +72,103 @@ app.get('/:placeholder', (req, res) =>
 // URL director for post
 app.post('/:placeholder', (req, res) => 
 {
-    // If user tries to login
-    if (req.originalUrl == "/formPost")
+    if (req.originalUrl == "/loginFormPost")
     {
-        // Get auth token from database
-        console.log("\n\n\nreceived login attempt");
-        getLoginToken(req.body["Email"], req.body["Password"]).then(authToken => 
+        console.log(req.body);
+        checkLoginCredentials(req.body["Email"], req.body["Password"]).then(result =>
         {
-            // Check if anything is returned and accordingly send return response
-            if (authToken.length == 0)
+            // If auth token is empty then send error
+            if (result.length == 0)
             {
-                res.status(404).end("");
+                res.status(400).end("Email or password was incorrect. Please try again.");
+                return;
+            }
+        
+            // Else redirect
+            if (result.length == 1)
+            {
+                tutorData = result[0];
+                res.sendFile(path.join(initalPath, "dashboard.html"));
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            res.status(404).end("ERROR! Could not connect to database.");
+        })
+    }
+    else if (req.originalUrl == "/addStudentFormPost")
+    {
+        // Adding student to database
+        console.log("\n\n\nadding student to database");
+        addStudent(req.body["FirstName"], req.body["LastName"], req.body["Email"], req.body["PhoneNumber"]).then(results => 
+        {
+            // If row changed then send successful status
+            if (results.affectedRows == 1)
+            {
+                res.status(200).end();
             }
             else
             {
-                res.status(200).end((authToken[0]["LoginToken"]).toString());
+                res.status(404).end("");
             }
         })
     }
+    else if (req.originalUrl == "/addClassFormPost")
+    {
+        // Adding class to database
+        console.log("\n\n\nadding class to database");
+        addClass(req.body["Name"], req.body["Price"]).then(results =>
+        {
+            // If row changed then send successful status
+            if (results.affectedRows == 1)
+            {
+                res.status(200).end();
+            }
+            else
+            {
+                res.status(404).end("");
+            }
+        })
+    }
+    else if (req.originalUrl == "/updateUserInfo")
+    {
+        // Get user info from database
+        console.log(req.body);
+        // getUserInfo(req.body["AuthToken"]).then(userInfo =>
+        // {
+        //     // If authtoken is empty then send error back else send user info
+        //     if (userInfo.length == 0)
+        //     {
+        //         res.status(404).end("");
+        //     }
+        //     else
+        //     {
+        //         res.status(200).end(JSON.stringify(userInfo[0]));
+        //     }
+        // })
+    }
+    else if (req.originalUrl == "/resetPasswordFormPost")
+    {
+        // Get user info from database
+        console.log("\n\n\nResetting Password");
+        // getUserInfo(req.body["AuthToken"]).then(userInfo =>
+        // {
+        //     // If old password doesn't match or authtoken not correct then send back error
+        //     if (userInfo.length == 0)
+        //     {
+        //         res.status(404).end("");
+        //     }
+        //     else
+        //     {
+        //         res.status(200).end();
+        //     }
+        // })
+    }
 })
 
-app.listen(3000, () => 
+// Start listening on port
+app.listen(port, () => 
 {
-    console.log('\n');
-    console.log('listening on port 3000.....');
+    console.log("\n");
+    console.log(`Listening on port ${port}`);
 })
