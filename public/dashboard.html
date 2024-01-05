@@ -152,7 +152,7 @@
     <script type="text/javascript">
         // Get chart data from server
         var timePeriod = "Week"
-        var xValues = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        var xValues = ["", "", "", "", "", "", ""];
 
         var ctx = document.getElementById("hoursChart").getContext("2d");
         var myChart = new Chart(ctx, {
@@ -162,7 +162,6 @@
             datasets: 
             [
                 {
-                    label: "Hours Tutored Last " + timePeriod,
                     data: [4, 2, 3.5, 5, 1, 3, 7],
                     backgroundColor:
                         // "rgba(255, 99, 132, 0.2)",
@@ -178,7 +177,7 @@
             options: {
                 title: {
                     display: true,
-                    text: "Hours Tutored Last " + timePeriod,
+                    text: "Hours Tutored This " + timePeriod,
                 },
                 legend: {
                     display: false
@@ -217,7 +216,7 @@
             options: {
                 title: {
                     display: true,
-                    text: "Money Earned Last " + timePeriod
+                    text: "Money Earned This " + timePeriod
                 },
                 legend: {
                     display: false

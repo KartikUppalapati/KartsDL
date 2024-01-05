@@ -1,5 +1,7 @@
 // Import stuff
 const port = 3000;
+const ip = require('ip');
+var http = require('http');
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
@@ -170,5 +172,13 @@ app.post('/:placeholder', (req, res) =>
 app.listen(port, () => 
 {
     console.log("\n");
-    console.log(`Listening on port ${port}`);
+    console.log(`Listening on port: ${port}`);
+    console.log(`Network access via: ${ip.address()}:${port}!`);
+    http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp)
+    {
+        resp.on('data', function(externalIp) 
+        {
+          console.log(`External access if port forwarded: ${externalIp}:${port}`)
+        });
+    });
 })
