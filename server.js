@@ -25,7 +25,7 @@ var con = mysql.createConnection(
 });
 
 // Sql query stuff
-// const tempQuery = `select * from Tutors`;
+// const tempQuery = `select * from Hours`;
 // con.query(tempQuery, (err, results) =>
 // {
 //     console.table(results);
@@ -413,11 +413,15 @@ app.get('/:placeholder', (req, res) =>
 // Functions for date
 Date.prototype.GetFirstDayOfWeek = function()
 {
-  return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1) )));
+    return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1) )));
 }
 Date.prototype.GetLastDayOfWeek = function()
 {
-  return (new Date(this.setDate(this.getDate() - this.getDay() +7)));
+    if (new Date().getDay() == 0)
+    {
+        return new Date();
+    }
+    return (new Date(this.setDate(this.getDate() - this.getDay() +7)));
 }
 
 // URL director for post
@@ -427,9 +431,10 @@ app.post('/:placeholder', (req, res) =>
     {
         checkLoginCredentials(req.body["Email"], req.body["Password"]).then(result =>
         {
+            // If login fail
             if (result.length == 0)
             {
-                res.status(400).end("Email or password was incorrect. Please try again.");
+                res.sendFile(path.join(initalPath, "indexLoginError.html"));
                 return;
             }
         

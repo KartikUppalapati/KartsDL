@@ -32,6 +32,17 @@ body
   background-color: #f8f4e5;
 }
 
+.loginError
+{
+  width: 67%;
+  padding: 15px;
+  font-size: 14pt;
+  border-radius: 10px;
+  margin-bottom: 35px;
+  margin-left: 14.5%;
+  background-color: #F2DEDE;
+}
+
 input
 {
   width: 70%;
@@ -41,7 +52,7 @@ input
   font-size: 14pt;
   line-height: 28pt;
   margin-bottom: 28pt;
-  background: #f8f4e5;
+  background-color: #f8f4e5;
   border-bottom: 5px solid black;
 }
 
@@ -88,14 +99,4 @@ input:-webkit-autofill:focus
   color: white;
   background: black;
   border: 1px solid black;
-}
-
-.error
-{
-  background: #F2DEDE;
-  color: #0c0101;
-  padding: 10px;
-  width: 95%;
-  border-radius: 5px;
-  margin: 20px auto;
 }
