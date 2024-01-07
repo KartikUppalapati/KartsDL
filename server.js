@@ -25,7 +25,7 @@ var con = mysql.createConnection(
 });
 
 // Sql query stuff
-// const tempQuery = `select * from Hours`;
+// const tempQuery = ``;
 // con.query(tempQuery, (err, results) =>
 // {
 //     console.table(results);
@@ -34,23 +34,26 @@ var con = mysql.createConnection(
 // Check functions
 const checkLoginCredentials = async (email, password) =>
 {
-  const QUERY = `SELECT * FROM Tutors WHERE Email = "${email}" and Password = "${password}"`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-  {
+    // Ex1: admin"-- "
+    // Ex2: admin" or "1"="1
+    // Prevent sql injection by using prepared statement
+    const QUERY = `SELECT * FROM Tutors WHERE Email = "?" and Password = "?"`;
+    return new Promise((resolve, reject) => con.query(QUERY, [email, password], (err, results) =>
+    {
     if (err)
     {
-      reject(err);
+        reject(err);
     }
     else
     {
-      resolve(results);
-      if (results.length > 0)
-      {
+        resolve(results);
+        if (results.length > 0)
+        {
         return results[0];
-      }
-      return 0;
+        }
+        return 0;
     }
-  }));
+    }));
 }
 
 const checkStudentExists = async (firstName, lastName) =>
@@ -483,7 +486,7 @@ app.post('/:placeholder', (req, res) =>
         .catch(errorWithQuery =>
         {
             console.log(errorWithQuery.message);
-            res.status(400).end("ERROR! Could not connect to database.");
+            res.sendFile(path.join(initalPath, "indexLoginError.html"));
         })
     }
     else if (req.originalUrl == "/getStudents")
