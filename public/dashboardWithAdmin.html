@@ -26,6 +26,18 @@
                     <li id="mainDashboardButton" onclick="menuNav('mainDashboardArea', this.id)" class="menuItem activeMenu">Dashboard</li>
                     <li id="addHoursButton" onclick="menuNav('addHoursDashboardArea', this.id)" class="menuItem">Add Hours</li>
                     <li id="getNotesButton" onclick="menuNav('getNotesDashboardArea', this.id)" class="menuItem">Get Notes</li>
+                    <div id="adminButton" class="menuItem">
+                        <div class="sideMenuDropdown">
+                            <a>Admin</a>
+                            <div class="sideMenuDropdownContent" id="sideMenuDropdown">
+                                <li id="addTutorButton" onclick="menuNav('addTutorsDashboardArea', 'adminButton')" class="menuItem">Add Tutor</li>
+                                <li id="addStudentButton" onclick="menuNav('addStudentsDashboardArea', 'adminButton')" class="menuItem">Add Student</li>
+                                <li id="addClassButton" onclick="menuNav('addClassesDashboardArea', 'adminButton')" class="menuItem">Add Class</li>
+                                <li id="getStudentCostButton" onclick="menuNav('getCostDashboardArea', 'adminButton')" class="menuItem">Get Cost</li>
+                                <li id="allFinancesButton" onclick="menuNav('allFinancesDashboardArea', 'adminButton')" class="menuItem">All Finances</li>
+                            </div>
+                        </div>
+                    </div>
                 </ul>
             </div>
             <br>

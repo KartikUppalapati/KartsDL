@@ -14,12 +14,13 @@ html, body
 }
 
 /* For top navigation bar */
-.navbar 
+.navbar
 {
     z-index: 100;
-    width: 89.65%;
+    width: 84.65%;
     position: fixed;
-    margin-left: 10.35%;
+    margin-left: 15.35%;
+    /* background-color: #DB8C44; */
     background-color: lightblue;
 }
 
@@ -43,6 +44,11 @@ html, body
     overflow: hidden;
 }
 
+.sideMenuDropdown
+{
+    overflow: hidden;
+}
+
 .dropdown .dropbtn 
 {
     margin: 0;
@@ -55,7 +61,7 @@ html, body
     font-family: inherit;
 }
 
-.dropdown-content 
+.dropdownContent 
 {
     right: 0;
     z-index: 1;
@@ -66,7 +72,23 @@ html, body
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
-.dropdown-content a 
+.sideMenuDropdownContent
+{
+    z-index: 1;
+    display: none;
+    min-width: 170px;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.sideMenuDropdownContent li
+{
+    color: black;
+    list-style: none;
+}
+
+.dropdownContent a 
 {
     display: block;
     text-align: right;
@@ -74,21 +96,33 @@ html, body
     text-decoration: none;
 }
 
-.dropdown-content a:hover 
+.dropdownContent a:hover
 {
     background-color: #ffa580;
 }
 
-.dropdown:hover .dropdown-content 
+.dropdown:hover .dropdownContent
 {
     display: block;
+}
+
+.sideMenuDropdown:hover .sideMenuDropdownContent
+{
+    display: block;
+}
+
+.sideMenuDropdownContent li:hover
+{
+    color: black;
+    background-color: #ffa580;
 }
 
 /* Side Bar */
 .sideMenu 
 {
+    z-index: 1;
     float: left;
-    width: 10.35%;
+    width: 15.35%;
     height: 100%;
     color: black;
     background: #f8f4e5;
@@ -111,24 +145,24 @@ html, body
 
 .menuItem
 {
-    height: 30px;
+    height: 35px;
     margin: 10px 0;
     font-size: 100%;
+    cursor: pointer;
     font-weight: 200;
+    line-height: 35px;
     padding-left: 15%;
-    vertical-align: middle;
     position: relative;
+    vertical-align: middle;
 }
 
 .menuItem:not(.activeMenu):hover 
 {
-    color: #ffa580;
+    background-color: #ffa580;
 }
 
 .activeMenu
 {
-    height: 35px;
-    line-height: 35px;
     font-weight: 400;
     background: #ffa580;
 }
@@ -138,7 +172,7 @@ html, body
     height: 100%;
 }
 
-.profileArea
+.allDashboardAreas
 {
     height: 100%;
     display: none;
@@ -146,22 +180,7 @@ html, body
     justify-content: center;
 }
 
-.profileArea h1
-{
-    font-size: 25px;
-    text-align: center;
-    padding-bottom: 35px;
-}
-
-.resetPasswordArea
-{
-    height: 100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.resetPasswordArea h1
+.allDashboardAreas h1
 {
     font-size: 25px;
     text-align: center;
@@ -175,14 +194,6 @@ html, body
     background-color: #f8f4e5;
 }
 
-.mainDashboard
-{
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .chartContainer
 {
     width: 35vw;
@@ -190,20 +201,12 @@ html, body
     padding: 35px;
 }
 
-.addHoursDashboard
+.chartContainerFull
 {
-    height: 100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.adminDashboard
-{
-    height: 100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
+    width: 35vw;
+    height: 70%;
+    padding: 35px;
+    margin-top: 5%;
 }
 
 .adminButton
@@ -383,9 +386,45 @@ input
     border-bottom: 5px solid black;
 }
 
+input:disabled
+{
+    background: white;
+}
+
+textarea
+{
+    width: 100%;
+    border: none;
+    outline: none;
+    color: black;
+    font-size: 14pt;
+    line-height: 28pt;
+    margin-bottom: 28pt;
+    background: #f8f4e5;
+    border-bottom: 5px solid black;
+}
+
+select
+{
+    height: 50px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: black;
+    font-size: 14pt;
+    line-height: 28pt;
+    margin-bottom: 28pt;
+    background: #f8f4e5;
+    border-bottom: 5px solid black;
+}
+
 .adminForm
 {
-    display: none;
+    padding: 15px;
+    height: 55%;
+    width: 90%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .adminForm button 
@@ -435,7 +474,7 @@ input
     background-color: black;
 }
 
-.adminFormButtons
+.centerButton
 {
     text-align: center;
 }
@@ -483,14 +522,12 @@ input
 .centerMe
 {
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.centerMe h1
+.centerMe p
 {
-    font-size: 20px;
+    font-size: 23px;
+    text-align: center;
 }
 
 
@@ -513,6 +550,48 @@ input
     position: absolute;
 }
 
+/* For input pickers placeholders */
+#startTimePicker:before
+{
+    content: "Start time: ";
+    margin-right: .6em;
+    color: black;
+}
+
+#endTimePicker:before
+{
+    content: "End time: ";
+    margin-right: .6em;
+    color: black;
+}
+
+#birthday:before
+{
+    content: "Birthday: ";
+    margin-right: .6em;
+    color: black;
+}
+
+#dateTutored:before
+{
+    content: "Date of Class: ";
+    margin-right: .6em;
+    color: black;
+}
+
+#startDateRange:before
+{
+    content: "Start Date Range: ";
+    margin-right: .6em;
+    color: black;
+}
+
+#endDateRange:before
+{
+    content: "End Date Range: ";
+    margin-right: .6em;
+    color: black;
+}
 
 /* Headers */
 h1
