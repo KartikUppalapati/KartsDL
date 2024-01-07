@@ -37,40 +37,36 @@ const checkLoginCredentials = async (email, password) =>
     // Ex1: admin"-- "
     // Ex2: admin" or "1"="1
     // Prevent sql injection by using prepared statement
-    const QUERY = `SELECT * FROM Tutors WHERE Email = "?" and Password = "?"`;
-    return new Promise((resolve, reject) => con.query(QUERY, [email, password], (err, results) =>
+    var QUERY = mysql.format("SELECT * FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
-    if (err)
-    {
-        reject(err);
-    }
-    else
-    {
-        resolve(results);
-        if (results.length > 0)
+        if (err)
         {
-        return results[0];
+            reject(err);
         }
-        return 0;
-    }
+        else
+        {
+            resolve(results);
+            return results;
+        }
     }));
 }
 
 const checkStudentExists = async (firstName, lastName) =>
 {
-  const QUERY = `SELECT * FROM Students WHERE FirstName = "${firstName}" AND LastName = "${lastName}"`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-  {
-    if (err) 
+    const QUERY = `SELECT * FROM Students WHERE FirstName = "${firstName}" AND LastName = "${lastName}"`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      reject(err)
-    } 
-    else 
-    {
-      resolve(results);
-      return results;
-    }
-  }));
+        if (err) 
+        {
+            reject(err)
+        } 
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 const checkClassExists = async (className, classLevel) =>
