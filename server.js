@@ -15,8 +15,9 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
 // Connect to database
-var con = mysql.createConnection(
+var con = mysql.createPool(
 {
+    connectionLimit: 15,
     host: "database-1.c021kjx8ndry.us-east-2.rds.amazonaws.com",
     user: "admin",
     password: "pleasework",
