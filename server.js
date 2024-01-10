@@ -27,9 +27,9 @@ var con = mysql.createPool(
 
 // Sql query stuff
 // const tempQuery = ``;
-// con.query(tempQuery, (err, results) =>
+// con.query(tempQuery, (err, result) =>
 // {
-//     console.table(results);
+//     console.table(result);
 // })
 
 // Check functions
@@ -38,7 +38,7 @@ const checkLoginCredentials = async (email, password) =>
     // Ex1: admin"-- "
     // Ex2: admin" or "1"="1
     // Prevent sql injection by using prepared statement
-    var QUERY = mysql.format("SELECT * FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
+    const QUERY = mysql.format("SELECT * FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
         if (err)
@@ -311,19 +311,19 @@ const getTutor = async (id) =>
   }));
 }
 
-const getHours = async (tutorData, date) =>
+const getHours = async (tutorData, startDate, endDate) =>
 {
-  const QUERY = `SELECT * FROM Hours WHERE TutorId = ${tutorData["Id"]} AND Date = "${date}"`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+  const QUERY = mysql.format("SELECT * FROM Hours WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
+  return new Promise((resolve, reject) => con.query(QUERY, (err, result) => 
   {
     if (err) 
     {
-      reject(err)
+        reject(err)
     }
     else 
     {
-      resolve(results);
-      return results;
+        resolve(result);
+        return result;
     }
   }));
 }
@@ -528,63 +528,81 @@ app.post('/:placeholder', (req, res) =>
         const dates = [];
 
         // Based req time period adjust
-        var maxDaysBack = 7;
+        var maxDays = 7;
         if (req.body["TimePeriod"] == "month")
         {
-            maxDaysBack = 31;
+            maxDays = 31;
         }
 
-        // For each day back from current date get money students and date and add to list
-        for (let i = 0; i < maxDaysBack; i++)
+        // Get start date
+        var today = new Date();
+        today.setDate(today.GetFirstDayOfWeek().getDate());
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var year = today.getFullYear();
+        var startDate = `${year}-${month}-${day}`;
+
+        // Loop through time period
+        for (let i = 0; i < maxDays; i++)
         {
-            // Get date - i
-            var today = new Date();
-            today.setDate(today.GetLastDayOfWeek().getDate() - i);
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            var currentDate = `${year}-${month}-${day}`;
-            dates.push(`${month}/${day}`);
+            // Get current date
+            today.setDate(today.GetFirstDayOfWeek().getDate() + i);
+            day = String(today.getDate()).padStart(2, '0');
+            month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 
-            getHours(req.body["Tutor"], currentDate).then(result =>
-            {
-                // If result not empty go through all hours logged for day and sum up money generated
-                var dailyMoneyGenerated = 0;
-                var dailyHoursTutored = 0;
-                if (result.length > 0)
-                {
-                    for (let i = 0; i < result.length; i++)
-                    {
-                        dailyMoneyGenerated += (result[i]["MoneyGenerated"] * req.body["Tutor"].Percentage / 100);
-                        startTime = new Date(0, 0, 0, result[i]["StartTime"].split(":")[0], result[i]["StartTime"].split(":")[1]);
-                        endTime = new Date(0, 0, 0, result[i]["EndTime"].split(":")[0], result[i]["EndTime"].split(":")[1]);
-                        dailyHoursTutored += (endTime - startTime) / 3600000;
-                    }
-                }
-        
-                // Calculate daily and totals and add to lists
-                totalMoneyGenerated += dailyMoneyGenerated;
-                totalStudentsTutored += result.length;
-                totalHoursTutored += dailyHoursTutored;
-                moneyGenerated.push(dailyMoneyGenerated);
-                studentsTutored.push(result.length);
-                hoursTutored.push(dailyHoursTutored);
-        
-                // On last day send back
-                if (i == maxDaysBack - 1)
-                {
-                    var outputsArray = {};
-                    outputsArray["moneyGeneratedList"] = moneyGenerated.reverse();
-                    outputsArray["studentsTutoredList"] = studentsTutored.reverse();
-                    outputsArray["hoursTutoredList"] = hoursTutored.reverse();
-                    outputsArray["datesList"] = dates.reverse();
-                    outputsArray["totalMoneyGenerated"] = totalMoneyGenerated;
-                    outputsArray["totalStudentsTutored"] = totalStudentsTutored;
-                    outputsArray["totalHoursTutored"] = totalHoursTutored;
-                    res.status(200).end(JSON.stringify(outputsArray));
-                }
-            })
+            // Put values into lists
+            dates.push(`${month}/${day}`);
+            moneyGenerated.push(0);
+            studentsTutored.push(0);
+            hoursTutored.push(0);
         }
+
+        // Get end date
+        day = String(today.getDate()).padStart(2, '0');
+        month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        year = today.getFullYear();
+        var endDate = `${year}-${month}-${day}`;
+
+        getHours(req.body["Tutor"], startDate, endDate).then(result =>
+        {
+            // Go through all hours logged for date range
+            for (let j = 0; j < result.length; j++)
+            {
+                var currentMoneyGenerated = 0;
+                var currentHoursTutored = 0;
+                currentMoneyGenerated = (result[j]["MoneyGenerated"] * req.body["Tutor"].Percentage / 100);
+                startTime = new Date(0, 0, 0, result[j]["StartTime"].split(":")[0], result[j]["StartTime"].split(":")[1]);
+                endTime = new Date(0, 0, 0, result[j]["EndTime"].split(":")[0], result[j]["EndTime"].split(":")[1]);
+                currentHoursTutored = (endTime - startTime) / 3600000;
+
+                // Calculate daily and totals
+                totalMoneyGenerated += currentMoneyGenerated;
+                totalHoursTutored += currentHoursTutored;
+                totalStudentsTutored += 1;
+
+                // Get index to add to
+                var currentDate = new Date(result[j]["Date"]);
+                day = String(currentDate.getDate()).padStart(2, '0');
+                month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                var indexToUpdate = dates.indexOf(`${month}/${day}`);
+
+                // Update lists
+                moneyGenerated[indexToUpdate] = moneyGenerated[indexToUpdate] + currentMoneyGenerated;
+                studentsTutored[indexToUpdate] = studentsTutored[indexToUpdate] + 1;
+                hoursTutored[indexToUpdate] = hoursTutored[indexToUpdate] + currentHoursTutored;
+            }
+
+            // Send back
+            var outputsArray = {};
+            outputsArray["moneyGeneratedList"] = moneyGenerated;
+            outputsArray["studentsTutoredList"] = studentsTutored;
+            outputsArray["hoursTutoredList"] = hoursTutored;
+            outputsArray["datesList"] = dates;
+            outputsArray["totalMoneyGenerated"] = totalMoneyGenerated;
+            outputsArray["totalStudentsTutored"] = totalStudentsTutored;
+            outputsArray["totalHoursTutored"] = totalHoursTutored;
+            res.status(200).end(JSON.stringify(outputsArray));
+        })
     }
     else if (req.originalUrl == "/getNotes")
     {
