@@ -26,7 +26,8 @@ var con = mysql.createPool(
 });
 
 // Sql query stuff
-// const tempQuery = ``;
+// const tempQuery = `select Date, Classes.Name, Classes.Level, Notes from Hours inner join Classes on Classes.Id = Hours.ClassId where StudentId = 16 and TutorId = 2 order by Date desc limit 10`;
+// const tempQuery = `describe Classes`;
 // con.query(tempQuery, (err, result) =>
 // {
 //     console.table(result);
@@ -364,19 +365,19 @@ const getTutorFinances = async (tutorData, filterData) =>
 
 const getNotes = async (studentData, tutorData) =>
 {
-  const QUERY = `select * from Hours where StudentId = ${studentData["Id"]} and TutorId = ${tutorData["Id"]} order by Date desc limit 1`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-  {
+    const QUERY = `select Date, Classes.Name, Classes.Level, Notes from Hours inner join Classes on Classes.Id = Hours.ClassId where StudentId = ${studentData["Id"]} and TutorId = ${tutorData["Id"]} order by Date desc limit 10`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+    {
     if (err) 
     {
-      reject(err)
+        reject(err)
     }
     else 
     {
-      resolve(results);
-      return results;
+        resolve(results);
+        return results;
     }
-  }));
+    }));
 }
 
 const getCost = async (studentData, startDate, endDate) =>
@@ -610,8 +611,7 @@ app.post('/:placeholder', (req, res) =>
         {
             if (result.length > 0)
             {
-                const classDate = new Date(result[0]["Date"]);
-                res.status(200).end(classDate.toDateString() + " - \n" + result[0]["Notes"]);
+                res.status(200).end(JSON.stringify(result));
             }
             else
             {

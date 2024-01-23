@@ -158,14 +158,26 @@
                     </form>
                 </div>
                 <div id="getNotesDashboardArea" class="allDashboardAreas">
-                    <form id="getNotesForm" class="adminForm" onsubmit="return getNotes()">
-                        <select id="getNotesStudentsDropdown" name="Student" required>
-                            <option value="" disabled selected>Select student</option>
-                        </select>
-                        <div class="centerButton">
-                            <button type="submit">Get Notes</button>
+                    <div class="parentDivForTable">
+                        <div>
+                            <form id="getNotesForm" class="adminForm" onsubmit="return getNotes()">
+                                <div class="flexParent">
+                                    <select id="getNotesStudentsDropdown" name="Student" required class="inputSelectForNotes">
+                                        <option value="" disabled selected>Select student</option>
+                                    </select>
+                                    <button type="submit" class="submitButtonForNotes">Get Notes</button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                        <div class="notesTableDiv">
+                            <div class="table-header">
+                                <div class="col-1">Date</div>
+                                <div class="col-2">Class Name</div>
+                                <div class="col-3">Class Notes</div>
+                            </div>
+                            <div id="notesTable" class="notesTable"></div>
+                        </div>
+                    </div>
                 </div>
                 <div id="getCostDashboardArea" class="allDashboardAreas">
                     <form id="getCostForm" class="adminForm" onsubmit="return getCost()">
@@ -318,7 +330,7 @@
             }
         });
           
-        // Get student, tutor, and classes
+        // Get stuff to show
         getStudents();
         getClasses();
         getTutors();
@@ -523,7 +535,19 @@
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    alert(this.responseText);
+                    document.getElementById("notesTable").innerHTML = "";
+                    var hours = JSON.parse(this.responseText);
+                    for (let i = 0; i < hours.length; i++)
+                    {
+                        var classDate = new Date(hours[i]["Date"]);
+                        var htmlToAdd = 
+                        `<div class="table-row">
+                            <div class="col-1">${classDate.toDateString()}</div>
+                            <div class="col-2">${hours[i]["Name"] + " " + hours[i]["Level"]}</div>
+                            <div class="col-3">${hours[i]["Notes"]}</div>
+                        </div>`;
+                        document.getElementById("notesTable").innerHTML += htmlToAdd;
+                    }
                 }
                 else
                 {
