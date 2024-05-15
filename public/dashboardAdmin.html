@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <title>Your Dashboard</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <!-- GOOGLE FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Karla:400,700|Roboto" rel="stylesheet">
+        <link href="plugins/material/css/materialdesignicons.min.css" rel="stylesheet"/>
+        <link href="plugins/simplebar/simplebar.css" rel="stylesheet"/>
+
+        <!-- PLUGINS CSS STYLE -->
+        <link href="plugins/nprogress/nprogress.css" rel="stylesheet" />
+        <link href="plugins/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css" rel="stylesheet"/>
+        <link href="plugins/jvectormap/jquery-jvectormap-2.0.3.css" rel="stylesheet"/>
+        <link href="plugins/daterangepicker/daterangepicker.css" rel="stylesheet"/>
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="plugins/toaster/toastr.min.css" rel="stylesheet"/>
+        <link href="plugins/fullcalendar/core-4.3.1/main.min.css" rel="stylesheet">
+        <link href="plugins/fullcalendar/daygrid-4.3.0/main.min.css" rel="stylesheet">
+
+        <!-- MONO CSS -->
+        <link id="main-css-href" rel="stylesheet" href="style.css"/>
+
+        <!-- FAVICON -->
+        <!-- <link href="images/favicon.png" rel="shortcut icon"/> -->
+        <script src="plugins/nprogress/nprogress.js"></script>
+    </head>
+
+    <body class="navbar-fixed sidebar-fixed" id="body">
+        <div class="wrapper">
+            <!-- Left Side -->
+            <aside id="left-sidebar" class="left-sidebar sidebar-light">
+                <div id="sidebar" class="sidebar sidebar-with-footer">
+                    <!-- Header Area -->
+                    <div class="app-brand">
+                        <a>
+                            <!-- <img src="images/logo.png" alt="Mono"> -->
+                            <span class="brand-name">MMT Finances</span>
+                        </a>
+                    </div>
+
+                    <!-- Body Area -->
+                    <div class="sidebar-left" data-simplebar style="height: 100%;">
+                        <ul class="nav sidebar-inner" id="sidebar-menu">
+                            <li
+                                id="mainDashboardButton" class="active"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('mainDashboardArea', 'mainDashboardButton')">
+                                    <i class="mdi mdi-chart-line"></i>
+                                    <span class="nav-text">Dashboard</span>
+                                </a>
+                            </li>
+                        
+                            <li
+                                id="allHoursButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton')">
+                                    <i class="mdi mdi-view-list"></i>
+                                    <span class="nav-text">All Hours</span>
+                                </a>
+                            </li>
+
+                            <li
+                                id="addHoursButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addHoursDashboardArea', 'addHoursButton')">
+                                    <i class="mdi mdi-library-plus"></i>
+                                    <span class="nav-text">Add Hours</span>
+                                </a>
+                            </li>
+
+                            <li
+                                id="adminButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('adminDashboardArea', 'adminButton'); setInvoiceDates(); getCompanyTotals();">
+                                    <i class="mdi mdi-account-supervisor"></i>
+                                    <span class="nav-text">Admin</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Side -->
+            <div class="page-wrapper">
+                <!-- Top Navbar -->
+                <header class="main-header" id="header">
+                    <nav class="navbar navbar-expand-lg navbar-light" id="navbar">
+                        <!-- Hamburger Menu -->
+                        <div class="navbar-left">
+                            <button id="sidebar-toggler" class="sidebar-toggle">
+                                <span class="sr-only">Toggle navigation</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Dropdown List -->
+                        <div class="navbar-right">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown user-menu">
+                                    <button class="dropdown-toggle nav-link" data-toggle="dropdown">
+                                        <span id="hiText" class="d-none d-lg-inline-block">First Last</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none')">
+                                                <i class="mdi mdi-account-outline"></i>
+                                                <p>Profile</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="window.location.href = '/';">
+                                                <i class="mdi mdi-logout"></i>
+                                                <p>Log Out</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </header>
+
+                <!-- Dashboard Areas -->
+                <div class="content-wrapper">
+                    <div class="content">
+                        <div id="profileArea" style="display: none;">
+                            <!-- Picture, Name and Email -->
+                            <div class="card card-default card-profile">
+                                <div class="card-header" style="background-image:url(assets/img/user/user-bg-01.jpg)"></div>
+                                <div class="card-body card-profile-body">
+                                    <div class="profile-avata">
+                                        <img class="rounded-circle" src="">
+                                        <p id="userProfileName" class="h5 d-block mt-3 mb-2">First Last</p>
+                                        <a id="userProfileEmail" class="d-block text-color">random@example.com</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Career Stats -->
+                            <div class="row">
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-success rounded-circle mb-2">
+                                          <i class="mdi mdi-coin"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerMoneyMadeTotal" class="h2 d-block">$0</span>
+                                          <p>Total Money Earned</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-info rounded-circle mb-2">
+                                          <i class="mdi mdi-counter"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerStudentsTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Students Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-secondary rounded-circle mb-2">
+                                          <i class="mdi mdi-account-clock-outline"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerHoursTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Hours Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Update Profile Info -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Update Profile Info</h2>
+                                </div>
+                                <form id="updateUserProfileForm" class="mt-3" onsubmit="return updateProfile()">
+                                    <div class="form-row mt-3">
+                                        <input id="userProfileFirstName" name="FirstName" placeholder="First Name" class="form-control" type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input id="userProfileLastName" name="LastName" placeholder="Last Name" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input id="userProfilePhone" name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Update Password -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Update Password</h2>
+                                </div>
+                                <form id="updatePasswordForm" class="mt-3" onsubmit="return updatePassword()">
+                                    <div class="form-row mt-3">
+                                        <input name="OldPassword" placeholder="Old Password" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input name="NewPassword" placeholder="New Password" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input name="NewPasswordAgain" placeholder="New Password Again" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div id="mainDashboardArea">
+                            <!-- Top Statistics -->
+                            <div class="row">
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                        <div class="card-header">
+                                            <h2 id="moneyEarned">$0</h2>
+                                            <div id="moneyEarnedSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                                title="">
+                                                Week's Total Earnings
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-wrapper">
+                                                <div>
+                                                    <div id="moneyChartArea"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                    <div class="card-header">
+                                        <h2 id="studentsTutored">0</h2>
+                                        <div id="studentsTutoredSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                            title="">
+                                            Week's Total Students
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-wrapper">
+                                        <div>
+                                            <div id="studentsChartArea"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                    <div class="card-header">
+                                        <h2 id="hoursTutored">0</h2>
+                                        <div id="hoursTutoredSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                            title="">
+                                            Week's Total Hours
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-wrapper">
+                                        <div>
+                                            <div id="hoursChartArea"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calendar Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card card-default">
+                                        <div class="card-body">
+                                            <div id="calendarArea"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="allHoursDashboardArea" style="display: none;">
+                            <!-- Hour Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card card-default">
+                                        <div class="card-body">
+                                            <table id="hoursTable" class="table table-hover table-product" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Student</th>
+                                                        <th>Class</th>
+                                                        <th>Start Time</th>
+                                                        <th>End Time</th>
+                                                        <th>Price</th>
+                                                        <th>Class Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="hoursTableBody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="addHoursDashboardArea" style="display: none;">
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                            <form id="addHoursForm" onsubmit="return addHours()">
+                                <div class="form-row">
+                                    <div class="col-6 form-group">
+                                        <label>Select Student</label>
+                                        <select id="addHoursStudentsDropdown" name="Student" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        <label>Select Class</label>
+                                        <select id="addHoursClassesDropdown" name="Class" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-4 form-group">
+                                        <label>Date of Class</label>
+                                        <input id="addHoursDateTutored" name="Date" required class="form-control" type="date">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Started</label>
+                                        <input id="startTimePicker" name="startTime" class="form-control" required type="time">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Ended</label>
+                                        <input id="endTimePicker" name="endTime" class="form-control" required type="time">
+                                    </div>
+                                </div>
+                                <label>Notes</label>
+                                <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                <div class="form-footer mt-6 text-center">
+                                    <button type="submit" class="btn btn-primary">Add Hours</button>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                        <div id="adminDashboardArea" style="display: none;">
+                            <!-- Company Stats -->
+                            <div class="row">
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-success rounded-circle mb-2">
+                                          <i class="mdi mdi-coin"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="companyMoneyMadeTotal" class="h2 d-block">$0</span>
+                                          <p>Total Revenue</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-info rounded-circle mb-2">
+                                          <i class="mdi mdi-counter"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="companyStudentsTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Students Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-secondary rounded-circle mb-2">
+                                          <i class="mdi mdi-account-clock-outline"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="companyHoursTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Hours Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Area -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <!-- Invoice Header -->
+                                <div class="d-flex justify-content-between">
+                                    <div class="invoice-wrapper rounded bg-white">
+                                        <form id="getInvoiceForm" class="mt-3" onsubmit="return getInvoice()">
+                                            <div class="form-row">
+                                                <div class="col-3 form-group">
+                                                    <label>Select Student</label>
+                                                    <select id="invoiceStudentsDropdown" name="Student" class="form-control" required>
+                                                        <option value="" disabled selected></option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-3 form-group">
+                                                    <label>Start Date</label>
+                                                    <input id="invoiceStartDate" name="startDate" class="form-control" required type="date">
+                                                </div>
+                                                <div class="col-3 form-group">
+                                                    <label>End Date</label>
+                                                    <input id="invoiceEndDate" name="endDate" class="form-control" required type="date">
+                                                </div>
+                                                <div class="col-3 form-group">
+                                                    <label>Get Invoice</label>
+                                                    <button type="submit" class="btn btn-primary form-control">Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="btn-group">
+                                    <button class="btn btn-sm btn-light">
+                                        <i class="mdi mdi-content-save"></i> Save</button>
+                                    </div>
+                                </div>
+
+                                <!-- Invoice Table -->
+                                <div class="table-responsive">
+                                    <table class="table mt-3 table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date</th>
+                                            <th>Item</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoiceTableBody"></tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Invoice Total -->
+                                <div class="row justify-content-end">
+                                    <div class="col-lg-5 col-xl-4 col-xl-3 ml-sm-auto">
+                                    <ul class="list-unstyled mt-4">
+                                        <li class="pb-3 text-dark">Total
+                                        <span id="invoiceTotal" class="d-inline-block float-right">$0</span>
+                                        </li>
+                                    </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add Areas -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Add Tutor</h2>
+                                </div>
+                                <form id="addTutorForm" class="mt-3" onsubmit="return addTutor()">
+                                    <div class="form-row">
+                                        <div class="col-6">
+                                            <input name="FirstName" placeholder="Tutor First Name" class="form-control" required type="text">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="LastName" placeholder="Tutor Last Name" class="form-control" required type="text">
+                                        </div>
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <div class="col-4">
+                                            <input name="Email" placeholder="Tutor Email" class="form-control" required type="email">
+                                        </div>
+                                        <div class="col-4">
+                                            <input name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
+                                        </div>
+                                        <div class="col-4">
+                                            <input name="Percentage" placeholder="Tutor Percentage (Ex. 80 for 80%)" pattern="[0-9]+" class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Add Tutor</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Add Student</h2>
+                                </div>
+                                <form id="addStudentForm" class="mt-3" onsubmit="return addStudent()">
+                                    <div class="form-row mt-3">
+                                        <div class="col-6">
+                                            <input name="FirstName" placeholder="Student First Name" class="form-control" required type="text">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="LastName" placeholder="Student Last Name" class="form-control" required type="text">
+                                        </div>
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <div class="col-6">
+                                            <input name="Email" placeholder="Student Email" class="form-control" required type="email">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="Price" placeholder="Student Rate (Ex. 50)" class="form-control" required pattern="[0-9]+" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <div class="col-6">
+                                            <input id="birthday" name="Birthday" type="date" class="form-control" required>  
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="PhoneNumber" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">  
+                                        </div>
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Add Student</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Add Class</h2>
+                                </div>
+                                <form id="addClassForm" class="mt-3" onsubmit="return addClass()">
+                                    <div class="form-row">
+                                        <div class="col-6">
+                                            <input name="Name" placeholder="Class Name" class="form-control" required type="text">
+                                        </div>
+                                        <div class="col-6">
+                                            <select name="Level" placeholder="Class Level" class="form-control" required>
+                                                <option value="" disabled selected>Select class level</option>
+                                                <option value="preK">preK</option>
+                                                <option value="K-5">K-5</option>
+                                                <option value="6-8">6-8</option>
+                                                <option value="9-12">9-12</option>
+                                                <option value="Higher">Higher</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Add</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+  
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="plugins/simplebar/simplebar.min.js"></script>
+    <!-- <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script> -->
+    <script src="plugins/apexcharts/apexcharts.js"></script>
+    <script src="plugins/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js"></script>                  
+    <!-- <script src="plugins/jvectormap/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-world-mill.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-us-aea.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/moment.min.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/daterangepicker.js"></script> -->
+    <!-- <script>
+        jQuery(document).ready(function() {
+            jQuery('input[name="dateRange"]').daterangepicker({
+            autoUpdateInput: false,
+            singleDatePicker: true,
+            locale: {
+            cancelLabel: 'Clear'
+            }
+        });
+            jQuery('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+            jQuery(this).val(picker.startDate.format('MM/DD/YYYY'));
+            });
+            jQuery('input[name="dateRange"]').on('cancel.daterangepicker', function (ev, picker) {
+            jQuery(this).val('');
+            });
+        });
+    </script> -->
+    <!-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> -->
+    <script src="plugins/fullcalendar/core-4.3.1/main.min.js"></script>
+    <script src="plugins/fullcalendar/daygrid-4.3.0/main.min.js"></script>
+    <script src="plugins/toaster/toastr.min.js"></script>
+    <script src="js/mono.js"></script>
+    <script src="js/custom.js"></script>
+
+    <script>
+        // Init stuff
+        var tutorData = [];
+        var timePeriod = "Week";
+        var currentDashboard = "mainDashboardArea";
+        var currentDashboardButton = "mainDashboardButton";
+
+        // Calendar
+        var calendarArea = document.getElementById('calendarArea');
+        var weekCalendar = new FullCalendar.Calendar(calendarArea,
+        {
+            firstDay: 1,
+            height: 275,
+            plugins: ['dayGrid'],
+            defaultView: 'dayGridWeek',
+            validRange: function(nowDate)
+            {
+                // Get next monday
+                var today = new Date();
+                today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+                today.setDate(today.getDate() + 7);
+                var day = String(today.getDate()).padStart(2, '0');
+                var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var year = today.getFullYear();
+
+                // Return
+                return {
+                    end: `${year}-${month}-${day}`
+                };
+            },
+            customButtons:
+            {
+                prev: {
+                    text: 'Prev',
+                    click: function()
+                    {
+                        weekCalendar.prev();
+                        getDashboardCharts();
+                    }
+                },
+                next: {
+                    text: 'Next',
+                    click: function()
+                    {
+                        weekCalendar.next();
+                        getDashboardCharts();
+                    }
+                },
+                today: {
+                    text: 'Today',
+                    click: function()
+                    {
+                        weekCalendar.today();
+                        getDashboardCharts();
+                    }
+                },
+            }
+        });
+        weekCalendar.render();
+
+        // Charts
+        var moneyChartArea = document.getElementById("moneyChartArea");
+        if (moneyChartArea !== null)
+        {
+            var moneyChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-1",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#46c79e",
+                    type: "area",
+                    sparkline:
+                    {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels:
+                    {
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient:
+                    {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y:
+                    {
+                        title:
+                        {
+                            formatter: function ()
+                            {
+                                return "Money Earned";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    }
+                ]
+            };
+            var moneyChart = new ApexCharts(moneyChartArea, moneyChartOptions);
+            moneyChart.render();
+        }
+
+        var studentsChartArea = document.getElementById("studentsChartArea");
+        if (studentsChartArea !== null)
+        {
+            var studentsChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-3",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#6696fe",
+                    type: "area",
+                    sparkline:
+                    {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels:{
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient:
+                    {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y: {
+                        title: 
+                        {
+                            formatter: function ()
+                            {
+                                return "Students Taught";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    },
+                ],
+            };
+            var studentsChart = new ApexCharts(studentsChartArea, studentsChartOptions);
+            studentsChart.render();
+        }
+
+        var hoursChartArea = document.getElementById("hoursChartArea");
+        if (hoursChartArea !== null)
+        {
+            var hoursChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-3",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#fd5190",
+                    type: "area",
+                    sparkline: {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels: {
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y: {
+                        title:
+                        {
+                            formatter: function ()
+                            {
+                                return "Hours Taught";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    },
+                ],
+            };
+            var hoursChart = new ApexCharts(hoursChartArea, hoursChartOptions);
+            hoursChart.render();
+        }
+
+        // Get stuff to show
+        getPageLoadInfo();
+                
+        // Set tutor data in profile
+        function setUserProfile()
+        {
+            // Set profile info
+            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
+            document.getElementById("hiText").innerHTML = "Hi " + tutorData["FirstName"] + "!";
+            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
+            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
+            document.getElementById("userProfileLastName").value = tutorData["LastName"];
+            document.getElementById("userProfileEmail").value = tutorData["Email"];
+            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
+
+            // Get tutor totals
+            getTutorTotals();
+        }
+
+        // Set dates in invoice form
+        function setInvoiceDates()
+        {
+            // Set start date in invoice
+            var today = new Date();
+            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
+
+            // Set end date in invoice
+            today.setDate(today.getDate() + 6);
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
+        }
+        
+        // Submit action for update profile form
+        function updateProfile()
+        {
+            // Get inputs
+            var inputs = document.getElementById("updateUserProfileForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "updateUserInfo", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    tutorData = JSON.parse(this.responseText);
+                    setUserProfile();
+                    alert("SUCCESS! Profile has been updated.")
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Submit action for update password form
+        function updatePassword()
+        {
+            // Get inputs
+            var inputs = document.getElementById("updatePasswordForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "updatePassword", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    alert(this.responseText);
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Submit action for add tutor form
+        function addTutor()
+        {
+            // Get inputs
+            var inputs = document.getElementById("addTutorForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "addTutor", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    tInfo = JSON.parse(this.responseText);
+                    tInfo = tInfo[0];
+                    document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
+                    alert("Tutor added successfully!");
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+
+        // Submit action for add student form
+        function addStudent()
+        {
+            // Get inputs
+            var inputs = document.getElementById("addStudentForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "addStudent", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    sInfo = JSON.parse(this.responseText);
+                    sInfo = sInfo[0];
+                    document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                    document.getElementById("getCostStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                    alert("Student added successfully!");
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+
+        // Submit action for add class form
+        function addClass()
+        {
+            // Get inputs
+            var inputs = document.getElementById("addClassForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "addClass", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    cInfo = JSON.parse(this.responseText);
+                    cInfo = cInfo[0];
+                    document.getElementById("classesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                    alert("Class added successfully!");
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+
+        // Submit action for add hours form
+        function addHours()
+        {
+            // Get inputs
+            var inputs = document.getElementById("addHoursForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "addHours", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    alert(this.responseText);
+                    getPageLoadInfo();
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Function to call necessary functions on page load
+        function getPageLoadInfo()
+        {
+            // Set today date in add hour form
+            var today = new Date();
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
+
+            // Set name and profile info
+            setUserProfile()
+
+            // Call helper functions
+            getDashboardCharts();
+            getDashboardHours();
+            getStudents();
+            getClasses();
+            getTutors();
+        }
+
+        // Get from server to populate select inputs
+        function getTutors()
+        {
+            request = new XMLHttpRequest();
+            request.open("POST", "getTutors", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    tutorsInfo = JSON.parse(this.responseText);
+                    for (let i = 0; i < tutorsInfo.length; i++)
+                    {
+                        tInfo = tutorsInfo[i];
+                        document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+
+        // Get from server to populate select inputs
+        function getStudents()
+        {
+            request = new XMLHttpRequest();
+            request.open("POST", "getStudents", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    studentsInfo = JSON.parse(this.responseText);
+                    for (let i = 0; i < studentsInfo.length; i++)
+                    {
+                        sInfo = studentsInfo[i];
+                        document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                        document.getElementById("invoiceStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+
+        // Get from server to populate select inputs
+        function getClasses()
+        {
+            request = new XMLHttpRequest();
+            request.open("POST", "getClasses", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    classesInfo = JSON.parse(this.responseText);
+                    for (let i = 0; i < classesInfo.length; i++)
+                    {
+                        cInfo = classesInfo[i];
+                        document.getElementById("addHoursClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+        
+        // Submit action for get cost form
+        function getInvoice()
+        {
+            // Get inputs
+            var inputs = document.getElementById("getInvoiceForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getInvoice", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Clear table
+                    var invoiceTableBody = document.getElementById("invoiceTableBody");
+                    invoiceTableBody.innerHTML = "";
+
+                    // Go through each row and add to table
+                    var invoiceData = JSON.parse(this.responseText);
+                    var totalPrice = 0;
+                    for (let i = 0; i < invoiceData.length; i++)
+                    {
+                        // Get date
+                        var classDate = new Date(invoiceData[i]["Date"].substring(0, 10));
+
+                        // Add to invoice table
+                        invoiceTableBody.innerHTML +=
+                        `<tr>
+                            <th>${i + 1}</th>
+                            <th>${classDate.toISOString().split('T')[0]}</th>
+                            <th>${invoiceData[i]["FirstName"]} ${invoiceData[i]["LastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
+                            <th>${invoiceData[i]["StartTime"].substring(0, 5)}</th>
+                            <th>${invoiceData[i]["EndTime"].substring(0, 5)}</th>
+                            <th>$${invoiceData[i]["MoneyGenerated"]}</th>
+                        </tr>`;
+
+                        // Add money generated to total price
+                        totalPrice += invoiceData[i]["MoneyGenerated"];
+                    }
+
+                    // If not empty set total price
+                    if (invoiceData.length != 0)
+                    {
+                        document.getElementById("invoiceTotal").innerHTML = `$${Number(totalPrice).toLocaleString('en')}`;
+                    }
+                    else
+                    {
+                        alert("No classes logged during this time.");
+                    }
+                }
+                else
+                {
+                    alert("ERROR! Couldn't fetch data, please try again!");
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Get tutor totals
+        function getTutorTotals()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getTutorTotals", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var tutorTotals = JSON.parse(this.responseText);
+
+                    // Update dashboard elements
+                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${Number(tutorTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("careerStudentsTaughtTotal").innerHTML = tutorTotals["TotalStudents"];
+                    document.getElementById("careerHoursTaughtTotal").innerHTML = tutorTotals["TotalHours"];
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        }
+        
+        // Get company totals
+        function getCompanyTotals()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getCompanyTotals", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var companyTotals = JSON.parse(this.responseText);
+
+                    // Update dashboard elements
+                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${Number(companyTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("companyStudentsTaughtTotal").innerHTML = companyTotals["TotalStudents"];
+                    document.getElementById("companyHoursTaughtTotal").innerHTML = companyTotals["TotalHours"];
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        }
+        
+        // Get dashboard chart stats
+        function getDashboardCharts()
+        {
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getDashboardCharts", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var outputsArray = JSON.parse(this.responseText);
+
+                    // Update dashboard top 3 numbers
+                    document.getElementById("moneyEarned").innerHTML = `$${outputsArray["totalMoneyGenerated"]}`;
+                    document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
+                    document.getElementById("hoursTutored").innerHTML = outputsArray["totalHoursTutored"];
+
+                    // Update dashboard top 3 charts
+                    moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
+                    studentsChart.updateSeries([{data: outputsArray["studentsTutoredList"]}]);
+                    hoursChart.updateSeries([{data: outputsArray["hoursTutoredList"]}]);
+                }
+            };
+            request.send(JSON.stringify({"StartDate": weekCalendar.getDate(), "Tutor": tutorData}));
+            return false;
+        };
+
+        // Get rows for hours table
+        function getDashboardHours()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getDashboardHours", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Clear hours table and calendar
+                    var hoursTableBody = document.getElementById("hoursTableBody");
+                    hoursTableBody.innerHTML = "";
+                    weekCalendar.removeAllEvents();
+
+                    // Go through each row and add to table
+                    var hours = JSON.parse(this.responseText);
+                    for (let i = 0; i < hours.length; i++)
+                    {
+                        // Get date
+                        var classDate = new Date(hours[i]["Date"].substring(0, 10));
+
+                        // Add to calendar
+                        weekCalendar.addEvent
+                        (
+                            {
+                                title: `${hours[i]["FirstName"]} ${hours[i]["LastName"]} ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
+                                start: `${classDate.toISOString().split('T')[0]}`,
+                                color: "#31343d"
+                            }
+                        );
+
+                        // Add to hour table
+                        hoursTableBody.innerHTML +=
+                        `<tr>
+                            <th>${classDate.toISOString().split('T')[0]}</th>
+                            <th>${hours[i]["FirstName"]} ${hours[i]["LastName"]}</th>
+                            <th>${hours[i]["ClassName"]} ${hours[i]["Level"]}</th>
+                            <th>${hours[i]["StartTime"].substring(0, 5)}</th>
+                            <th>${hours[i]["EndTime"].substring(0, 5)}</th>
+                            <th>$${hours[i]["MoneyGenerated"]}</th>
+                            <th>${hours[i]["Notes"]}</th>
+                        </tr>`;
+                    }
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Function to run when menu item is clicked
+        function menuNav(dashboardName, elementToMakeActive)
+        {
+            // Deselect old and select current
+            document.getElementById(currentDashboardButton).className = "";
+            if (elementToMakeActive != "none")
+            {
+                document.getElementById(elementToMakeActive).className = ("active");
+                currentDashboardButton = elementToMakeActive;
+            }
+
+            // Hide old dashboard show new and adjust current dashboard var accordingly
+            document.getElementById(currentDashboard).style.display = "none";
+            document.getElementById(dashboardName).style.display = "block";
+            currentDashboard = dashboardName;
+        }
+    </script>
+</html>

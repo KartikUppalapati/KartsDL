@@ -1,184 +1,396 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
     <head>
         <title>Your Dashboard</title>
-        <link rel="stylesheet" href="dashboard.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    </head>
-    <body>
-        <div class="navbar">
-            <div class="dropdown">
-                <button class="dropbtn">
-                    <img src="userLogin.jpg"/>
-                </button>
-                <div class="dropdownContent" id="myDropdown">
-                    <a id="viewProfileButton" onclick="setUserProfile(); menuNav('profileArea', 'none')">View Profile</a>
-                    <a id="changePasswordButton" onclick="menuNav('updatePasswordArea', 'none')">Change Password</a>
-                    <a onclick="window.location.href = '/';">Logout</a>
-                </div>
-            </div>
-        </div>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-        <div class="container">
-            <div class="sideMenu">
-                <h1>MMT</h1>
-                <ul id="sidemenu" class="menu">
-                    <li id="mainDashboardButton" onclick="menuNav('mainDashboardArea', this.id)" class="menuItem activeMenu">Dashboard</li>
-                    <li id="addHoursButton" onclick="menuNav('addHoursDashboardArea', this.id)" class="menuItem">Add Hours</li>
-                    <li id="getNotesButton" onclick="menuNav('getNotesDashboardArea', this.id)" class="menuItem">Get Notes</li>
-                </ul>
-            </div>
-            <br>
-            <br>
-            <br>
-            <div class="dashboardArea">
-                <div id="profileArea" class="allDashboardAreas">
-                    <form id="updateUserProfileForm" class="adminForm" onsubmit="return updateProfile()">
-                        <input id="userProfileFirstName" name="FirstName" placeholder="First Name" required type="text">
-                        <input id="userProfileLastName" name="LastName" placeholder="Last Name" required type="text">
-                        <input id="userProfilePhone" name="Phone" placeholder="123-456-7890" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
-                        <input id="userProfileEmail" name="Email" placeholder="Email" required type="text" disabled>
-                        <div class="centerButton">
-                            <button type="submit" class="submitButton">Update Profile</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="updatePasswordArea" class="allDashboardAreas">
-                    <form id="updatePasswordForm" class="adminForm" onsubmit="return updatePassword()">
-                        <input name="OldPassword" placeholder="Old Password" required type="text">
-                        <input name="NewPassword" placeholder="New Password" required type="text">
-                        <input name="NewPasswordAgain" placeholder="New Password Again" required type="text">
-                        <div class="centerButton">
-                            <button type="submit" class="submitButton">Update Password</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="mainDashboardArea" class="allDashboardAreas" style="display: flex;">
-                    <div>
-                        <div class="chartContainer">
-                            <canvas id="studentsChart"></canvas>
-                        </div>
-                        <div class="chartContainer">
-                            <canvas id="moneyChart"></canvas>
-                        </div>
+        <!-- GOOGLE FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Karla:400,700|Roboto" rel="stylesheet">
+        <link href="plugins/material/css/materialdesignicons.min.css" rel="stylesheet"/>
+        <link href="plugins/simplebar/simplebar.css" rel="stylesheet"/>
+
+        <!-- PLUGINS CSS STYLE -->
+        <link href="plugins/nprogress/nprogress.css" rel="stylesheet" />
+        <link href="plugins/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css" rel="stylesheet"/>
+        <link href="plugins/jvectormap/jquery-jvectormap-2.0.3.css" rel="stylesheet"/>
+        <link href="plugins/daterangepicker/daterangepicker.css" rel="stylesheet"/>
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="plugins/toaster/toastr.min.css" rel="stylesheet"/>
+        <link href="plugins/fullcalendar/core-4.3.1/main.min.css" rel="stylesheet">
+        <link href="plugins/fullcalendar/daygrid-4.3.0/main.min.css" rel="stylesheet">
+
+        <!-- MONO CSS -->
+        <link id="main-css-href" rel="stylesheet" href="style.css"/>
+
+        <!-- FAVICON -->
+        <!-- <link href="images/favicon.png" rel="shortcut icon"/> -->
+        <script src="plugins/nprogress/nprogress.js"></script>
+    </head>
+
+    <body class="navbar-fixed sidebar-fixed" id="body">
+        <div class="wrapper">
+            <aside id="left-sidebar" class="left-sidebar sidebar-light">
+                <div id="sidebar" class="sidebar sidebar-with-footer">
+                    <!-- Aplication Brand -->
+                    <div class="app-brand">
+                        <a>
+                            <!-- <img src="images/logo.png" alt="Mono"> -->
+                            <span class="brand-name">MMT Finances</span>
+                        </a>
                     </div>
-                    <div>
-                        <div class="chartContainer">
-                            <div class="centerMe">
-                                <p id="moneyEarned">Money Earned: $0</p>
-                                <p id="studentsTutored">Students Tutored: 0</p>
-                                <p id="hoursTutored">Hours Tutored: 0</p>
+
+                    <!-- Left Sidebar -->
+                    <div class="sidebar-left" data-simplebar style="height: 100%;">
+                        <ul class="nav sidebar-inner" id="sidebar-menu">
+                            <li
+                                id="mainDashboardButton" class="active"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('mainDashboardArea', 'mainDashboardButton')">
+                                    <i class="mdi mdi-chart-line"></i>
+                                    <span class="nav-text">Dashboard</span>
+                                </a>
+                            </li>
+                        
+                            <li
+                                id="allHoursButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton')">
+                                    <i class="mdi mdi-view-list"></i>
+                                    <span class="nav-text">All Hours</span>
+                                </a>
+                            </li>
+
+                            <li
+                                id="addHoursButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addHoursDashboardArea', 'addHoursButton')">
+                                    <i class="mdi mdi-library-plus"></i>
+                                    <span class="nav-text">Add Hours</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="page-wrapper">
+                <!-- Top Navbar -->
+                <header class="main-header" id="header">
+                    <nav class="navbar navbar-expand-lg navbar-light" id="navbar">
+                        <!-- Hamburger Menu -->
+                        <div class="navbar-left">
+                            <button id="sidebar-toggler" class="sidebar-toggle">
+                                <span class="sr-only">Toggle navigation</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Dropdown List -->
+                        <div class="navbar-right">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown user-menu">
+                                    <button class="dropdown-toggle nav-link" data-toggle="dropdown">
+                                        <span id="hiText" class="d-none d-lg-inline-block">First Last</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none')">
+                                                <i class="mdi mdi-account-outline"></i>
+                                                <p>Profile</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="window.location.href = '/';">
+                                                <i class="mdi mdi-logout"></i>
+                                                <p>Log Out</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </header>
+
+                <!-- Dashboard Areas -->
+                <div class="content-wrapper">
+                    <div class="content">
+                        <div id="profileArea" style="display: none;">
+                            <!-- Picture, Name and Email -->
+                            <div class="card card-default card-profile">
+                                <div class="card-header" style="background-image:url(assets/img/user/user-bg-01.jpg)"></div>
+                                <div class="card-body card-profile-body">
+                                    <div class="profile-avata">
+                                        <img class="rounded-circle" src="">
+                                        <p id="userProfileName" class="h5 d-block mt-3 mb-2">First Last</p>
+                                        <a id="userProfileEmail" class="d-block text-color">random@example.com</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Career Stats -->
+                            <div class="row">
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-success rounded-circle mb-2">
+                                          <i class="mdi mdi-coin"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerMoneyMadeTotal" class="h2 d-block">$0</span>
+                                          <p>Total Money Earned</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-info rounded-circle mb-2">
+                                          <i class="mdi mdi-counter"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerStudentsTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Students Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-default">
+                                      <div class="d-flex p-5 align-items-center flex-column">
+                                        <div class="icon-md bg-secondary rounded-circle mb-2">
+                                          <i class="mdi mdi-account-clock-outline"></i>
+                                        </div>
+                                        <div class="text-center">
+                                          <span id="careerHoursTaughtTotal" class="h2 d-block">0</span>
+                                          <p>Total Hours Taught</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Update Profile Info -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Update Profile Info</h2>
+                                </div>
+                                <form id="updateUserProfileForm" class="mt-3" onsubmit="return updateProfile()">
+                                    <div class="form-row mt-3">
+                                        <input id="userProfileFirstName" name="FirstName" placeholder="First Name" class="form-control" type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input id="userProfileLastName" name="LastName" placeholder="Last Name" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input id="userProfilePhone" name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Update Password -->
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="d-flex justify-content-between">
+                                    <h2 class="text-dark font-weight-medium">Update Password</h2>
+                                </div>
+                                <form id="updatePasswordForm" class="mt-3" onsubmit="return updatePassword()">
+                                    <div class="form-row mt-3">
+                                        <input name="OldPassword" placeholder="Old Password" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input name="NewPassword" placeholder="New Password" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <input name="NewPasswordAgain" placeholder="New Password Again" class="form-control" required type="text">
+                                    </div>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div class="chartContainer">
-                            <canvas id="hoursChart"></canvas>
+                        <div id="mainDashboardArea">
+                            <!-- Top Statistics -->
+                            <div class="row">
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                        <div class="card-header">
+                                            <h2 id="moneyEarned">$0</h2>
+                                            <div id="moneyEarnedSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                                title="">
+                                                Week's Total Earnings
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-wrapper">
+                                                <div>
+                                                    <div id="moneyChartArea"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                    <div class="card-header">
+                                        <h2 id="studentsTutored">0</h2>
+                                        <div id="studentsTutoredSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                            title="">
+                                            Week's Total Students
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-wrapper">
+                                        <div>
+                                            <div id="studentsChartArea"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-sm-6">
+                                    <div class="card card-default card-mini">
+                                    <div class="card-header">
+                                        <h2 id="hoursTutored">0</h2>
+                                        <div id="hoursTutoredSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
+                                            title="">
+                                            Week's Total Hours
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-wrapper">
+                                        <div>
+                                            <div id="hoursChartArea"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calendar Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card card-default">
+                                        <div class="card-body">
+                                            <div id="calendarArea"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="allHoursDashboardArea" style="display: none;">
+                            <!-- Hour Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card card-default">
+                                        <div class="card-body">
+                                            <table id="hoursTable" class="table table-hover table-product" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Student</th>
+                                                        <th>Class</th>
+                                                        <th>Start Time</th>
+                                                        <th>End Time</th>
+                                                        <th>Price</th>
+                                                        <th>Class Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="hoursTableBody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="addHoursDashboardArea" style="display: none;">
+                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                            <form id="addHoursForm" onsubmit="return addHours()">
+                                <div class="form-row">
+                                    <div class="col-6 form-group">
+                                        <label>Select Student</label>
+                                        <select id="addHoursStudentsDropdown" name="Student" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        <label>Select Class</label>
+                                        <select id="addHoursClassesDropdown" name="Class" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-4 form-group">
+                                        <label>Date of Class</label>
+                                        <input id="addHoursDateTutored" name="Date" required class="form-control" type="date">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Started</label>
+                                        <input id="startTimePicker" name="startTime" class="form-control" required type="time">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Ended</label>
+                                        <input id="endTimePicker" name="endTime" class="form-control" required type="time">
+                                    </div>
+                                </div>
+                                <label>Notes</label>
+                                <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                <div class="form-footer mt-6 text-center">
+                                    <button type="submit" class="btn btn-primary">Add Hours</button>
+                                </div>
+                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="addHoursDashboardArea" class="allDashboardAreas">
-                    <form id="addHoursForm" class="adminForm" onsubmit="return addHours()">
-                        <select id="classesDropdown" name="Class" required>
-                            <option value="" disabled selected>Select class</option>
-                        </select>
-                        <select id="addHoursStudentsDropdown" name="Student" required>
-                            <option value="" disabled selected>Select student</option>
-                        </select>
-                        <input id="startTimePicker" name="startTime" required type="time">
-                        <input id="endTimePicker" name="endTime" required type="time">
-                        <input id="dateTutored" name="Date" required type="date">
-                        <textarea name="Notes" placeholder="Description" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
-                        <div class="centerButton">
-                            <button type="submit">Add Hours</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="addTutorsDashboardArea" class="allDashboardAreas">
-                    <form id="addTutorForm" class="adminForm" onsubmit="return addTutor()">
-                        <input name="FirstName" placeholder="Tutor First Name" required type="text">
-                        <input name="LastName" placeholder="Tutor Last Name" required type="text">
-                        <input name="Email" placeholder="Tutor Email" required type="email">
-                        <input name="Phone" placeholder="123-456-7890" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
-                        <input name="Percentage" placeholder="Tutor Percentage (Ex. 80 for 80%)" pattern="[0-9]+" required>
-                        <div class="centerButton">
-                            <button type="submit">Add Tutor</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="addStudentsDashboardArea" class="allDashboardAreas">
-                    <form id="addStudentForm" class="adminForm" onsubmit="return addStudent()">
-                        <input name="FirstName" placeholder="Student First Name" required type="text">
-                        <input name="LastName" placeholder="Student Last Name" required type="text">
-                        <input name="Email" placeholder="Student Email" required type="email">
-                        <input name="Price" placeholder="Student Rate (Ex. 50)" required pattern="[0-9]+" type="text">
-                        <input id="birthday" name="Birthday" type="date" required>
-                        <input name="PhoneNumber" placeholder="123-456-7890" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
-                        <div class="centerButton">
-                            <button type="submit">Add Student</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="addClassesDashboardArea" class="allDashboardAreas">
-                    <form id="addClassForm" class="adminForm" onsubmit="return addClass()">
-                        <input name="Name" placeholder="Class Name" required type="text">
-                        <select name="Level" placeholder="Class Level" required>
-                            <option value="" disabled selected>Select class level</option>
-                            <option value="preK">preK</option>
-                            <option value="K-5">K-5</option>
-                            <option value="6-8">6-8</option>
-                            <option value="9-12">9-12</option>
-                            <option value="Higher">Higher</option>
-                        </select>
-                        <div class="centerButton">
-                            <button type="submit">Add Class</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="allFinancesDashboardArea" class="allDashboardAreas">
-                    <form id="allFinancesForm" class="adminForm" onsubmit="return getAllFinances()">
-                        <select id="allFinancesTutorsDropdown" name="Tutor" required>
-                            <option value="All Tutors" selected>All Tutors</option>
-                        </select>
-                        <input id="startDateRange" name="StartDateRange" type="date" required>
-                        <input id="endDateRange" name="EndDateRange" type="date" required>
-                        <div class="centerButton">
-                            <button type="submit">Get finances</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="getNotesDashboardArea" class="allDashboardAreas">
-                    <form id="getNotesForm" class="adminForm" onsubmit="return getNotes()">
-                        <select id="getNotesStudentsDropdown" name="Student" required>
-                            <option value="" disabled selected>Select student</option>
-                        </select>
-                        <div class="centerButton">
-                            <button type="submit">Get Notes</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="getCostDashboardArea" class="allDashboardAreas">
-                    <form id="getCostForm" class="adminForm" onsubmit="return getCost()">
-                        <select id="getCostStudentsDropdown" name="Student" required>
-                            <option value="" disabled selected>Select student</option>
-                        </select>
-                        <input id="startDate" name="StartDate" required type="date">
-                        <input id="endDate" name="EndDate" required type="date">
-                        <div class="centerButton">
-                            <button type="submit">Get Cost</button>
-                        </div>
-                    </form>
-                </div>
             </div>
-
-            <!-- <div id="titleBar">
-                <div id="profilePic">
-                    <img src="http://s3-us-west-2.amazonaws.com/s.cdpn.io/153917/profile/profile-512_1.jpg" />
-                </div>
-                <span onclick="filterNav(this)" class="controls activeControl">Daily</span>
-                <span onclick="filterNav(this)" class="controls">Weekly</span>
-                <span onclick="filterNav(this)" class="controls">Monthly</span>
-            </div> -->
         </div>
     </body>
+  
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="plugins/simplebar/simplebar.min.js"></script>
+    <!-- <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script> -->
+    <script src="plugins/apexcharts/apexcharts.js"></script>
+    <script src="plugins/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js"></script>                  
+    <!-- <script src="plugins/jvectormap/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-world-mill.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-us-aea.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/moment.min.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/daterangepicker.js"></script> -->
+    <!-- <script>
+        jQuery(document).ready(function() {
+            jQuery('input[name="dateRange"]').daterangepicker({
+            autoUpdateInput: false,
+            singleDatePicker: true,
+            locale: {
+            cancelLabel: 'Clear'
+            }
+        });
+            jQuery('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+            jQuery(this).val(picker.startDate.format('MM/DD/YYYY'));
+            });
+            jQuery('input[name="dateRange"]').on('cancel.daterangepicker', function (ev, picker) {
+            jQuery(this).val('');
+            });
+        });
+    </script> -->
+    <!-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> -->
+    <script src="plugins/fullcalendar/core-4.3.1/main.min.js"></script>
+    <script src="plugins/fullcalendar/daygrid-4.3.0/main.min.js"></script>
+    <script src="plugins/toaster/toastr.min.js"></script>
+    <script src="js/mono.js"></script>
+    <script src="js/custom.js"></script>
 
     <script>
         // Init stuff
@@ -186,131 +398,392 @@
         var timePeriod = "Week";
         var currentDashboard = "mainDashboardArea";
         var currentDashboardButton = "mainDashboardButton";
-        
-        // Charts
-        var studentsChart = new Chart(document.getElementById("studentsChart").getContext("2d"),
+
+        // Calendar
+        var calendarArea = document.getElementById('calendarArea');
+        var weekCalendar = new FullCalendar.Calendar(calendarArea,
         {
-            type: "bar",
-            data: {
-            labels: ["", "", "", "", "", "", ""],
-            datasets: 
-            [
-                {
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor:
-                        // "rgba(255, 99, 132, 0.2)",
-                        "rgba(54, 162, 235, 0.75)",
-                        // "rgba(255, 206, 86, 0.2)",
-                        // "rgba(75, 192, 192, 0.2)",
-                        // "rgba(153, 102, 255, 0.2)",
-                        // "rgba(255, 159, 64, 0.2)",
-                        // "rgba(255, 99, 132, 0.2)"
-                },
-            ]
-            },
-            options: 
+            firstDay: 1,
+            height: 275,
+            plugins: ['dayGrid'],
+            defaultView: 'dayGridWeek',
+            validRange: function(nowDate)
             {
-                title: {
-                    display: true,
-                    text: "Students Tutored This " + timePeriod,
+                // Get next monday
+                var today = new Date();
+                today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+                today.setDate(today.getDate() + 7);
+                var day = String(today.getDate()).padStart(2, '0');
+                var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var year = today.getFullYear();
+
+                // Return
+                return {
+                    end: `${year}-${month}-${day}`
+                };
+            },
+            customButtons:
+            {
+                prev: {
+                    text: 'Prev',
+                    click: function()
+                    {
+                        weekCalendar.prev();
+                        getDashboardCharts();
+                    }
                 },
-                legend: {
-                    display: false
+                next: {
+                    text: 'Next',
+                    click: function()
+                    {
+                        weekCalendar.next();
+                        getDashboardCharts();
+                    }
                 },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        ticks: {
-                            beginAtZero: true,
-                            stepSize: 1,
-                        }
-                    }]
-                }
+                today: {
+                    text: 'Today',
+                    click: function()
+                    {
+                        weekCalendar.today();
+                        getDashboardCharts();
+                    }
+                },
             }
         });
+        weekCalendar.render();
+
+        // Charts
+        var moneyChartArea = document.getElementById("moneyChartArea");
+        if (moneyChartArea !== null)
+        {
+            var moneyChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-1",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#46c79e",
+                    type: "area",
+                    sparkline:
+                    {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels:
+                    {
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient:
+                    {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y:
+                    {
+                        title:
+                        {
+                            formatter: function ()
+                            {
+                                return "Money Earned";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    }
+                ]
+            };
+            var moneyChart = new ApexCharts(moneyChartArea, moneyChartOptions);
+            moneyChart.render();
+        }
+
+        var studentsChartArea = document.getElementById("studentsChartArea");
+        if (studentsChartArea !== null)
+        {
+            var studentsChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-3",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#6696fe",
+                    type: "area",
+                    sparkline:
+                    {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels:{
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient:
+                    {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y: {
+                        title: 
+                        {
+                            formatter: function ()
+                            {
+                                return "Students Taught";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    },
+                ],
+            };
+            var studentsChart = new ApexCharts(studentsChartArea, studentsChartOptions);
+            studentsChart.render();
+        }
+
+        var hoursChartArea = document.getElementById("hoursChartArea");
+        if (hoursChartArea !== null)
+        {
+            var hoursChartOptions =
+            {
+                chart:
+                {
+                    id: "spline-area-3",
+                    group: "social",
+                    height: 135,
+                    width: "100%",
+                    background: "#fd5190",
+                    type: "area",
+                    sparkline: {
+                        enabled: true,
+                    },
+                },
+                yaxis:
+                {
+                    labels: {
+                        minWidth: 40,
+                    },
+                },
+                stroke:
+                {
+                    width: 3,
+                },
+                colors: ["#ffffff"],
+                fill:
+                {
+                    type: "gradient",
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100],
+                    },
+                },
+                labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                tooltip:
+                {
+                    followCursor: false,
+                    theme: "dark",
+                    x:
+                    {
+                        show: true,
+                    },
+                    marker:
+                    {
+                        show: false,
+                    },
+                    y: {
+                        title:
+                        {
+                            formatter: function ()
+                            {
+                                return "Hours Taught";
+                            },
+                        },
+                    },
+                },
+                series:
+                [
+                    {
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    },
+                ],
+            };
+            var hoursChart = new ApexCharts(hoursChartArea, hoursChartOptions);
+            hoursChart.render();
+        }
+
+        // Get stuff to show
+        getPageLoadInfo();
+                
+        // Set tutor data in profile
+        function setUserProfile()
+        {
+            // Set profile info
+            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
+            document.getElementById("hiText").innerHTML = "Hi " + tutorData["FirstName"] + "!";
+            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
+            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
+            document.getElementById("userProfileLastName").value = tutorData["LastName"];
+            document.getElementById("userProfileEmail").value = tutorData["Email"];
+            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
+
+            // Get tutor totals
+            getTutorTotals();
+        }
+
+        // Set dates in invoice form
+        function setInvoiceDates()
+        {
+            // Set start date in invoice
+            var today = new Date();
+            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
+
+            // Set end date in invoice
+            today.setDate(today.getDate() + 6);
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
+        }
         
-        var moneyChart = new Chart(document.getElementById("moneyChart").getContext("2d"), {
-            type: "bar",
-            data: {
-            labels: ["", "", "", "", "", "", ""],
-            datasets: 
-            [
-                {
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor: 
-                        // "rgba(255, 99, 132, 0.2)",
-                        // "rgba(54, 162, 235, 0.2)",
-                        "rgba(255, 206, 86, .75)",
-                        // "rgba(75, 192, 192, 0.2)",
-                        // "rgba(153, 102, 255, 0.2)",
-                        // "rgba(255, 159, 64, 0.2)",
-                        // "rgba(255, 99, 132, 0.2)"
-                },
-            ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Money Earned This " + timePeriod
-                },
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        ticks: {
-                            beginAtZero: true   // minimum value will be 0.
-                        }
-                    }]
-                }
+        // Submit action for update profile form
+        function updateProfile()
+        {
+            // Get inputs
+            var inputs = document.getElementById("updateUserProfileForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
             }
-        });
-       
-        var hoursChart = new Chart(document.getElementById("hoursChart").getContext("2d"), {
-            type: "bar",
-            data: {
-            labels: ["", "", "", "", "", "", ""],
-            datasets: 
-            [
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "updateUserInfo", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
                 {
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor: 
-                        // "rgba(255, 99, 132, 0.2)",
-                        // "rgba(54, 162, 235, 0.2)",
-                        // "rgba(255, 206, 86, .75)",
-                        // "rgba(75, 192, 192, 0.2)",
-                        // "rgba(153, 102, 255, 0.2)",
-                        // "rgba(255, 159, 64, 0.2)",
-                        "rgba(255, 99, 132, 0.75)"
-                },
-            ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Hours Tutored This " + timePeriod
-                },
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        ticks: {
-                            beginAtZero: true,
-                            stepSize: .5,
-                        }
-                    }]
+                    tutorData = JSON.parse(this.responseText);
+                    setUserProfile();
+                    alert("SUCCESS! Profile has been updated.")
                 }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Submit action for update password form
+        function updatePassword()
+        {
+            // Get inputs
+            var inputs = document.getElementById("updatePasswordForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
             }
-        });
-          
-        // Get student, tutor, and classes
-        getStudents();
-        getClasses();
-        getTutors();
-        getDashboard();
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "updatePassword", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    alert(this.responseText);
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
         
         // Submit action for add tutor form
         function addTutor()
@@ -371,7 +844,6 @@
                     sInfo = JSON.parse(this.responseText);
                     sInfo = sInfo[0];
                     document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                    document.getElementById("getNotesStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                     document.getElementById("getCostStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                     alert("Student added successfully!");
                 }
@@ -444,7 +916,7 @@
                 if (this.readyState == 4 && this.status == 200) 
                 {
                     alert(this.responseText);
-                    getDashboard();
+                    getPageLoadInfo();
                 }
                 else
                 {
@@ -455,185 +927,27 @@
             return false;
         };
         
-        // Submit action for get all finances form
-        function getAllFinances()
+        // Function to call necessary functions on page load
+        function getPageLoadInfo()
         {
-            // Get inputs
-            var inputs = document.getElementById("allFinancesForm").elements;
-            var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
-            {
-                var item = inputs.item(i);
-                inputsAsArray[item.name] = item.value.trim();
-            }
+            // Set today date in add hour form
+            var today = new Date();
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
 
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "getAllFinances", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    alert(this.responseText);
-                }
-                else
-                {
-                    alert(this.responseText);
-                }
-            };
-            request.send(JSON.stringify(inputsAsArray));
-            return false;
-        };
+            // Set name and profile info
+            setUserProfile()
 
-        // Submit action for get notes form
-        function getNotes()
-        {
-            // Get inputs
-            var inputs = document.getElementById("getNotesForm").elements;
-            var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
-            {
-                var item = inputs.item(i);
-                inputsAsArray[item.name] = item.value.trim();
-            }
-
-            // Add tutor data
-            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
-
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "getNotes", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    alert(this.responseText);
-                }
-                else
-                {
-                    alert(this.responseText);
-                }
-            };
-            request.send(JSON.stringify(inputsAsArray));
-            return false;
-        };
-
-        // Submit action for get notes form
-        function getCost()
-        {
-            // Get inputs
-            var inputs = document.getElementById("getCostForm").elements;
-            var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
-            {
-                var item = inputs.item(i);
-                inputsAsArray[item.name] = item.value.trim();
-            }
-
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "getCost", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    alert(this.responseText);
-                }
-                else
-                {
-                    alert(this.responseText);
-                }
-            };
-            request.send(JSON.stringify(inputsAsArray));
-            return false;
-        };
-        
-        // Submit action for update profile form
-        function updateProfile()
-        {
-            // Get inputs
-            var inputs = document.getElementById("updateUserProfileForm").elements;
-            var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
-            {
-                var item = inputs.item(i);
-                inputsAsArray[item.name] = item.value.trim();
-            }
-
-            // Add tutor data
-            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
-
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "updateUserInfo", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    tutorData = JSON.parse(this.responseText);
-                    alert("SUCCESS! Profile has been updated.")
-                }
-                else
-                {
-                    alert(this.responseText);
-                }
-            };
-            request.send(JSON.stringify(inputsAsArray));
-            return false;
-        };
-        
-        // Submit action for update password form
-        function updatePassword()
-        {
-            // Get inputs
-            var inputs = document.getElementById("updatePasswordForm").elements;
-            var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
-            {
-                var item = inputs.item(i);
-                inputsAsArray[item.name] = item.value.trim();
-            }
-
-            // Add tutor data
-            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
-
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "updatePassword", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    alert(this.responseText);
-                }
-                else
-                {
-                    alert(this.responseText);
-                }
-            };
-            request.send(JSON.stringify(inputsAsArray));
-            return false;
-        };
-
-        // Show tutor data in profile
-        function setUserProfile()
-        {
-            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
-            document.getElementById("userProfileLastName").value = tutorData["LastName"];
-            document.getElementById("userProfileEmail").value = tutorData["Email"];
-            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
+            // Call helper functions
+            getDashboardCharts();
+            getDashboardHours();
+            getStudents();
+            getClasses();
+            getTutors();
         }
-        
+
         // Get from server to populate select inputs
         function getTutors()
         {
@@ -672,8 +986,7 @@
                     {
                         sInfo = studentsInfo[i];
                         document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                        document.getElementById("getNotesStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                        document.getElementById("getCostStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                        document.getElementById("invoiceStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                     }
                 }
             };
@@ -695,19 +1008,144 @@
                     for (let i = 0; i < classesInfo.length; i++)
                     {
                         cInfo = classesInfo[i];
-                        document.getElementById("classesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                        document.getElementById("addHoursClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
                     }
                 }
             };
             request.send(JSON.stringify());
         }
+        
+        // Submit action for get cost form
+        function getInvoice()
+        {
+            // Get inputs
+            var inputs = document.getElementById("getInvoiceForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
 
-        // Get dashboard stats
-        function getDashboard()
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getInvoice", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Clear table
+                    var invoiceTableBody = document.getElementById("invoiceTableBody");
+                    invoiceTableBody.innerHTML = "";
+
+                    // Go through each row and add to table
+                    var invoiceData = JSON.parse(this.responseText);
+                    var totalPrice = 0;
+                    for (let i = 0; i < invoiceData.length; i++)
+                    {
+                        // Get date
+                        var classDate = new Date(invoiceData[i]["Date"].substring(0, 10));
+
+                        // Add to invoice table
+                        invoiceTableBody.innerHTML +=
+                        `<tr>
+                            <th>${i + 1}</th>
+                            <th>${classDate.toISOString().split('T')[0]}</th>
+                            <th>${invoiceData[i]["FirstName"]} ${invoiceData[i]["LastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
+                            <th>${invoiceData[i]["StartTime"].substring(0, 5)}</th>
+                            <th>${invoiceData[i]["EndTime"].substring(0, 5)}</th>
+                            <th>$${invoiceData[i]["MoneyGenerated"]}</th>
+                        </tr>`;
+
+                        // Add money generated to total price
+                        totalPrice += invoiceData[i]["MoneyGenerated"];
+                    }
+
+                    // If not empty set total price
+                    if (invoiceData.length != 0)
+                    {
+                        document.getElementById("invoiceTotal").innerHTML = `$${Number(totalPrice).toLocaleString('en')}`;
+                    }
+                    else
+                    {
+                        alert("No classes logged during this time.");
+                    }
+                }
+                else
+                {
+                    alert("ERROR! Couldn't fetch data, please try again!");
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+        
+        // Get tutor totals
+        function getTutorTotals()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getTutorTotals", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var tutorTotals = JSON.parse(this.responseText);
+
+                    // Update dashboard elements
+                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${Number(tutorTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("careerStudentsTaughtTotal").innerHTML = tutorTotals["TotalStudents"];
+                    document.getElementById("careerHoursTaughtTotal").innerHTML = tutorTotals["TotalHours"];
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        }
+        
+        // Get company totals
+        function getCompanyTotals()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getCompanyTotals", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var companyTotals = JSON.parse(this.responseText);
+
+                    // Update dashboard elements
+                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${Number(companyTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("companyStudentsTaughtTotal").innerHTML = companyTotals["TotalStudents"];
+                    document.getElementById("companyHoursTaughtTotal").innerHTML = companyTotals["TotalHours"];
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        }
+        
+        // Get dashboard chart stats
+        function getDashboardCharts()
         {
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "getDashboard", false);
+            request.open("POST", "getDashboardCharts", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
@@ -717,23 +1155,74 @@
                     // Parse output json
                     var outputsArray = JSON.parse(this.responseText);
 
-                    // Update dashboard elements
-                    document.getElementById("moneyEarned").innerHTML = `Money Earned: $${outputsArray["totalMoneyGenerated"]}`;
-                    document.getElementById("studentsTutored").innerHTML = `Students Tutored: ${outputsArray["totalStudentsTutored"]}`;
-                    document.getElementById("hoursTutored").innerHTML = `Hours Tutored: ${outputsArray["totalHoursTutored"]}`;
+                    // Update dashboard top 3 numbers
+                    document.getElementById("moneyEarned").innerHTML = `$${outputsArray["totalMoneyGenerated"]}`;
+                    document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
+                    document.getElementById("hoursTutored").innerHTML = outputsArray["totalHoursTutored"];
 
-                    studentsChart.data.datasets[0].data = outputsArray["studentsTutoredList"];
-                    moneyChart.data.datasets[0].data = outputsArray["moneyGeneratedList"];
-                    hoursChart.data.datasets[0].data = outputsArray["hoursTutoredList"];
-                    studentsChart.data.labels = outputsArray["datesList"];
-                    hoursChart.data.labels = outputsArray["datesList"];
-                    moneyChart.data.labels = outputsArray["datesList"];
-                    studentsChart.update();
-                    hoursChart.update();
-                    moneyChart.update();
+                    // Update dashboard top 3 charts
+                    moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
+                    studentsChart.updateSeries([{data: outputsArray["studentsTutoredList"]}]);
+                    hoursChart.updateSeries([{data: outputsArray["hoursTutoredList"]}]);
                 }
             };
-            request.send(JSON.stringify({"TimePeriod": timePeriod, "Tutor": tutorData}));
+            request.send(JSON.stringify({"StartDate": weekCalendar.getDate(), "Tutor": tutorData}));
+            return false;
+        };
+
+        // Get rows for hours table
+        function getDashboardHours()
+        {
+            // Get inputs
+            var inputsAsArray = {};
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getDashboardHours", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Clear hours table and calendar
+                    var hoursTableBody = document.getElementById("hoursTableBody");
+                    hoursTableBody.innerHTML = "";
+                    weekCalendar.removeAllEvents();
+
+                    // Go through each row and add to table
+                    var hours = JSON.parse(this.responseText);
+                    for (let i = 0; i < hours.length; i++)
+                    {
+                        // Get date
+                        var classDate = new Date(hours[i]["Date"].substring(0, 10));
+
+                        // Add to calendar
+                        weekCalendar.addEvent
+                        (
+                            {
+                                title: `${hours[i]["FirstName"]} ${hours[i]["LastName"]} ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
+                                start: `${classDate.toISOString().split('T')[0]}`,
+                                color: "#31343d"
+                            }
+                        );
+
+                        // Add to hour table
+                        hoursTableBody.innerHTML +=
+                        `<tr>
+                            <th>${classDate.toISOString().split('T')[0]}</th>
+                            <th>${hours[i]["FirstName"]} ${hours[i]["LastName"]}</th>
+                            <th>${hours[i]["ClassName"]} ${hours[i]["Level"]}</th>
+                            <th>${hours[i]["StartTime"].substring(0, 5)}</th>
+                            <th>${hours[i]["EndTime"].substring(0, 5)}</th>
+                            <th>$${hours[i]["MoneyGenerated"]}</th>
+                            <th>${hours[i]["Notes"]}</th>
+                        </tr>`;
+                    }
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
             return false;
         };
         
@@ -741,27 +1230,17 @@
         function menuNav(dashboardName, elementToMakeActive)
         {
             // Deselect old and select current
-            document.getElementById(currentDashboardButton).className = "menuItem";
+            document.getElementById(currentDashboardButton).className = "";
             if (elementToMakeActive != "none")
             {
+                document.getElementById(elementToMakeActive).className = ("active");
                 currentDashboardButton = elementToMakeActive;
-                document.getElementById(elementToMakeActive).className = ("menuItem activeMenu");
             }
 
             // Hide old dashboard show new and adjust current dashboard var accordingly
             document.getElementById(currentDashboard).style.display = "none";
-            document.getElementById(dashboardName).style.display = "flex";
+            document.getElementById(dashboardName).style.display = "block";
             currentDashboard = dashboardName;
-        }
-        
-        // Function to run when filter item is clicked
-        function filterNav(item)
-        {
-            // Check if item can be clicked
-            if (item.className != "controls activeControl")
-            {
-                alert(item.textContent);
-            }
         }
     </script>
 </html>

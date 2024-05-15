@@ -17,20 +17,20 @@ app.use(express.json());
 // Connect to database
 var con = mysql.createPool(
 {
-    connectionLimit: 15,
-    host: "database-1.c021kjx8ndry.us-east-2.rds.amazonaws.com",
-    user: "admin",
-    password: "pleasework",
-    port: 3306,
-    database: "testdb"
+  connectionLimit: 15,
+  host: "database-1.c021kjx8ndry.us-east-2.rds.amazonaws.com",
+  user: "admin",
+  password: "pleasework",
+  port: 3306,
+  database: "testdb"
 });
 
 // Sql query stuff
-// const tempQuery = `select Date, Classes.Name, Classes.Level, Notes from Hours inner join Classes on Classes.Id = Hours.ClassId where StudentId = 16 and TutorId = 2 order by Date desc limit 10`;
-// const tempQuery = `describe Classes`;
+// const tempQuery = `SELECT * from Tutors`;
 // con.query(tempQuery, (err, result) =>
 // {
-//     console.table(result);
+//   console.table(result);
+//   console.log(err);
 // })
 
 // Check functions
@@ -312,19 +312,53 @@ const getTutor = async (id) =>
   }));
 }
 
-const getHours = async (tutorData, startDate, endDate) =>
+const getTutorTotals = async (id) =>
+{
+    const QUERY = mysql.format("SELECT COUNT(*) as TotalStudents, SUM(MoneyGenerated) as TotalMoney, SUM(TIMESTAMPDIFF(MINUTE, StartTime, EndTime)/60) as TotalHours from Hours WHERE TutorId = ?", id);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+    if (err) 
+    {
+        reject(err)
+    } 
+    else 
+    {
+        resolve(results);
+        return results;
+    }
+    }));
+}
+
+const getCompanyTotals = async () =>
+{
+    const QUERY = "SELECT COUNT(*) as TotalStudents, SUM(MoneyGenerated) as TotalMoney, SUM(TIMESTAMPDIFF(MINUTE, StartTime, EndTime)/60) as TotalHours from Hours";
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+    if (err) 
+    {
+        reject(err)
+    } 
+    else 
+    {
+        resolve(results);
+        return results;
+    }
+    }));
+}
+
+const getHoursWithinDates = async (tutorData, startDate, endDate) =>
 {
   const QUERY = mysql.format("SELECT * FROM Hours WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, result) => 
   {
     if (err) 
     {
-        reject(err)
+      reject(err);
     }
     else 
     {
-        resolve(result);
-        return result;
+      resolve(result);
+      return result;
     }
   }));
 }
@@ -336,7 +370,7 @@ const getCompanyFinances = async (filterData) =>
   {
     if (err) 
     {
-      reject(err)
+      reject(err);
     }
     else 
     {
@@ -353,7 +387,7 @@ const getTutorFinances = async (tutorData, filterData) =>
   {
     if (err) 
     {
-      reject(err)
+      reject(err);
     }
     else 
     {
@@ -363,26 +397,26 @@ const getTutorFinances = async (tutorData, filterData) =>
   }));
 }
 
-const getNotes = async (studentData, tutorData) =>
+const getDashboardHours = async (tutorData) =>
 {
-    const QUERY = `select Date, Classes.Name, Classes.Level, Notes from Hours inner join Classes on Classes.Id = Hours.ClassId where StudentId = ${studentData["Id"]} and TutorId = ${tutorData["Id"]} order by Date desc limit 10`;
-    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-    {
+  const QUERY = mysql.format("SELECT Date, Students.FirstName, Students.LastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? order by Date desc", [tutorData["Id"]]);
+  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+  {
     if (err) 
     {
-        reject(err)
+      reject(err);
     }
     else 
     {
-        resolve(results);
-        return results;
+      resolve(results);
+      return results;
     }
-    }));
+  }));
 }
 
-const getCost = async (studentData, startDate, endDate) =>
+const getInvoice = async (studentData, startDate, endDate) =>
 {
-  const QUERY = `select SUM(MoneyGenerated) from Hours where StudentId = ${studentData["Id"]} and Date >= "${startDate}" and Date <= "${endDate}"`;
+  const QUERY = `select Date, Tutors.FirstName, Tutors.LastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Tutors on Hours.TutorId = Tutors.Id where StudentId = ${studentData["Id"]} and Date >= "${startDate}" and Date <= "${endDate}"`;
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
   {
     if (err) 
@@ -414,7 +448,7 @@ app.get('/:placeholder', (req, res) =>
 // Functions for date
 Date.prototype.GetFirstDayOfWeek = function()
 {
-    return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1) )));
+    return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1))));
 }
 Date.prototype.GetLastDayOfWeek = function()
 {
@@ -446,7 +480,7 @@ app.post('/:placeholder', (req, res) =>
                 // If user not admin cut out
                 if (result[0]["Id"] <= 2)
                 {
-                    dashboardFileToUse = "dashboardWithAdmin.html"
+                    dashboardFileToUse = "dashboardAdmin.html"
                 }
 
                 // Create copy of dashboard html and insert tutor user data
@@ -517,7 +551,37 @@ app.post('/:placeholder', (req, res) =>
             }
         })
     }
-    else if (req.originalUrl == "/getDashboard")
+    else if (req.originalUrl == "/getTutorTotals")
+    {
+        tutorData = JSON.parse(req.body["Tutor"]);
+        getTutorTotals(tutorData["Id"]).then(result =>
+        {
+            if (result.length > 0)
+            {
+                res.status(200).end(JSON.stringify(result[0]));
+            }
+            else
+            {
+                res.status(400).end("ERROR! Unable to fetch tutor totals!")
+            }
+        })
+    }
+    else if (req.originalUrl == "/getCompanyTotals")
+    {
+        tutorData = JSON.parse(req.body["Tutor"]);
+        getCompanyTotals(tutorData["Id"]).then(result =>
+        {
+            if (result.length > 0)
+            {
+                res.status(200).end(JSON.stringify(result[0]));
+            }
+            else
+            {
+                res.status(400).end("ERROR! Unable to fetch company totals!")
+            }
+        })
+    }
+    else if (req.originalUrl == "/getDashboardCharts")
     {
         // Things to send back
         var totalMoneyGenerated = 0;
@@ -528,15 +592,8 @@ app.post('/:placeholder', (req, res) =>
         const hoursTutored = [];
         const dates = [];
 
-        // Based req time period adjust
-        var maxDays = 7;
-        if (req.body["TimePeriod"] == "month")
-        {
-            maxDays = 31;
-        }
-
         // Get start date
-        var today = new Date();
+        var today = new Date(req.body["StartDate"]);
         today.setDate(today.GetFirstDayOfWeek().getDate());
         var day = String(today.getDate()).padStart(2, '0');
         var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -544,7 +601,7 @@ app.post('/:placeholder', (req, res) =>
         var startDate = `${year}-${month}-${day}`;
 
         // Loop through time period
-        for (let i = 0; i < maxDays; i++)
+        for (let i = 0; i < 7; i++)
         {
             // Get current date
             today.setDate(today.GetFirstDayOfWeek().getDate() + i);
@@ -564,7 +621,7 @@ app.post('/:placeholder', (req, res) =>
         year = today.getFullYear();
         var endDate = `${year}-${month}-${day}`;
 
-        getHours(req.body["Tutor"], startDate, endDate).then(result =>
+        getHoursWithinDates(req.body["Tutor"], startDate, endDate).then(result =>
         {
             // Go through all hours logged for date range
             for (let j = 0; j < result.length; j++)
@@ -605,9 +662,9 @@ app.post('/:placeholder', (req, res) =>
             res.status(200).end(JSON.stringify(outputsArray));
         })
     }
-    else if (req.originalUrl == "/getNotes")
+    else if (req.originalUrl == "/getDashboardHours")
     {
-        getNotes(JSON.parse(req.body["Student"]), JSON.parse(req.body["Tutor"])).then(result =>
+        getDashboardHours(JSON.parse(req.body["Tutor"])).then(result =>
         {
             if (result.length > 0)
             {
@@ -615,7 +672,7 @@ app.post('/:placeholder', (req, res) =>
             }
             else
             {
-                res.status(400).end("Student has no previous class notes.");
+                res.status(400).end("Tutor has no hours");
             }
         })
     }
@@ -659,20 +716,12 @@ app.post('/:placeholder', (req, res) =>
             }
         })
     }
-    else if (req.originalUrl == "/getCost")
+    else if (req.originalUrl == "/getInvoice")
     {
         studentData = JSON.parse(req.body["Student"]);
-        getCost(studentData, req.body["StartDate"], req.body["EndDate"]).then(result =>
+        getInvoice(studentData, req.body["startDate"], req.body["endDate"]).then(result =>
         {
-            var moneyGenerated = result[0]["SUM(MoneyGenerated)"];
-            if (moneyGenerated != null)
-            {
-                res.status(200).end(`The cost of tutoring ${studentData["FirstName"]} ${studentData["LastName"]} was $${moneyGenerated}`);
-            }
-            else
-            {
-                res.status(400).end("Student has no recorded classes during this time frame.");
-            }
+            res.status(200).end(JSON.stringify(result));
         })
     }
     else if (req.originalUrl == "/updateUserInfo")
