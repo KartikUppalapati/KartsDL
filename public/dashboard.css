@@ -96,6 +96,18 @@ p {
   margin-bottom: 1rem;
 }
 
+.fc-content
+{
+    cursor: pointer;
+}
+
+.fc-content:hover
+{
+    border-radius: 3px;
+    /* transform: scale(1.25); */
+    background-color: var(--primary);
+}
+
 abbr[title],
 abbr[data-original-title] {
   text-decoration: underline;
@@ -5719,7 +5731,7 @@ a.close.disabled {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1050;
+  z-index: 1055;
   display: none;
   width: 100%;
   height: 100%;
@@ -5807,7 +5819,7 @@ a.close.disabled {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1040;
+  z-index: 1050;
   width: 100vw;
   height: 100vh;
   background-color: #000;

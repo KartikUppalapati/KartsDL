@@ -1,5 +1,5 @@
 // Import stuff
-const port = 3000;
+const port = 3001;
 const fs = require('fs');
 const ip = require('ip');
 const http = require('http');
@@ -26,7 +26,7 @@ var con = mysql.createPool(
 });
 
 // Sql query stuff
-// const tempQuery = `SELECT * from Tutors`;
+// const tempQuery = `select * from Hours`;
 // con.query(tempQuery, (err, result) =>
 // {
 //   console.table(result);
@@ -194,19 +194,53 @@ const addClass = async (className, classLevel) =>
 
 const addHours = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
 {
-  const QUERY = `INSERT INTO Hours VALUES(${tutorData["Id"]}, ${studentData["Id"]}, ${classData["Id"]}, "${hoursData["startTime"]}", "${hoursData["endTime"]}", "${hoursData["Date"]}", "${hoursData["Notes"]}", ${moneyGenerated})`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-  {
-    if (err) 
+    const QUERY = `INSERT INTO Hours VALUES(${tutorData["Id"]}, ${studentData["Id"]}, ${classData["Id"]}, "${hoursData["startTime"]}", "${hoursData["endTime"]}", "${hoursData["Date"]}", "${hoursData["Notes"]}", ${moneyGenerated})`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      reject(err)
-    } 
-    else 
+        if (err)
+        {
+            reject(err);
+        } 
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const editHours = async (tutorData, hoursData, studentData, classData, moneyGenerated, prevMoneyGenerated) =>
+{
+    const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}" and MoneyGenerated = ${prevMoneyGenerated}`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      resolve(results);
-      return results;
-    }
-  }));
+        if (err) 
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const deleteHours = async (tutorData, hoursData, moneyGenerated) =>
+{
+    const QUERY = `DELETE FROM Hours WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["StudentId"]} and ClassId = ${hoursData["ClassId"]} and StartTime = "${hoursData["startTime"]}" and EndTime = "${hoursData["endTime"]}" and Date = "${hoursData["Date"]}" and Notes = "${hoursData["Notes"]}" and MoneyGenerated = ${moneyGenerated}`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 // Get functions
@@ -346,9 +380,26 @@ const getCompanyTotals = async () =>
     }));
 }
 
+const getAllHours = async (tutorData) =>
+    {
+      const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? order by Date desc", [tutorData["Id"]]);
+      return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+      {
+        if (err) 
+        {
+          reject(err);
+        }
+        else 
+        {
+          resolve(results);
+          return results;
+        }
+      }));
+    }
+
 const getHoursWithinDates = async (tutorData, startDate, endDate) =>
 {
-  const QUERY = mysql.format("SELECT * FROM Hours WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
+  const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, result) => 
   {
     if (err) 
@@ -383,23 +434,6 @@ const getCompanyFinances = async (filterData) =>
 const getTutorFinances = async (tutorData, filterData) =>
 {
   const QUERY = `SELECT SUM(MoneyGenerated) FROM Hours WHERE TutorId = ${tutorData["Id"]} AND Date >= "${filterData.StartDateRange}" AND Date <= "${filterData.EndDateRange}"`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-  {
-    if (err) 
-    {
-      reject(err);
-    }
-    else 
-    {
-      resolve(results);
-      return results;
-    }
-  }));
-}
-
-const getDashboardHours = async (tutorData) =>
-{
-  const QUERY = mysql.format("SELECT Date, Students.FirstName, Students.LastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? order by Date desc", [tutorData["Id"]]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
   {
     if (err) 
@@ -581,7 +615,7 @@ app.post('/:placeholder', (req, res) =>
             }
         })
     }
-    else if (req.originalUrl == "/getDashboardCharts")
+    else if (req.originalUrl == "/getDashboard")
     {
         // Things to send back
         var totalMoneyGenerated = 0;
@@ -659,12 +693,13 @@ app.post('/:placeholder', (req, res) =>
             outputsArray["totalMoneyGenerated"] = totalMoneyGenerated;
             outputsArray["totalStudentsTutored"] = totalStudentsTutored;
             outputsArray["totalHoursTutored"] = totalHoursTutored;
+            outputsArray["calendarHours"] = result;
             res.status(200).end(JSON.stringify(outputsArray));
         })
     }
-    else if (req.originalUrl == "/getDashboardHours")
+    else if (req.originalUrl == "/getAllHours")
     {
-        getDashboardHours(JSON.parse(req.body["Tutor"])).then(result =>
+        getAllHours(JSON.parse(req.body["Tutor"])).then(result =>
         {
             if (result.length > 0)
             {
@@ -867,7 +902,7 @@ app.post('/:placeholder', (req, res) =>
 
         // Check that end time not before start time
         timeElapsed = endTime - startTime;
-        if (timeElapsed < 0)
+        if (timeElapsed <= 0)
         {
             res.status(400).end("ERROR! End time must be after start time.");
             return;
@@ -880,6 +915,55 @@ app.post('/:placeholder', (req, res) =>
             if (result.affectedRows == 1)
             {
                 res.status(200).end("SUCCESS! Hours have been logged.");
+            }
+        })
+    }
+    else if (req.originalUrl == "/editHours")
+    {
+        // Convert data to usuable types
+        tutorData = JSON.parse(req.body["Tutor"]);
+        classData = JSON.parse(req.body["Class"]);
+        studentData = JSON.parse(req.body["Student"]);
+        startTime = new Date(0, 0, 0, req.body["startTime"].split(":")[0], req.body["startTime"].split(":")[1]);
+        endTime = new Date(0, 0, 0, req.body["endTime"].split(":")[0], req.body["endTime"].split(":")[1]);
+        prevStartTime = new Date(0, 0, 0, req.body["prevStartTime"].split(":")[0], req.body["prevStartTime"].split(":")[1]);
+        prevEndTime = new Date(0, 0, 0, req.body["prevEndTime"].split(":")[0], req.body["prevEndTime"].split(":")[1]);
+
+        // Check that current end time not before start time
+        timeElapsed = endTime - startTime;
+        prevTimeElapsed = prevEndTime - prevStartTime;
+        if (timeElapsed <= 0)
+        {
+            res.status(400).end("ERROR! End time must be after start time.");
+            return;
+        }
+
+        // Calculate money generated and add hours
+        moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
+        prevMoneyGenerated = req.body["prevStudentPrice"] * (prevTimeElapsed / 3600000);
+        editHours(tutorData, req.body, studentData, classData, moneyGenerated, prevMoneyGenerated).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end("SUCCESS! Hours have been edited.");
+            }
+        })
+    }
+    else if (req.originalUrl == "/deleteHours")
+    {
+        // Get and convert data to usuable types
+        tutorData = JSON.parse(req.body["Tutor"]);
+        startTime = new Date(0, 0, 0, req.body["startTime"].split(":")[0], req.body["startTime"].split(":")[1]);
+        endTime = new Date(0, 0, 0, req.body["endTime"].split(":")[0], req.body["endTime"].split(":")[1]);
+        timeElapsed = endTime - startTime;
+
+        // Delete Hours
+        moneyGenerated = req.body["StudentPrice"] * (timeElapsed / 3600000);
+        deleteHours(tutorData, req.body, moneyGenerated).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end("SUCCESS! Hours have been deleted.");
             }
         })
     }

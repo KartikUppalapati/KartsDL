@@ -31,17 +31,18 @@
 
     <body class="navbar-fixed sidebar-fixed" id="body">
         <div class="wrapper">
+            <!-- Left Side -->
             <aside id="left-sidebar" class="left-sidebar sidebar-light">
                 <div id="sidebar" class="sidebar sidebar-with-footer">
-                    <!-- Aplication Brand -->
+                    <!-- Header Area -->
                     <div class="app-brand">
                         <a>
-                            <!-- <img src="images/logo.png" alt="Mono"> -->
+                            <img src="images/favicon1.png" alt="Mono">
                             <span class="brand-name">MMT Finances</span>
                         </a>
                     </div>
 
-                    <!-- Left Sidebar -->
+                    <!-- Body Area -->
                     <div class="sidebar-left" data-simplebar style="height: 100%;">
                         <ul class="nav sidebar-inner" id="sidebar-menu">
                             <li
@@ -54,9 +55,9 @@
                             </li>
                         
                             <li
-                                id="allHoursButton"
+                                id="allHoursButton" style="display: none;"
                             >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton')">
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton'); getAllHours();">
                                     <i class="mdi mdi-view-list"></i>
                                     <span class="nav-text">All Hours</span>
                                 </a>
@@ -75,6 +76,7 @@
                 </div>
             </aside>
 
+            <!-- Right Side -->
             <div class="page-wrapper">
                 <!-- Top Navbar -->
                 <header class="main-header" id="header">
@@ -153,7 +155,7 @@
                                         </div>
                                         <div class="text-center">
                                           <span id="careerStudentsTaughtTotal" class="h2 d-block">0</span>
-                                          <p>Total Students Taught</p>
+                                          <p>Total Classes Taught</p>
                                         </div>
                                       </div>
                                     </div>
@@ -243,7 +245,7 @@
                                         <h2 id="studentsTutored">0</h2>
                                         <div id="studentsTutoredSummary" class="sub-title mb-4" data-html="true" data-toggle="tooltip" data-placement="bottom"
                                             title="">
-                                            Week's Total Students
+                                            Week's Total Classes
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -313,17 +315,68 @@
                         </div>
                         <div id="addHoursDashboardArea" style="display: none;">
                             <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
-                            <form id="addHoursForm" onsubmit="return addHours()">
+                                <form id="addHoursForm" onsubmit="return addHours()">
+                                    <div class="form-row">
+                                        <div class="col-6 form-group">
+                                            <label>Select Student</label>
+                                            <select id="addHoursStudentsDropdown" name="Student" class="form-control" required>
+                                                <option value="" disabled selected></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 form-group">
+                                            <label>Select Class</label>
+                                            <select id="addHoursClassesDropdown" name="Class" class="form-control" required>
+                                                <option value="" disabled selected></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-4 form-group">
+                                            <label>Date of Class</label>
+                                            <input id="addHoursDateTutored" name="Date" required class="form-control" type="date">
+                                        </div>
+                                        <div class="col-4 form-group">
+                                            <label>Time Started</label>
+                                            <input id="startTimePicker" name="startTime" class="form-control" required type="time">
+                                        </div>
+                                        <div class="col-4 form-group">
+                                            <label>Time Ended</label>
+                                            <input id="endTimePicker" name="endTime" class="form-control" required type="time">
+                                        </div>
+                                    </div>
+                                    <label>Notes</label>
+                                    <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                    <div class="form-footer mt-6 text-center">
+                                        <button type="submit" class="btn btn-primary">Add Hours</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Area -->
+            <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addHoursModalForm">
                                 <div class="form-row">
                                     <div class="col-6 form-group">
                                         <label>Select Student</label>
-                                        <select id="addHoursStudentsDropdown" name="Student" class="form-control" required>
+                                        <select id="addHoursStudentsModalDropdown" name="Student" class="form-control" required>
                                             <option value="" disabled selected></option>
                                         </select>
                                     </div>
                                     <div class="col-6 form-group">
                                         <label>Select Class</label>
-                                        <select id="addHoursClassesDropdown" name="Class" class="form-control" required>
+                                        <select id="addHoursClassesModalDropdown" name="Class" class="form-control" required>
                                             <option value="" disabled selected></option>
                                         </select>
                                     </div>
@@ -331,24 +384,24 @@
                                 <div class="form-row">
                                     <div class="col-4 form-group">
                                         <label>Date of Class</label>
-                                        <input id="addHoursDateTutored" name="Date" required class="form-control" type="date">
+                                        <input id="addHoursModalDateTutored" name="Date" required class="form-control" type="date">
                                     </div>
                                     <div class="col-4 form-group">
                                         <label>Time Started</label>
-                                        <input id="startTimePicker" name="startTime" class="form-control" required type="time">
+                                        <input id="startTimeModalPicker" name="startTime" class="form-control" required type="time">
                                     </div>
                                     <div class="col-4 form-group">
                                         <label>Time Ended</label>
-                                        <input id="endTimePicker" name="endTime" class="form-control" required type="time">
+                                        <input id="endTimeModalPicker" name="endTime" class="form-control" required type="time">
                                     </div>
                                 </div>
                                 <label>Notes</label>
-                                <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
-                                <div class="form-footer mt-6 text-center">
-                                    <button type="submit" class="btn btn-primary">Add Hours</button>
-                                </div>
+                                <textarea id="notesModalBox" name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
                             </form>
-                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalDeleteButton" type="button" class="btn btn-danger btn-pill" onclick="eventDeleteConfirm()">Delete</button>
+                            <button type="button" class="btn btn-primary btn-pill" onclick="setEvent();">Save</button>
                         </div>
                     </div>
                 </div>
@@ -395,9 +448,10 @@
     <script>
         // Init stuff
         var tutorData = [];
-        var timePeriod = "Week";
+        var currentEvent = [];
         var currentDashboard = "mainDashboardArea";
         var currentDashboardButton = "mainDashboardButton";
+        var modal = new bootstrap.Modal(document.getElementById("editEventModal"));
 
         // Calendar
         var calendarArea = document.getElementById('calendarArea');
@@ -407,6 +461,53 @@
             height: 275,
             plugins: ['dayGrid'],
             defaultView: 'dayGridWeek',
+            eventClick: function(eventWrapper)
+            {
+                // Get current event
+                currentEvent = eventWrapper.event;
+
+                // Change delete back
+                document.getElementById("modalDeleteButton").innerHTML = "Delete";
+                document.getElementById("modalDeleteButton").onclick = eventDeleteConfirm;
+
+                // Set things in modal
+                document.getElementById("addHoursModalDateTutored").value = currentEvent._def.extendedProps["Date"];
+                document.getElementById("startTimeModalPicker").value = currentEvent._def.extendedProps["StartTime"];
+                document.getElementById("endTimeModalPicker").value = currentEvent._def.extendedProps["EndTime"];
+                document.getElementById("notesModalBox").value = currentEvent._def.extendedProps["Notes"];
+
+                // Set student by going thru student list and finding id match
+                for (let i = 1; i < document.getElementById("addHoursStudentsModalDropdown").length; i++)
+                {
+                    // Get student data
+                    var studentData = JSON.parse(document.getElementById("addHoursStudentsModalDropdown").options[i].value);
+
+                    // If id matches set to index and stop searching
+                    if (studentData["Id"] == currentEvent._def.extendedProps["StudentId"])
+                    {
+                        currentEvent.setExtendedProp("StudentPrice", studentData["Price"])
+                        document.getElementById("addHoursStudentsModalDropdown").options.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                // Set classes by going thru classes list and finding id match
+                for (let i = 1; i < document.getElementById("addHoursClassesModalDropdown").length; i++)
+                {
+                    // Get student data
+                    var classData = JSON.parse(document.getElementById("addHoursClassesModalDropdown").options[i].value);
+
+                    // If id matches set to index and stop searching
+                    if (classData["Id"] == currentEvent._def.extendedProps["ClassId"])
+                    {
+                        document.getElementById("addHoursClassesModalDropdown").options.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                // Open modal
+                modal.show();
+            },
             validRange: function(nowDate)
             {
                 // Get next monday
@@ -429,7 +530,7 @@
                     click: function()
                     {
                         weekCalendar.prev();
-                        getDashboardCharts();
+                        getDashboard();
                     }
                 },
                 next: {
@@ -437,7 +538,7 @@
                     click: function()
                     {
                         weekCalendar.next();
-                        getDashboardCharts();
+                        getDashboard();
                     }
                 },
                 today: {
@@ -445,7 +546,7 @@
                     click: function()
                     {
                         weekCalendar.today();
-                        getDashboardCharts();
+                        getDashboard();
                     }
                 },
             }
@@ -498,7 +599,7 @@
                 tooltip:
                 {
                     followCursor: false,
-                    theme: "dark",
+                    theme: "light",
                     x:
                     {
                         show: true,
@@ -573,7 +674,7 @@
                 tooltip:
                 {
                     followCursor: false,
-                    theme: "dark",
+                    theme: "light",
                     x:
                     {
                         show: true,
@@ -587,7 +688,7 @@
                         {
                             formatter: function ()
                             {
-                                return "Students Taught";
+                                return "Classes Taught";
                             },
                         },
                     },
@@ -645,7 +746,7 @@
                 tooltip:
                 {
                     followCursor: false,
-                    theme: "dark",
+                    theme: "light",
                     x:
                     {
                         show: true,
@@ -677,9 +778,143 @@
 
         // Get stuff to show
         getPageLoadInfo();
+
+        // Set event delete function
+        function eventDeleteConfirm()
+        {
+            // Change text
+            document.getElementById("modalDeleteButton").innerHTML = "Confirm Delete?";
+
+            // Change click function
+            document.getElementById("modalDeleteButton").onclick = eventDeleteConfirmed;
+        }
+
+        // Set event delete confirm function
+        function eventDeleteConfirmed()
+        {
+            // Close Modal
+            modal.hide();
+            
+            // Get inputs
+            var inputsAsArray = {};
+
+            // Add all saved state data to input array
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+            inputsAsArray["Date"] = currentEvent._def.extendedProps["Date"];
+            inputsAsArray["StudentId"] = currentEvent._def.extendedProps["StudentId"];
+            inputsAsArray["StudentPrice"] = currentEvent._def.extendedProps["StudentPrice"];
+            inputsAsArray["ClassId"] = currentEvent._def.extendedProps["ClassId"];
+            inputsAsArray["startTime"] = currentEvent._def.extendedProps["StartTime"];
+            inputsAsArray["endTime"] = currentEvent._def.extendedProps["EndTime"];
+            inputsAsArray["Notes"] = currentEvent._def.extendedProps["Notes"].trim();
+            
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "deleteHours", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Refresh dashbaord and tutor data
+                    getDashboard();
+                    getTutorTotals();
+
+                    // Show server message
+                    alert(this.responseText);
+
+                    // Change delete function back
+                    document.getElementById("modalDeleteButton").onclick = eventDeleteConfirm;
+                }
+                else
+                {
+                    // Show error message
+                    alert("ERROR! Couldn't remove hours. Please try again.");
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+        }
+
+        // Set event using data from modal form
+        function setEvent()
+        {   
+            // Get inputs
+            var inputsAsArray = {};
+            var inputs = document.getElementById("addHoursModalForm").elements;
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+
+            // Add all saved state data as prev to input array
+            inputsAsArray["Notes"] = document.getElementById("notesModalBox").value;
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+            inputsAsArray["prevDate"] = currentEvent._def.extendedProps["Date"];
+            inputsAsArray["prevStudentId"] = currentEvent._def.extendedProps["StudentId"];
+            inputsAsArray["prevStudentPrice"] = currentEvent._def.extendedProps["StudentPrice"];
+            inputsAsArray["prevClassId"] = currentEvent._def.extendedProps["ClassId"];
+            inputsAsArray["prevStartTime"] = currentEvent._def.extendedProps["StartTime"];
+            inputsAsArray["prevEndTime"] = currentEvent._def.extendedProps["EndTime"];
+            inputsAsArray["prevNotes"] = currentEvent._def.extendedProps["Notes"].trim();
+            
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "editHours", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Set event data
+                    var classData = JSON.parse(document.getElementById("addHoursClassesModalDropdown").value);
+                    var studentData = JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value);
+                    currentEvent.setProp("title", `${studentData["FirstName"]} ${studentData["LastName"].charAt(0)}. ${classData["Name"]} ${classData["Level"]}`);
+                    currentEvent.setStart(document.getElementById("addHoursModalDateTutored").value, {maintainDuration: true});
+
+                    // Save event extended data
+                    currentEvent.setExtendedProp("Date", document.getElementById("addHoursModalDateTutored").value)
+                    currentEvent.setExtendedProp("StartTime", document.getElementById("startTimeModalPicker").value)
+                    currentEvent.setExtendedProp("EndTime", document.getElementById("endTimeModalPicker").value)
+                    currentEvent.setExtendedProp("Notes", document.getElementById("notesModalBox").value)
+
+                    // Save class and student id if not empty
+                    if (document.getElementById("addHoursStudentsModalDropdown").value != "")
+                    {
+                        currentEvent.setExtendedProp("StudentId", JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value)["Id"])   
+                        currentEvent.setExtendedProp("StudentPrice", JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value)["Price"])
+                    }
+                    if (document.getElementById("addHoursClassesModalDropdown").value != "")
+                    {
+                        currentEvent.setExtendedProp("ClassId", JSON.parse(document.getElementById("addHoursClassesModalDropdown").value)["Id"])
+                    }
+
+                    // Close Modal
+                    modal.hide();
+
+                    // Refresh stats
+                    getDashboard();
+                    getTutorTotals();
+
+                    // Show server response
+                    alert(this.responseText);
+                }
+                else
+                {
+                    // Show server response
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+        }
                 
         // Set tutor data in profile
-        function setUserProfile()
+        function setTutorProfile()
         {
             // Set profile info
             document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
@@ -689,9 +924,6 @@
             document.getElementById("userProfileLastName").value = tutorData["LastName"];
             document.getElementById("userProfileEmail").value = tutorData["Email"];
             document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
-
-            // Get tutor totals
-            getTutorTotals();
         }
 
         // Set dates in invoice form
@@ -808,7 +1040,6 @@
                 {
                     tInfo = JSON.parse(this.responseText);
                     tInfo = tInfo[0];
-                    document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
                     alert("Tutor added successfully!");
                 }
                 else
@@ -916,7 +1147,8 @@
                 if (this.readyState == 4 && this.status == 200) 
                 {
                     alert(this.responseText);
-                    getPageLoadInfo();
+                    getDashboard();
+                    getTutorTotals();
                 }
                 else
                 {
@@ -937,12 +1169,12 @@
             var year = today.getFullYear();
             document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
 
-            // Set name and profile info
-            setUserProfile()
+            // Set tutor info
+            setTutorProfile()
+            getTutorTotals();
 
             // Call helper functions
-            getDashboardCharts();
-            getDashboardHours();
+            getDashboard();
             getStudents();
             getClasses();
             getTutors();
@@ -963,7 +1195,7 @@
                     for (let i = 0; i < tutorsInfo.length; i++)
                     {
                         tInfo = tutorsInfo[i];
-                        document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
+                        // document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
                     }
                 }
             };
@@ -985,6 +1217,7 @@
                     for (let i = 0; i < studentsInfo.length; i++)
                     {
                         sInfo = studentsInfo[i];
+                        document.getElementById("addHoursStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                         document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                         document.getElementById("invoiceStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                     }
@@ -1008,6 +1241,7 @@
                     for (let i = 0; i < classesInfo.length; i++)
                     {
                         cInfo = classesInfo[i];
+                        document.getElementById("addHoursClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
                         document.getElementById("addHoursClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
                     }
                 }
@@ -1070,6 +1304,7 @@
                     }
                     else
                     {
+                        document.getElementById("invoiceTotal").innerHTML = `$0`;
                         alert("No classes logged during this time.");
                     }
                 }
@@ -1082,6 +1317,62 @@
             return false;
         };
         
+        // Get dashboard charts and calendar
+        function getDashboard()
+        {
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "getDashboard", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Parse output json
+                    var outputsArray = JSON.parse(this.responseText);
+
+                    // Update dashboard top 3 numbers
+                    document.getElementById("moneyEarned").innerHTML = `$${outputsArray["totalMoneyGenerated"]}`;
+                    document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
+                    document.getElementById("hoursTutored").innerHTML = outputsArray["totalHoursTutored"];
+
+                    // Update dashboard top 3 charts
+                    moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
+                    studentsChart.updateSeries([{data: outputsArray["studentsTutoredList"]}]);
+                    hoursChart.updateSeries([{data: outputsArray["hoursTutoredList"]}]);
+
+                    // Update calendar
+                    weekCalendar.removeAllEvents();
+                    var hours = outputsArray["calendarHours"];
+                    for (let i = 0; i < hours.length; i++)
+                    {
+                        // Get date
+                        var classDate = new Date(hours[i]["Date"].substring(0, 10));
+
+                        // Add to calendar
+                        weekCalendar.addEvent
+                        (
+                            {
+                                title: `${hours[i]["FirstName"]} ${hours[i]["LastName"].charAt(0)}. ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
+                                start: `${classDate.toISOString().split('T')[0]}`,
+                                StudentId: `${hours[i]["StudentId"]}`,
+                                StudentPrice: 0,
+                                ClassId: `${hours[i]["ClassId"]}`,
+                                StartTime: `${hours[i]["StartTime"]}`,
+                                EndTime: `${hours[i]["EndTime"]}`,
+                                Date: `${classDate.toISOString().split('T')[0]}`,
+                                Notes: `${hours[i]["Notes"]}`,
+                                color: "#31343d"
+                            }
+                        );
+                    }
+                }
+            };
+            request.send(JSON.stringify({"StartDate": weekCalendar.getDate(), "Tutor": tutorData}));
+            return false;
+        };
+
         // Get tutor totals
         function getTutorTotals()
         {
@@ -1139,39 +1430,9 @@
             request.send(JSON.stringify(inputsAsArray));
             return false;
         }
-        
-        // Get dashboard chart stats
-        function getDashboardCharts()
-        {
-            // Send to server
-            request = new XMLHttpRequest();
-            request.open("POST", "getDashboardCharts", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    // Parse output json
-                    var outputsArray = JSON.parse(this.responseText);
-
-                    // Update dashboard top 3 numbers
-                    document.getElementById("moneyEarned").innerHTML = `$${outputsArray["totalMoneyGenerated"]}`;
-                    document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
-                    document.getElementById("hoursTutored").innerHTML = outputsArray["totalHoursTutored"];
-
-                    // Update dashboard top 3 charts
-                    moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
-                    studentsChart.updateSeries([{data: outputsArray["studentsTutoredList"]}]);
-                    hoursChart.updateSeries([{data: outputsArray["hoursTutoredList"]}]);
-                }
-            };
-            request.send(JSON.stringify({"StartDate": weekCalendar.getDate(), "Tutor": tutorData}));
-            return false;
-        };
-
+                
         // Get rows for hours table
-        function getDashboardHours()
+        function getAllHours()
         {
             // Get inputs
             var inputsAsArray = {};
@@ -1179,7 +1440,7 @@
 
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "getDashboardHours", false);
+            request.open("POST", "getAllHours", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
@@ -1189,7 +1450,6 @@
                     // Clear hours table and calendar
                     var hoursTableBody = document.getElementById("hoursTableBody");
                     hoursTableBody.innerHTML = "";
-                    weekCalendar.removeAllEvents();
 
                     // Go through each row and add to table
                     var hours = JSON.parse(this.responseText);
@@ -1197,16 +1457,6 @@
                     {
                         // Get date
                         var classDate = new Date(hours[i]["Date"].substring(0, 10));
-
-                        // Add to calendar
-                        weekCalendar.addEvent
-                        (
-                            {
-                                title: `${hours[i]["FirstName"]} ${hours[i]["LastName"]} ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
-                                start: `${classDate.toISOString().split('T')[0]}`,
-                                color: "#31343d"
-                            }
-                        );
 
                         // Add to hour table
                         hoursTableBody.innerHTML +=
