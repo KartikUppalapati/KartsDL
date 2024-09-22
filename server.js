@@ -26,7 +26,7 @@ var con = mysql.createPool(
 });
 
 // Sql query stuff
-// const tempQuery = `select * from Hours`;
+// const tempQuery = `select * from Hours WHERE TutorId = 2 and StudentId = 10 and ClassId = 14 and StartTime = "07:30:00" and EndTime = "08:50:00" and Date = "2024-09-15" and Notes = "Mmt quiz 6 14-20"`;
 // con.query(tempQuery, (err, result) =>
 // {
 //   console.table(result);
@@ -209,9 +209,9 @@ const addHours = async (tutorData, hoursData, studentData, classData, moneyGener
     }));
 }
 
-const editHours = async (tutorData, hoursData, studentData, classData, moneyGenerated, prevMoneyGenerated) =>
+const editHours = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
 {
-    const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}" and MoneyGenerated = ${prevMoneyGenerated}`;
+    const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}"`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err) 
@@ -931,7 +931,6 @@ app.post('/:placeholder', (req, res) =>
 
         // Check that current end time not before start time
         timeElapsed = endTime - startTime;
-        prevTimeElapsed = prevEndTime - prevStartTime;
         if (timeElapsed <= 0)
         {
             res.status(400).end("ERROR! End time must be after start time.");
@@ -940,8 +939,7 @@ app.post('/:placeholder', (req, res) =>
 
         // Calculate money generated and add hours
         moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
-        prevMoneyGenerated = req.body["prevStudentPrice"] * (prevTimeElapsed / 3600000);
-        editHours(tutorData, req.body, studentData, classData, moneyGenerated, prevMoneyGenerated).then(result =>
+        editHours(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
         {
             if (result.affectedRows == 1)
             {
