@@ -26,7 +26,7 @@ var con = mysql.createPool(
 });
 
 // Sql query stuff
-// const tempQuery = `select * from Hours WHERE TutorId = 2 and StudentId = 10 and ClassId = 14 and StartTime = "07:30:00" and EndTime = "08:50:00" and Date = "2024-09-15" and Notes = "Mmt quiz 6 14-20"`;
+// const tempQuery = `select * from Students`;
 // con.query(tempQuery, (err, result) =>
 // {
 //   console.table(result);
