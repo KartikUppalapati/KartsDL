@@ -34,7 +34,7 @@
             <!-- Left Side -->
             <aside id="left-sidebar" class="left-sidebar sidebar-light">
                 <div id="sidebar" class="sidebar sidebar-with-footer">
-                    <!-- Header Area -->
+                    <!-- Top Navbar -->
                     <div class="app-brand">
                         <a>
                             <img src="images/favicon1.png" alt="Mono">
@@ -42,13 +42,13 @@
                         </a>
                     </div>
 
-                    <!-- Body Area -->
+                    <!-- Button Areas -->
                     <div class="sidebar-left" data-simplebar style="height: 100%;">
                         <ul class="nav sidebar-inner" id="sidebar-menu">
                             <li
                                 id="mainDashboardButton" class="active"
                             >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('mainDashboardArea', 'mainDashboardButton')">
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('mainDashboardArea', 'mainDashboardButton', '')">
                                     <i class="mdi mdi-chart-line"></i>
                                     <span class="nav-text">Dashboard</span>
                                 </a>
@@ -57,7 +57,7 @@
                             <li
                                 id="allHoursButton" style="display: none;"
                             >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton'); getAllHours();">
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton', 'getAllHours');">
                                     <i class="mdi mdi-view-list"></i>
                                     <span class="nav-text">All Hours</span>
                                 </a>
@@ -66,7 +66,7 @@
                             <li
                                 id="addHoursButton"
                             >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addHoursDashboardArea', 'addHoursButton')">
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addHoursDashboardArea', 'addHoursButton', 'addHoursFunction')">
                                     <i class="mdi mdi-library-plus"></i>
                                     <span class="nav-text">Add Hours</span>
                                 </a>
@@ -88,16 +88,17 @@
                             </button>
                         </div>
                         
-                        <!-- Dropdown List -->
+                        <!-- Profile Dropdown List -->
                         <div class="navbar-right">
                             <ul class="nav navbar-nav">
                                 <li class="dropdown user-menu">
                                     <button class="dropdown-toggle nav-link" data-toggle="dropdown">
+                                        <!-- <img src="images/user/user-xs-01.jpg" class="user-image rounded-circle" alt="User Image"/> -->
                                         <span id="hiText" class="d-none d-lg-inline-block">First Last</span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li>
-                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none')">
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none', 'tutorDashboardFunction')">
                                                 <i class="mdi mdi-account-outline"></i>
                                                 <p>Profile</p>
                                             </a>
@@ -776,8 +777,8 @@
             hoursChart.render();
         }
 
-        // Get stuff to show
-        getPageLoadInfo();
+        // Get info for page load
+        setTimeout(function() {mainDashboardFunction();}, 150);
 
         // Set event delete function
         function eventDeleteConfirm()
@@ -912,39 +913,7 @@
             };
             request.send(JSON.stringify(inputsAsArray));
         }
-                
-        // Set tutor data in profile
-        function setTutorProfile()
-        {
-            // Set profile info
-            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
-            document.getElementById("hiText").innerHTML = "Hi " + tutorData["FirstName"] + "!";
-            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
-            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
-            document.getElementById("userProfileLastName").value = tutorData["LastName"];
-            document.getElementById("userProfileEmail").value = tutorData["Email"];
-            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
-        }
 
-        // Set dates in invoice form
-        function setInvoiceDates()
-        {
-            // Set start date in invoice
-            var today = new Date();
-            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
-
-            // Set end date in invoice
-            today.setDate(today.getDate() + 6);
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
-        }
-        
         // Submit action for update profile form
         function updateProfile()
         {
@@ -1158,27 +1127,6 @@
             request.send(JSON.stringify(inputsAsArray));
             return false;
         };
-        
-        // Function to call necessary functions on page load
-        function getPageLoadInfo()
-        {
-            // Set today date in add hour form
-            var today = new Date();
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
-
-            // Set tutor info
-            setTutorProfile()
-            getTutorTotals();
-
-            // Call helper functions
-            getDashboard();
-            getStudents();
-            getClasses();
-            getTutors();
-        }
 
         // Get from server to populate select inputs
         function getTutors()
@@ -1476,8 +1424,71 @@
             return false;
         };
         
+        // Get info for main dashboard
+        function mainDashboardFunction()
+        {
+            // Set name in navbar text
+            document.getElementById("hiText").innerHTML = "Hi " + tutorData["FirstName"] + "!";
+
+            // Get dashboard statistics
+            getDashboard();
+
+            // Get values for dropdowns
+            getStudents();
+            getClasses();
+            getTutors();
+        }
+        
+        // Get info for tutor dashboard
+        function tutorDashboardFunction()
+        {
+            // Set profile info
+            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
+            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
+            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
+            document.getElementById("userProfileLastName").value = tutorData["LastName"];
+            document.getElementById("userProfileEmail").value = tutorData["Email"];
+            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
+
+            // Get tutor stats
+            getTutorTotals();
+        }
+        
+        // Get info for add hours dashboard
+        function addHoursFunction()
+        {
+            // Set today date in add hour form
+            var today = new Date();
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
+        }
+        
+        // Get info for admin dashboard
+        function adminDashboardFunction()
+        {
+            // Set start date in invoice
+            var today = new Date();
+            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
+
+            // Set end date in invoice
+            today.setDate(today.getDate() + 6);
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
+
+            // Get company totals
+            getCompanyTotals();
+        }
+
         // Function to run when menu item is clicked
-        function menuNav(dashboardName, elementToMakeActive)
+        function menuNav(dashboardName, elementToMakeActive, functionToRun)
         {
             // Deselect old and select current
             document.getElementById(currentDashboardButton).className = "";
@@ -1491,6 +1502,9 @@
             document.getElementById(currentDashboard).style.display = "none";
             document.getElementById(dashboardName).style.display = "block";
             currentDashboard = dashboardName;
+
+            // Run function
+            setTimeout(function() {window[functionToRun]();}, 150);
         }
     </script>
 </html>
