@@ -96,18 +96,6 @@ p {
   margin-bottom: 1rem;
 }
 
-.fc-content
-{
-    cursor: pointer;
-}
-
-.fc-content:hover
-{
-    border-radius: 3px;
-    /* transform: scale(1.25); */
-    background-color: var(--primary);
-}
-
 abbr[title],
 abbr[data-original-title] {
   text-decoration: underline;
@@ -17481,6 +17469,30 @@ html[dir=rtl] .sidebar li > a .caret:before {
 .mdi-hover:hover
 {
     color: var(--primary);
+}
+
+.fc-day:hover
+{
+    cursor: pointer;
+    background-color: var(--primary) !important;
+}
+
+.fc-content-skeleton
+{
+    pointer-events: none;
+}
+
+.fc-event
+{
+    pointer-events: auto;
+}
+
+.fc-content:hover
+{
+    cursor: pointer;
+    border-radius: 3px;
+    transform: scale(1.15);
+    background-color: var(--primary);
 }
 
 li .active a span

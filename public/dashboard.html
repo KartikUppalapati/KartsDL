@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head>
-        <title>Your Dashboard</title>
+        <title>Tutor Dashboard</title>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -60,15 +60,6 @@
                                 <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('allHoursDashboardArea', 'allHoursButton', 'getAllHours');">
                                     <i class="mdi mdi-view-list"></i>
                                     <span class="nav-text">All Hours</span>
-                                </a>
-                            </li>
-
-                            <li
-                                id="addSessionButton"
-                            >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addSessionDashboardArea', 'addSessionButton', 'addSessionFunction')">
-                                    <i class="mdi mdi-library-plus"></i>
-                                    <span class="nav-text">Add Session</span>
                                 </a>
                             </li putAdminButtonBelowHere>
                         </ul>
@@ -369,45 +360,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="addSessionDashboardArea" style="display: none;">
-                            <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
-                                <form id="addSessionForm" onsubmit="return addSession()">
-                                    <div class="form-row">
-                                        <div class="col-6 form-group">
-                                            <label>Select Student</label>
-                                            <select id="addSessionStudentsDropdown" name="Student" class="form-control" required>
-                                                <option value="" disabled selected></option>
-                                            </select>
-                                        </div>
-                                        <div class="col-6 form-group">
-                                            <label>Select Class</label>
-                                            <select id="addSessionClassesDropdown" name="Class" class="form-control" required>
-                                                <option value="" disabled selected></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col-4 form-group">
-                                            <label>Date of Class</label>
-                                            <input id="addSessionDateTutored" name="Date" required class="form-control" type="date">
-                                        </div>
-                                        <div class="col-4 form-group">
-                                            <label>Time Started</label>
-                                            <input id="startTimePicker" name="startTime" class="form-control" required type="time">
-                                        </div>
-                                        <div class="col-4 form-group">
-                                            <label>Time Ended</label>
-                                            <input id="endTimePicker" name="endTime" class="form-control" required type="time">
-                                        </div>
-                                    </div>
-                                    <label>Notes</label>
-                                    <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
-                                    <div class="form-footer mt-6 text-center">
-                                        <button type="submit" class="btn btn-primary">Add Session</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                         <div id="adminDashboardArea" style="display: none;">
                             <div class="row">
                                 <!-- Admin List -->
@@ -621,7 +573,7 @@
                                                     <input name="Email" placeholder="Student Email" class="form-control" required type="email">
                                                 </div>
                                                 <div class="col-6">
-                                                    <input name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]+" type="text">
+                                                    <input name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]*[.,]?[0-9]*" type="text">
                                                 </div>
                                             </div>
                                             <div class="form-row mt-3">
@@ -674,7 +626,7 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <form id="editSessionModalForm">
+                            <form id="editSessionModalForm" onsubmit="return updateEvent();">
                                 <div class="form-row">
                                     <div class="col-6 form-group">
                                         <label>Select Student</label>
@@ -705,11 +657,54 @@
                                 </div>
                                 <label>Notes</label>
                                 <textarea id="notesModalBox" name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                <div class="form-footer mt-5 text-right">
+                                    <button id="modalDeleteButton" type="button" class="btn btn-danger" onclick="eventDeleteConfirm()">Delete</button>
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
                             </form>
                         </div>
-                        <div class="modal-footer">
-                            <button id="modalDeleteButton" type="button" class="btn btn-danger" onclick="eventDeleteConfirm()">Delete</button>
-                            <button type="button" class="btn btn-success" onclick="updateEvent();">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="addSessionModal" tabindex="-1" role="dialog" aria-labelledby="addSessionModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <form id="addSessionModalForm" onsubmit="return addSession();">
+                                <div class="form-row">
+                                    <div class="col-6 form-group">
+                                        <label>Select Student</label>
+                                        <select id="addSessionStudentsModalDropdown" name="Student" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        <label>Select Class</label>
+                                        <select id="addSessionClassesModalDropdown" name="Class" class="form-control" required>
+                                            <option value="" disabled selected></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-4 form-group">
+                                        <label>Date of Class</label>
+                                        <input id="addSessionModalDateTutored" name="Date" required class="form-control" type="date">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Started</label>
+                                        <input name="startTime" class="form-control" required type="time">
+                                    </div>
+                                    <div class="col-4 form-group">
+                                        <label>Time Ended</label>
+                                        <input name="endTime" class="form-control" required type="time">
+                                    </div>
+                                </div>
+                                <label>Notes</label>
+                                <textarea id="notesModalBox" name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                <div class="form-footer mt-5 text-right">
+                                    <button type="submit" class="btn btn-primary">Add Session</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -732,7 +727,7 @@
                                         <input id="editStudentEmail" name="Email" placeholder="Student Email" class="form-control" required type="email">
                                     </div>
                                     <div class="col-6">
-                                        <input id="editStudentPrice" name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]+" type="text">
+                                        <input id="editStudentPrice" name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]*[.,]?[0-9]*" type="text">
                                     </div>
                                 </div>
                                 <div class="form-row mt-3">
@@ -894,6 +889,7 @@
         var currentProfileButton = "profileInfoButton";
         var currentDashboardButton = "mainDashboardButton";
         var eventModal = new bootstrap.Modal(document.getElementById("editSessionModal"));
+        var sessionModal = new bootstrap.Modal(document.getElementById("addSessionModal"));
         var studentModal = new bootstrap.Modal(document.getElementById("editStudentModal"));
         var invoiceModal = new bootstrap.Modal(document.getElementById("viewInvoiceModal"));
         var contractModal = new bootstrap.Modal(document.getElementById("editContractModal"));
@@ -906,6 +902,10 @@
             height: 275,
             plugins: ['dayGrid'],
             defaultView: 'dayGridWeek',
+            dayClick: function(date, jsEvent, view)
+            {
+                alert('Clicked on: ' + date.format());
+            },
             eventClick: function(eventWrapper)
             {
                 // Get current event
@@ -925,64 +925,68 @@
                 document.getElementById("editSessionStudentsModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
                 document.getElementById("editSessionClassesModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
 
-                // Get students dropdown
-                request = new XMLHttpRequest();
-                request.open("POST", "getStudents", false);
-                request.setRequestHeader('Content-type', 'application/json');
-                request.onreadystatechange = function()
-                {
-                    // Successful response
-                    if (this.readyState == 4 && this.status == 200) 
-                    {
-                        // Get students as list
-                        studentsInfo = JSON.parse(this.responseText);
-
-                        for (let i = 0; i < studentsInfo.length; i++)
-                        {
-                            // Get student
-                            sInfo = studentsInfo[i];
-
-                            // Add student to dropdowns
-                            document.getElementById("editSessionStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-
-                            // If id matches set to index and stop searching
-                            if (sInfo["Id"] == currentEvent._def.extendedProps["StudentId"])
-                            {
-                                currentEvent.setExtendedProp("StudentPrice", sInfo["Price"])
-                                document.getElementById("editSessionStudentsModalDropdown").options.selectedIndex = i + 1;
-                            }
-                        }
-                    }
-                };
-                request.send(JSON.stringify());
-
-                // Get classes dropdown
-                request = new XMLHttpRequest();
-                request.open("POST", "getClasses", false);
-                request.setRequestHeader('Content-type', 'application/json');
-                request.onreadystatechange = function()
-                {
-                    // Successful response
-                    if (this.readyState == 4 && this.status == 200) 
-                    {
-                        classesInfo = JSON.parse(this.responseText);
-                        for (let i = 0; i < classesInfo.length; i++)
-                        {
-                            cInfo = classesInfo[i];
-                            document.getElementById("editSessionClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
-
-                            // If id matches set to index and stop searching
-                            if (cInfo["Id"] == currentEvent._def.extendedProps["ClassId"])
-                            {
-                                document.getElementById("editSessionClassesModalDropdown").options.selectedIndex = i + 1;
-                            }
-                        }
-                    }
-                };
-                request.send(JSON.stringify());
-
                 // Open modal
                 eventModal.show();
+
+                // Get dropdowns
+                setTimeout(function()
+                {
+                    // Get students dropdown
+                    request = new XMLHttpRequest();
+                    request.open("POST", "getStudents", false);
+                    request.setRequestHeader('Content-type', 'application/json');
+                    request.onreadystatechange = function()
+                    {
+                        // Successful response
+                        if (this.readyState == 4 && this.status == 200) 
+                        {
+                            // Get students as list
+                            studentsInfo = JSON.parse(this.responseText);
+
+                            for (let i = 0; i < studentsInfo.length; i++)
+                            {
+                                // Get student
+                                sInfo = studentsInfo[i];
+
+                                // Add student to dropdowns
+                                document.getElementById("editSessionStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+
+                                // If id matches set to index and stop searching
+                                if (sInfo["Id"] == currentEvent._def.extendedProps["StudentId"])
+                                {
+                                    currentEvent.setExtendedProp("StudentPrice", sInfo["Price"])
+                                    document.getElementById("editSessionStudentsModalDropdown").options.selectedIndex = i + 1;
+                                }
+                            }
+                        }
+                    };
+                    request.send(JSON.stringify());
+
+                    // Get classes dropdown
+                    request = new XMLHttpRequest();
+                    request.open("POST", "getClasses", false);
+                    request.setRequestHeader('Content-type', 'application/json');
+                    request.onreadystatechange = function()
+                    {
+                        // Successful response
+                        if (this.readyState == 4 && this.status == 200) 
+                        {
+                            classesInfo = JSON.parse(this.responseText);
+                            for (let i = 0; i < classesInfo.length; i++)
+                            {
+                                cInfo = classesInfo[i];
+                                document.getElementById("editSessionClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+
+                                // If id matches set to index and stop searching
+                                if (cInfo["Id"] == currentEvent._def.extendedProps["ClassId"])
+                                {
+                                    document.getElementById("editSessionClassesModalDropdown").options.selectedIndex = i + 1;
+                                }
+                            }
+                        }
+                    };
+                    request.send(JSON.stringify());
+                }, asyncFunctionTimeout)
             },
             validRange: function(nowDate)
             {
@@ -1028,6 +1032,144 @@
             }
         });
         weekCalendar.render();
+
+        // Delete events
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-09`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-09`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-09`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-09`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-09`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-09`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-09`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-09`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-09`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-09`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-11`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-11`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-10`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-10`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-11`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-11`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+        // weekCalendar.addEvent
+        // (
+        //     {
+        //         title: `Test Event`,
+        //         start: `2024-10-11`,
+        //         StudentId: `6`,
+        //         StudentPrice: 0,
+        //         ClassId: `13`,
+        //         StartTime: `11:00`,
+        //         EndTime: `12:30`,
+        //         Date: `2024-10-11`,
+        //         Notes: `Random`,
+        //         color: "#31343d"
+        //     }
+        // );
+
 
         // Dashboard Charts
         var moneyChartArea = document.getElementById("moneyChartArea");
@@ -1456,6 +1598,7 @@
                 }
             };
             request.send(JSON.stringify(inputsAsArray));
+            return false;
         }
 
         // Submit action for update contract modal
@@ -1689,7 +1832,7 @@
         function addSession()
         {
             // Get inputs
-            var inputs = document.getElementById("addSessionForm").elements;
+            var inputs = document.getElementById("addSessionModalForm").elements;
             var inputsAsArray = {};
             for(var i = 0; i < inputs.length - 1; i++)
             {
@@ -1712,6 +1855,7 @@
                     alert(this.responseText);
                     getDashboard();
                     getTutorTotals();
+                    sessionModal.hide();
                 }
                 else
                 {
@@ -1914,6 +2058,67 @@
         // Get dashboard charts and calendar
         function getDashboard()
         {
+            // Add on click action for week day
+            document.getElementsByClassName("fc-day").forEach(el => el.addEventListener('click', day =>
+            {
+                // Set date in modal
+                document.getElementById("addSessionModalDateTutored").value = day.target.getAttribute("data-date");
+
+                // Open modal
+                sessionModal.show();
+
+                // Clear dropdowns
+                document.getElementById("addSessionStudentsModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
+                document.getElementById("addSessionClassesModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
+
+                // Get dropdown info
+                setTimeout(function()
+                {
+                    // Get students dropdown
+                    request = new XMLHttpRequest();
+                    request.open("POST", "getStudents", false);
+                    request.setRequestHeader('Content-type', 'application/json');
+                    request.onreadystatechange = function()
+                    {
+                        // Successful response
+                        if (this.readyState == 4 && this.status == 200) 
+                        {
+                            // Get students as list
+                            studentsInfo = JSON.parse(this.responseText);
+
+                            for (let i = 0; i < studentsInfo.length; i++)
+                            {
+                                // Get student
+                                sInfo = studentsInfo[i];
+
+                                // Add student to dropdowns
+                                document.getElementById("addSessionStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                            }
+                        }
+                    };
+                    request.send(JSON.stringify());
+
+                    // Get classes dropdown
+                    request = new XMLHttpRequest();
+                    request.open("POST", "getClasses", false);
+                    request.setRequestHeader('Content-type', 'application/json');
+                    request.onreadystatechange = function()
+                    {
+                        // Successful response
+                        if (this.readyState == 4 && this.status == 200) 
+                        {
+                            classesInfo = JSON.parse(this.responseText);
+                            for (let i = 0; i < classesInfo.length; i++)
+                            {
+                                cInfo = classesInfo[i];
+                                document.getElementById("addSessionClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                            }
+                        }
+                    };
+                    request.send(JSON.stringify());
+                }, asyncFunctionTimeout);
+            }));
+
             // Send to server
             request = new XMLHttpRequest();
             request.open("POST", "getDashboard", false);
@@ -2089,65 +2294,7 @@
             // Get tutor stats
             getTutorTotals();
         }
-        
-        // Get info for add session dashboard
-        function addSessionFunction()
-        {
-            // Clear dropdowns
-            document.getElementById("addSessionStudentsDropdown").innerHTML = `<option value="" disabled selected></option>`;
-            document.getElementById("addSessionClassesDropdown").innerHTML = `<option value="" disabled selected></option>`;
-
-            // Set today date in add hour form
-            var today = new Date();
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("addSessionDateTutored").value = `${year}-${month}-${day}`;
-
-            // Get values for students dropdown
-            request = new XMLHttpRequest();
-            request.open("POST", "getStudents", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    // Get students as list
-                    studentsInfo = JSON.parse(this.responseText);
-
-                    for (let i = 0; i < studentsInfo.length; i++)
-                    {
-                        // Get student
-                        sInfo = studentsInfo[i];
-
-                        // Add student to dropdowns
-                        document.getElementById("addSessionStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                    }
-                }
-            };
-            request.send(JSON.stringify());
-
-            // Get values for classes dropdown
-            request = new XMLHttpRequest();
-            request.open("POST", "getClasses", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    classesInfo = JSON.parse(this.responseText);
-                    for (let i = 0; i < classesInfo.length; i++)
-                    {
-                        cInfo = classesInfo[i];
-                        document.getElementById("addSessionClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
-                    }
-                }
-            };
-            request.send(JSON.stringify());
-        }
-        
+ 
         // Get info for admin dashboard
         function adminDashboardFunction()
         {
