@@ -581,7 +581,7 @@ app.post('/:placeholder', (req, res) =>
                         data = data.replace("var tutorData = [];", `var tutorData = ${JSON.stringify(result[0])};`)
 
                         // If user admin
-                        if (result[0]["Admin"] = 1)
+                        if (result[0]["Admin"] == 1)
                         {
                             // Add admin button
                             data = data.replace("</li putAdminButtonBelowHere>", 
