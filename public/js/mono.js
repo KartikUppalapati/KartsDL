@@ -118,7 +118,6 @@ $(document).ready(function () {
     }
   
     /*======== 6. TODO LIST ========*/
-  
     function todoCheckAll() {
       var mdis = document.querySelectorAll(".todo-single-item .mdi");
       mdis.forEach(function (fa) {

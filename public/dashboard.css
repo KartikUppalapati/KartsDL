@@ -17456,27 +17456,49 @@ html[dir=rtl] .sidebar li > a .caret:before {
   font-weight: 500;
 }
 
-li .active
+/* li .active
 {
-  background-color: var(--primary);
+    background-color: var(--primary);
+} */
+
+.make-hidden
+{
+    display: none;
+}
+
+.student-tags
+{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.notify-bottom
+{
+    border-bottom: 5px solid var(--primary);
+}
+
+.mdi-hover:hover
+{
+    color: var(--primary);
 }
 
 li .active a span
 {
-  color: white;
+    color: white;
 }
 
 li:not(.active):hover a span
 {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 li:not(.active) a:hover i
 {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 li a:hover p
 {
-  color: var(--primary);
+    color: var(--primary);
 }

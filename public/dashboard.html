@@ -64,13 +64,13 @@
                             </li>
 
                             <li
-                                id="addHoursButton"
+                                id="addSessionButton"
                             >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addHoursDashboardArea', 'addHoursButton', 'addHoursFunction')">
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('addSessionDashboardArea', 'addSessionButton', 'addSessionFunction')">
                                     <i class="mdi mdi-library-plus"></i>
-                                    <span class="nav-text">Add Hours</span>
+                                    <span class="nav-text">Add Session</span>
                                 </a>
-                            </li>
+                            </li putAdminButtonBelowHere>
                         </ul>
                     </div>
                 </div>
@@ -93,13 +93,12 @@
                             <ul class="nav navbar-nav">
                                 <li class="dropdown user-menu">
                                     <button class="dropdown-toggle nav-link" data-toggle="dropdown">
-                                        <!-- <img src="images/user/user-xs-01.jpg" class="user-image rounded-circle" alt="User Image"/> -->
-                                        <span id="hiText" class="d-none d-lg-inline-block">First Last</span>
+                                        <span id="hiText" class="d-lg-inline-block">First Last</span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li>
-                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none', 'tutorDashboardFunction')">
-                                                <i class="mdi mdi-account-outline"></i>
+                                            <a class="dropdown-link-item" style="cursor: pointer;" onclick="menuNav('profileArea', 'none', 'profileDashboardFunction')">
+                                                <i class="mdi mdi-account"></i>
                                                 <p>Profile</p>
                                             </a>
                                         </li>
@@ -120,103 +119,159 @@
                 <div class="content-wrapper">
                     <div class="content">
                         <div id="profileArea" style="display: none;">
-                            <!-- Picture, Name and Email -->
+                            <!-- Header Area -->
                             <div class="card card-default card-profile">
-                                <div class="card-header" style="background-image:url(assets/img/user/user-bg-01.jpg)"></div>
-                                <div class="card-body card-profile-body">
+                                <div class="card-body card-profile-body mt-7">
                                     <div class="profile-avata">
-                                        <img class="rounded-circle" src="">
-                                        <p id="userProfileName" class="h5 d-block mt-3 mb-2">First Last</p>
+                                        <!-- <img class="rounded-circle" src="images/user/user-md-01.jpg" alt="Avata Image"> -->
+                                        <p id="userProfileName" class="h5 d-block mt-7 mb-2">First Last</p>
                                         <a id="userProfileEmail" class="d-block text-color">random@example.com</a>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Career Stats -->
+                            <!-- Body Area -->
                             <div class="row">
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card card-default">
-                                      <div class="d-flex p-5 align-items-center flex-column">
-                                        <div class="icon-md bg-success rounded-circle mb-2">
-                                          <i class="mdi mdi-coin"></i>
+                                <!-- Settings list -->
+                                <div class="col-xl-3">
+                                    <div class="card card-default">                    
+                                        <div class="card-body pt-0 mt-5">
+                                            <ul class="nav nav-settings">
+                                                <li class="nav-item">
+                                                    <a id="profileInfoButton" class="nav-link active" style="cursor: pointer;" onclick="profileMenuNav('profileInfoButton', [0], 'profileDashboardFunction')">
+                                                        <i class="mdi mdi-information-outline mr-1"></i> Info
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a id="profileButton" class="nav-link" style="cursor: pointer;" onclick="profileMenuNav('profileButton', [2], 'profileFunction')">
+                                                        <i class="mdi mdi-account-outline mr-1"></i> Profile
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a id="profileAccountButton" class="nav-link" style="cursor: pointer;" onclick="profileMenuNav('profileAccountButton', [3], '')">
+                                                        <i class="mdi mdi-settings-outline mr-1"></i> Account
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <div class="text-center">
-                                          <span id="careerMoneyMadeTotal" class="h2 d-block">$0</span>
-                                          <p>Total Money Earned</p>
-                                        </div>
-                                      </div>
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card card-default">
-                                      <div class="d-flex p-5 align-items-center flex-column">
-                                        <div class="icon-md bg-info rounded-circle mb-2">
-                                          <i class="mdi mdi-counter"></i>
+                                <!-- Settings Forms -->
+                                <div id="profileBodyArea" class="col-xl-9">
+                                    <!-- Profile Stats -->
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-success rounded-circle mb-2">
+                                                    <i class="mdi mdi-coin"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="careerMoneyMadeTotal" class="h2 d-block">$0</span>
+                                                    <p>Total Revenue</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-info rounded-circle mb-2">
+                                                    <i class="mdi mdi-counter"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="careerStudentsTaughtTotal" class="h2 d-block">0</span>
+                                                    <p>Total Classes Taught</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-secondary rounded-circle mb-2">
+                                                    <i class="mdi mdi-account-clock-outline"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="careerHoursTaughtTotal" class="h2 d-block">0</span>
+                                                    <p>Total Hours Taught</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="text-center">
-                                          <span id="careerStudentsTaughtTotal" class="h2 d-block">0</span>
-                                          <p>Total Classes Taught</p>
-                                        </div>
-                                      </div>
                                     </div>
-                                </div>
 
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card card-default">
-                                      <div class="d-flex p-5 align-items-center flex-column">
-                                        <div class="icon-md bg-secondary rounded-circle mb-2">
-                                          <i class="mdi mdi-account-clock-outline"></i>
-                                        </div>
-                                        <div class="text-center">
-                                          <span id="careerHoursTaughtTotal" class="h2 d-block">0</span>
-                                          <p>Total Hours Taught</p>
-                                        </div>
-                                      </div>
+                                    <!-- Update Profile Pic -->
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <form>
+                                            <div class="row">
+                                                <div class="col-xl-10">
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-8 col-lg-10">
+                                                            <div class="custom-file mb-1">
+                                                                <input type="file" class="custom-file-input" id="coverImage" required="">
+                                                                <label class="custom-file-label" for="coverImage">Choose jpg file</label>
+                                                                <div class="invalid-feedback">Example invalid custom file feedback</div>
+                                                            </div>
+                                                            <span class="d-block ">Upload a new profile picture</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        
+                                                <div class="col-xl-2">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Update Profile Info -->
-                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
-                                <div class="d-flex justify-content-between">
-                                    <h2 class="text-dark font-weight-medium">Update Profile Info</h2>
-                                </div>
-                                <form id="updateUserProfileForm" class="mt-3" onsubmit="return updateProfile()">
-                                    <div class="form-row mt-3">
-                                        <input id="userProfileFirstName" name="FirstName" placeholder="First Name" class="form-control" type="text">
+                                    <!-- Update Profile Info -->
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <div class="d-flex justify-content-between">
+                                            <h2 class="text-dark font-weight-medium">Update Profile</h2>
+                                        </div>
+                                        <form id="updateUserProfileForm" class="mt-3" onsubmit="return updateProfile()">
+                                            <div class="form-row mt-3">
+                                                <input id="userProfileFirstName" name="FirstName" placeholder="First Name" class="form-control" type="text">
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <input id="userProfileLastName" name="LastName" placeholder="Last Name" class="form-control" required type="text">
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <input id="userProfilePhone" name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
+                                            </div>
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Update</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div class="form-row mt-3">
-                                        <input id="userProfileLastName" name="LastName" placeholder="Last Name" class="form-control" required type="text">
-                                    </div>
-                                    <div class="form-row mt-3">
-                                        <input id="userProfilePhone" name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
-                                    </div>
-                                    <div class="form-footer mt-6 text-center">
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </div>
-                                </form>
-                            </div>
 
-                            <!-- Update Password -->
-                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
-                                <div class="d-flex justify-content-between">
-                                    <h2 class="text-dark font-weight-medium">Update Password</h2>
+                                    <!-- Update Password -->
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <div class="d-flex justify-content-between">
+                                            <h2 class="text-dark font-weight-medium">Update Password</h2>
+                                        </div>
+                                        <form id="updatePasswordForm" class="mt-3" onsubmit="return updatePassword()">
+                                            <div class="form-row mt-3">
+                                                <input name="OldPassword" placeholder="Old Password" class="form-control" required type="text">
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <input name="NewPassword" placeholder="New Password" class="form-control" required type="text">
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <input name="NewPasswordAgain" placeholder="New Password Again" class="form-control" required type="text">
+                                            </div>
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Update</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                                <form id="updatePasswordForm" class="mt-3" onsubmit="return updatePassword()">
-                                    <div class="form-row mt-3">
-                                        <input name="OldPassword" placeholder="Old Password" class="form-control" required type="text">
-                                    </div>
-                                    <div class="form-row mt-3">
-                                        <input name="NewPassword" placeholder="New Password" class="form-control" required type="text">
-                                    </div>
-                                    <div class="form-row mt-3">
-                                        <input name="NewPasswordAgain" placeholder="New Password Again" class="form-control" required type="text">
-                                    </div>
-                                    <div class="form-footer mt-6 text-center">
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                         <div id="mainDashboardArea">
@@ -314,19 +369,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="addHoursDashboardArea" style="display: none;">
-                            <div class="invoice-wrapper rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
-                                <form id="addHoursForm" onsubmit="return addHours()">
+                        <div id="addSessionDashboardArea" style="display: none;">
+                            <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <form id="addSessionForm" onsubmit="return addSession()">
                                     <div class="form-row">
                                         <div class="col-6 form-group">
                                             <label>Select Student</label>
-                                            <select id="addHoursStudentsDropdown" name="Student" class="form-control" required>
+                                            <select id="addSessionStudentsDropdown" name="Student" class="form-control" required>
                                                 <option value="" disabled selected></option>
                                             </select>
                                         </div>
                                         <div class="col-6 form-group">
                                             <label>Select Class</label>
-                                            <select id="addHoursClassesDropdown" name="Class" class="form-control" required>
+                                            <select id="addSessionClassesDropdown" name="Class" class="form-control" required>
                                                 <option value="" disabled selected></option>
                                             </select>
                                         </div>
@@ -334,7 +389,7 @@
                                     <div class="form-row">
                                         <div class="col-4 form-group">
                                             <label>Date of Class</label>
-                                            <input id="addHoursDateTutored" name="Date" required class="form-control" type="date">
+                                            <input id="addSessionDateTutored" name="Date" required class="form-control" type="date">
                                         </div>
                                         <div class="col-4 form-group">
                                             <label>Time Started</label>
@@ -348,36 +403,288 @@
                                     <label>Notes</label>
                                     <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
                                     <div class="form-footer mt-6 text-center">
-                                        <button type="submit" class="btn btn-primary">Add Hours</button>
+                                        <button type="submit" class="btn btn-primary">Add Session</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                        <div id="adminDashboardArea" style="display: none;">
+                            <div class="row">
+                                <!-- Admin List -->
+                                <div class="col-xl-3">
+                                    <div class="card card-default">
+                                        <div class="card-body pt-0 mt-5">
+                                            <ul class="nav nav-settings">
+                                                <li class="nav-item">
+                                                    <a id="adminInfoButton" class="nav-link active" style="cursor: pointer;" onclick="adminMenuNav('adminInfoButton', [0], 'adminDashboardFunction')">
+                                                        <i class="mdi mdi-information-outline mr-1"></i> Info
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <li class="nav-item">
+                                                        <a id="adminAddButton" class="nav-link" style="cursor: pointer;" onclick="adminMenuNav('adminAddButton', [2, 3, 4, 5], 'adminAddFunction')">
+                                                            <i class="mdi mdi-account-plus mr-1"></i> Add
+                                                        </a>
+                                                </li>
+                                                <!-- <li class="nav-item"></li>
+                                                    <a id="adminTutorsButton" class="nav-link" style="cursor: pointer;" onclick="adminMenuNav('adminTutorsButton', [3])">
+                                                        <i class="mdi mdi-account-supervisor mr-1"></i> Tutors
+                                                    </a>
+                                                </li> -->
+                                                <li class="nav-item">
+                                                    <a id="adminStudentsButton" class="nav-link" style="cursor: pointer;" onclick="adminMenuNav('adminStudentsButton', [1], 'adminStudentsFunction')">
+                                                        <i class="mdi mdi-account-group mr-1"></i> Students
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Admin Areas -->
+                                <div id="adminBodyArea" class="col-xl-9">
+                                    <!-- Company Stats -->
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-success rounded-circle mb-2">
+                                                    <i class="mdi mdi-coin"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="companyMoneyMadeTotal" class="h2 d-block">$0</span>
+                                                    <p>Total Revenue</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-info rounded-circle mb-2">
+                                                    <i class="mdi mdi-counter"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="companyStudentsTaughtTotal" class="h2 d-block">0</span>
+                                                    <p>Total Classes Taught</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card card-default">
+                                                <div class="d-flex p-5 align-items-center flex-column">
+                                                    <div class="icon-md bg-secondary rounded-circle mb-2">
+                                                    <i class="mdi mdi-account-clock-outline"></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                    <span id="companyHoursTaughtTotal" class="h2 d-block">0</span>
+                                                    <p>Total Hours Taught</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Student Carousel -->
+                                    <div class="card card-default" style="display: none;">
+                                        <div id="adminStudentsCarousel" class="row" style="width: 90%; margin-left: 5%;">
+                                            <div class="col-lg-6 col-xl-4 col-xxl-3">
+                                                <div class="card card-default mt-7">
+                                                    <div class="card-body text-center">
+                                                        <!-- Name & Profile Pic -->
+                                                        <a class="d-block mb-2">
+                                                            <div class="image mb-3 d-inline-flex mt-n8">
+                                                                <!-- <img src="images/user/user-md-2.jpg" class="img-fluid rounded-circle d-inline-block" alt=""> -->
+                                                            </div>
+                                                            <h3 id="studentCarousel0First" class="student-tags">First</h3>
+                                                            <h3 id="studentCarousel0Last" class="student-tags">Last</h3>
+                                                            <p id="studentCarousel0Phone" class="mt-3 text-smoke student-tags">913-123-4567</p>
+                                                            <p id="studentCarousel0Email" class="mb-3 text-smoke student-tags">example@gmail.com</p>
+                                                        </a>
+                                                
+                                                        <!-- Icons -->
+                                                        <div class="row justify-content-center">
+                                                            <div class="col-4">
+                                                                <i class="mdi mdi-account-edit mdi-24px mdi-hover" style="cursor: pointer;"
+                                                                onclick="openStudentModal(0)"></i>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <i class="mdi mdi-coin mdi-24px mdi-hover" style="cursor: pointer;"
+                                                                onclick="openInvoiceModal(0)"></i>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <i class="mdi mdi-file-document mdi-24px mdi-hover" style="cursor: pointer;"
+                                                                onclick="openContractModal(0)"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <a id="refress-button" href="javascript:" class="btn mdi mdi-cached btn-refress"></a> -->
+                                    </div>
+
+                                    <!-- Add Areas -->
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <form id="addAdminSessionForm" onsubmit="return addAdminSession()">
+                                            <div class="form-row">
+                                                <div class="col-4 form-group">
+                                                    <label>Select Tutor</label>
+                                                    <select id="addAdminSessionTutorsDropdown" name="Tutor" class="form-control" required>
+                                                        <option value="" disabled selected></option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>Select Student</label>
+                                                    <select id="addAdminSessionStudentsDropdown" name="Student" class="form-control" required>
+                                                        <option value="" disabled selected></option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>Select Class</label>
+                                                    <select id="addAdminSessionClassesDropdown" name="Class" class="form-control" required>
+                                                        <option value="" disabled selected></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-4 form-group">
+                                                    <label>Date of Class</label>
+                                                    <input id="addAdminSessionDateTutored" name="Date" required class="form-control" type="date">
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>Time Started</label>
+                                                    <input id="startTimePicker" name="startTime" class="form-control" required type="time">
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>Time Ended</label>
+                                                    <input id="endTimePicker" name="endTime" class="form-control" required type="time">
+                                                </div>
+                                            </div>
+                                            <label>Notes</label>
+                                            <textarea name="Notes" placeholder="Description" class="form-control" required type="text" maxlength="500" style="height: 150px; resize: none;"></textarea>
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Add Session</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <div class="d-flex justify-content-between">
+                                            <h2 class="text-dark font-weight-medium">Add Tutor</h2>
+                                        </div>
+                                        <form id="addTutorForm" class="mt-3" onsubmit="return addTutor()">
+                                            <div class="form-row">
+                                                <div class="col-6">
+                                                    <input name="FirstName" placeholder="Tutor First Name" class="form-control" required type="text">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input name="LastName" placeholder="Tutor Last Name" class="form-control" required type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <div class="col-4">
+                                                    <input name="Email" placeholder="Tutor Email" class="form-control" required type="email">
+                                                </div>
+                                                <div class="col-4">
+                                                    <input name="Phone" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">
+                                                </div>
+                                                <div class="col-4">
+                                                    <input name="Percentage" placeholder="Tutor Percentage (Ex. 80 for 80%)" pattern="[0-9]+" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Add Tutor</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <div class="d-flex justify-content-between">
+                                            <h2 class="text-dark font-weight-medium">Add Student</h2>
+                                        </div>
+                                        <form id="addStudentForm" class="mt-3" onsubmit="return addStudent()">
+                                            <div class="form-row mt-3">
+                                                <div class="col-6">
+                                                    <input name="FirstName" placeholder="Student First Name" class="form-control" required type="text">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input name="LastName" placeholder="Student Last Name" class="form-control" required type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <div class="col-6">
+                                                    <input name="Email" placeholder="Student Email" class="form-control" required type="email">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]+" type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <div class="col-6">
+                                                    <input id="birthday" name="Birthday" type="date" class="form-control" required>  
+                                                </div>
+                                                <div class="col-6">
+                                                    <input name="PhoneNumber" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">  
+                                                </div>
+                                            </div>
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Add Student</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6" style="display: none;">
+                                        <div class="d-flex justify-content-between">
+                                            <h2 class="text-dark font-weight-medium">Add Class</h2>
+                                        </div>
+                                        <form id="addClassForm" class="mt-3" onsubmit="return addClass()">
+                                            <div class="form-row">
+                                                <div class="col-6">
+                                                    <input name="Name" placeholder="Class Name" class="form-control" required type="text">
+                                                </div>
+                                                <div class="col-6">
+                                                    <select name="Level" placeholder="Class Level" class="form-control" required>
+                                                        <option value="" disabled selected>Select class level</option>
+                                                        <option value="preK">preK</option>
+                                                        <option value="K-5">K-5</option>
+                                                        <option value="6-8">6-8</option>
+                                                        <option value="9-12">9-12</option>
+                                                        <option value="Higher">Higher</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-footer mt-6 text-center">
+                                                <button type="submit" class="btn btn-primary">Add</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Area -->
-            <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModal" aria-hidden="true">
+            <!-- Modal Areas -->
+            <div class="modal fade" id="editSessionModal" tabindex="-1" role="dialog" aria-labelledby="editSessionModal" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
                         <div class="modal-body">
-                            <form id="addHoursModalForm">
+                            <form id="editSessionModalForm">
                                 <div class="form-row">
                                     <div class="col-6 form-group">
                                         <label>Select Student</label>
-                                        <select id="addHoursStudentsModalDropdown" name="Student" class="form-control" required>
+                                        <select id="editSessionStudentsModalDropdown" name="Student" class="form-control" required>
                                             <option value="" disabled selected></option>
                                         </select>
                                     </div>
                                     <div class="col-6 form-group">
                                         <label>Select Class</label>
-                                        <select id="addHoursClassesModalDropdown" name="Class" class="form-control" required>
+                                        <select id="editSessionClassesModalDropdown" name="Class" class="form-control" required>
                                             <option value="" disabled selected></option>
                                         </select>
                                     </div>
@@ -385,7 +692,7 @@
                                 <div class="form-row">
                                     <div class="col-4 form-group">
                                         <label>Date of Class</label>
-                                        <input id="addHoursModalDateTutored" name="Date" required class="form-control" type="date">
+                                        <input id="editSessionModalDateTutored" name="Date" required class="form-control" type="date">
                                     </div>
                                     <div class="col-4 form-group">
                                         <label>Time Started</label>
@@ -401,8 +708,137 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button id="modalDeleteButton" type="button" class="btn btn-danger btn-pill" onclick="eventDeleteConfirm()">Delete</button>
-                            <button type="button" class="btn btn-primary btn-pill" onclick="setEvent();">Save</button>
+                            <button id="modalDeleteButton" type="button" class="btn btn-danger" onclick="eventDeleteConfirm()">Delete</button>
+                            <button type="button" class="btn btn-success" onclick="updateEvent();">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <form id="updateStudentForm" class="mt-3" onsubmit="return updateStudent()">
+                                <div class="form-row mt-3">
+                                    <div class="col-6">
+                                        <input id="editStudentFirstName" name="FirstName" placeholder="Student First Name" class="form-control" required type="text">
+                                    </div>
+                                    <div class="col-6">
+                                        <input id="editStudentLastName" name="LastName" placeholder="Student Last Name" class="form-control" required type="text">
+                                    </div>
+                                </div>
+                                <div class="form-row mt-3">
+                                    <div class="col-6">
+                                        <input id="editStudentEmail" name="Email" placeholder="Student Email" class="form-control" required type="email">
+                                    </div>
+                                    <div class="col-6">
+                                        <input id="editStudentPrice" name="Price" placeholder="Student Price (Ex. 50)" class="form-control" required pattern="[0-9]+" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-row mt-3">
+                                    <div class="col-6">
+                                        <input id="editStudentBirthday" name="Birthday" type="date" class="form-control" required>  
+                                    </div>
+                                    <div class="col-6">
+                                        <input id="editStudentPhone" name="PhoneNumber" placeholder="123-456-7890" class="form-control" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" type="tel">  
+                                    </div>
+                                </div>
+                                <div class="modal-footer mt-3 text-center">
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="viewInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="viewInvoiceModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body mt-3">
+                            <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <!-- Invoice Form -->
+                                <div class="d-flex justify-content-between">
+                                    <div class="rounded bg-white">
+                                        <form id="getInvoiceForm" class="mt-3 make-hidden" onsubmit="return getInvoice()">
+                                            <div class="form-row">
+                                                <div class="col-4 form-group">
+                                                    <label>Start Date</label>
+                                                    <input id="invoiceStartDate" name="startDate" class="form-control" required type="date">
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>End Date</label>
+                                                    <input id="invoiceEndDate" name="endDate" class="form-control" required type="date">
+                                                </div>
+                                                <div class="col-4 form-group">
+                                                    <label>Get Invoice</label>
+                                                    <button type="submit" class="btn btn-primary form-control">Get</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <i class="mdi mdi-settings-outline mdi-18px mdi-hover" style="cursor: pointer;" onclick="document.getElementById('getInvoiceForm').classList.toggle('make-hidden')"></i>
+                                </div>
+
+                                <!-- Invoice Id -->
+                                <div>
+                                    <h3 id="modalInvoiceFullName" class="text-dark"></h3>
+                                    <p id="modalInvoicePhone">Phone:</p>
+                                    <p id="modalInvoiceEmail">Email:</p>
+                                </div>
+
+                                <!-- Invoice Table -->
+                                <div class="table-responsive">
+                                    <table class="table mt-3 table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date</th>
+                                            <th>Item</th>
+                                            <th>Start</th>
+                                            <th>End</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoiceTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="modal-footer">
+                            <button type="button" class="btn btn-success" onclick="saveStudentInvoice();">Download</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editContractModal" tabindex="-1" role="dialog" aria-labelledby="editContractModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <!-- Upload pdf -->
+                            <div class="rounded border bg-white py-5 px-3 px-md-4 px-lg-5 mb-6">
+                                <div class="row justify-content-end">
+                                    <i class="mdi mdi-settings-outline mdi-18px mdi-hover" style="cursor: pointer;" onclick="document.getElementById('updateContractForm').classList.toggle('make-hidden')"></i>
+                                </div>
+                                <form id="updateContractForm" class="mt-3 make-hidden" onsubmit="return updateContract()">
+                                    <div class="row">
+                                        <div>
+                                            <div class="form-group row">
+                                                <div class="ml-5 mr-5">
+                                                    <div class="custom-file mb-1">
+                                                        <input type="file" class="custom-file-input" id="coverImage" required="">
+                                                        <label class="custom-file-label" for="coverImage">Upload new contract</label>
+                                                        <div class="invalid-feedback">Example invalid custom file feedback</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div>
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -450,11 +886,19 @@
         // Init stuff
         var tutorData = [];
         var currentEvent = [];
+        var currentAdminTutorId = 0;
+        var currentAdminStudentId = 0;
+        var asyncFunctionTimeout = 200;
         var currentDashboard = "mainDashboardArea";
+        var currentAdminButton = "adminInfoButton";
+        var currentProfileButton = "profileInfoButton";
         var currentDashboardButton = "mainDashboardButton";
-        var modal = new bootstrap.Modal(document.getElementById("editEventModal"));
+        var eventModal = new bootstrap.Modal(document.getElementById("editSessionModal"));
+        var studentModal = new bootstrap.Modal(document.getElementById("editStudentModal"));
+        var invoiceModal = new bootstrap.Modal(document.getElementById("viewInvoiceModal"));
+        var contractModal = new bootstrap.Modal(document.getElementById("editContractModal"));
 
-        // Calendar
+        // Dashboard Calendar
         var calendarArea = document.getElementById('calendarArea');
         var weekCalendar = new FullCalendar.Calendar(calendarArea,
         {
@@ -472,42 +916,73 @@
                 document.getElementById("modalDeleteButton").onclick = eventDeleteConfirm;
 
                 // Set things in modal
-                document.getElementById("addHoursModalDateTutored").value = currentEvent._def.extendedProps["Date"];
+                document.getElementById("editSessionModalDateTutored").value = currentEvent._def.extendedProps["Date"];
                 document.getElementById("startTimeModalPicker").value = currentEvent._def.extendedProps["StartTime"];
                 document.getElementById("endTimeModalPicker").value = currentEvent._def.extendedProps["EndTime"];
                 document.getElementById("notesModalBox").value = currentEvent._def.extendedProps["Notes"];
 
-                // Set student by going thru student list and finding id match
-                for (let i = 1; i < document.getElementById("addHoursStudentsModalDropdown").length; i++)
+                // Clear dropdowns
+                document.getElementById("editSessionStudentsModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
+                document.getElementById("editSessionClassesModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
+
+                // Get students dropdown
+                request = new XMLHttpRequest();
+                request.open("POST", "getStudents", false);
+                request.setRequestHeader('Content-type', 'application/json');
+                request.onreadystatechange = function()
                 {
-                    // Get student data
-                    var studentData = JSON.parse(document.getElementById("addHoursStudentsModalDropdown").options[i].value);
-
-                    // If id matches set to index and stop searching
-                    if (studentData["Id"] == currentEvent._def.extendedProps["StudentId"])
+                    // Successful response
+                    if (this.readyState == 4 && this.status == 200) 
                     {
-                        currentEvent.setExtendedProp("StudentPrice", studentData["Price"])
-                        document.getElementById("addHoursStudentsModalDropdown").options.selectedIndex = i;
-                        break;
-                    }
-                }
+                        // Get students as list
+                        studentsInfo = JSON.parse(this.responseText);
 
-                // Set classes by going thru classes list and finding id match
-                for (let i = 1; i < document.getElementById("addHoursClassesModalDropdown").length; i++)
+                        for (let i = 0; i < studentsInfo.length; i++)
+                        {
+                            // Get student
+                            sInfo = studentsInfo[i];
+
+                            // Add student to dropdowns
+                            document.getElementById("editSessionStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+
+                            // If id matches set to index and stop searching
+                            if (sInfo["Id"] == currentEvent._def.extendedProps["StudentId"])
+                            {
+                                currentEvent.setExtendedProp("StudentPrice", sInfo["Price"])
+                                document.getElementById("editSessionStudentsModalDropdown").options.selectedIndex = i + 1;
+                            }
+                        }
+                    }
+                };
+                request.send(JSON.stringify());
+
+                // Get classes dropdown
+                request = new XMLHttpRequest();
+                request.open("POST", "getClasses", false);
+                request.setRequestHeader('Content-type', 'application/json');
+                request.onreadystatechange = function()
                 {
-                    // Get student data
-                    var classData = JSON.parse(document.getElementById("addHoursClassesModalDropdown").options[i].value);
-
-                    // If id matches set to index and stop searching
-                    if (classData["Id"] == currentEvent._def.extendedProps["ClassId"])
+                    // Successful response
+                    if (this.readyState == 4 && this.status == 200) 
                     {
-                        document.getElementById("addHoursClassesModalDropdown").options.selectedIndex = i;
-                        break;
+                        classesInfo = JSON.parse(this.responseText);
+                        for (let i = 0; i < classesInfo.length; i++)
+                        {
+                            cInfo = classesInfo[i];
+                            document.getElementById("editSessionClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+
+                            // If id matches set to index and stop searching
+                            if (cInfo["Id"] == currentEvent._def.extendedProps["ClassId"])
+                            {
+                                document.getElementById("editSessionClassesModalDropdown").options.selectedIndex = i + 1;
+                            }
+                        }
                     }
-                }
+                };
+                request.send(JSON.stringify());
 
                 // Open modal
-                modal.show();
+                eventModal.show();
             },
             validRange: function(nowDate)
             {
@@ -554,7 +1029,7 @@
         });
         weekCalendar.render();
 
-        // Charts
+        // Dashboard Charts
         var moneyChartArea = document.getElementById("moneyChartArea");
         if (moneyChartArea !== null)
         {
@@ -630,7 +1105,6 @@
             var moneyChart = new ApexCharts(moneyChartArea, moneyChartOptions);
             moneyChart.render();
         }
-
         var studentsChartArea = document.getElementById("studentsChartArea");
         if (studentsChartArea !== null)
         {
@@ -704,7 +1178,6 @@
             var studentsChart = new ApexCharts(studentsChartArea, studentsChartOptions);
             studentsChart.render();
         }
-
         var hoursChartArea = document.getElementById("hoursChartArea");
         if (hoursChartArea !== null)
         {
@@ -778,7 +1251,82 @@
         }
 
         // Get info for page load
-        setTimeout(function() {mainDashboardFunction();}, 150);
+        setTimeout(function() {mainDashboardFunction();}, asyncFunctionTimeout);
+
+        // Function to open student modal
+        function openEditStudentModal(studentId)
+        {
+            // Set student id
+            currentAdminStudentId = studentId;
+
+            // Update input fields
+            document.getElementById("editStudentFirstName").value = "";
+            document.getElementById("editStudentLastName").value = "";
+            document.getElementById("editStudentBirthday").value = "";
+            document.getElementById("editStudentEmail").value = "";
+            document.getElementById("editStudentPrice").value = "";
+            document.getElementById("editStudentPhone").value = "";
+
+            // Open modal
+            studentModal.show();
+
+            // Get student data
+            setTimeout(function() {getStudent();}, asyncFunctionTimeout);
+        }
+
+        // Function to open invoice modal
+        function openInvoiceModal(studentId)
+        {
+            // Clear table
+            document.getElementById("invoiceTableBody").innerHTML =
+            `<tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Loading</th>
+                <th></th>
+                <th></th>
+            </tr>`;
+
+            // Set header
+            document.getElementById("modalInvoiceFullName").innerHTML = document.getElementById("studentCarousel" + studentId + "First").innerHTML + " " + document.getElementById("studentCarousel" + studentId + "Last").innerHTML;
+            document.getElementById("modalInvoicePhone").innerHTML = "Phone: " + document.getElementById("studentCarousel" + studentId + "Phone").innerHTML;
+            document.getElementById("modalInvoiceEmail").innerHTML = "Email: " + document.getElementById("studentCarousel" + studentId + "Email").innerHTML;
+
+            // Set student id
+            currentAdminStudentId = studentId;
+
+            // Open modal
+            invoiceModal.show();
+
+            // Set start date in invoice
+            var today = new Date();
+            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
+
+            // Set end date in invoice
+            today.setDate(today.getDate() + 6);
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
+
+            // Get invoice
+            setTimeout(function() {getInvoice();}, asyncFunctionTimeout);
+        }
+
+        // Function to open contract modal
+        function openContractModal(studentId)
+        {
+            // Set student id
+            currentAdminStudentId = studentId;
+
+            // Open modal
+            contractModal.show();
+        }
 
         // Set event delete function
         function eventDeleteConfirm()
@@ -794,7 +1342,7 @@
         function eventDeleteConfirmed()
         {
             // Close Modal
-            modal.hide();
+            eventModal.hide();
             
             // Get inputs
             var inputsAsArray = {};
@@ -809,19 +1357,17 @@
             inputsAsArray["endTime"] = currentEvent._def.extendedProps["EndTime"];
             inputsAsArray["Notes"] = currentEvent._def.extendedProps["Notes"].trim();
             
-
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "deleteHours", false);
+            request.open("POST", "deleteSession", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    // Refresh dashbaord and tutor data
+                    // Refresh dashboard and tutor data
                     getDashboard();
-                    getTutorTotals();
 
                     // Show server message
                     alert(this.responseText);
@@ -832,24 +1378,23 @@
                 else
                 {
                     // Show error message
-                    alert("ERROR! Couldn't remove hours. Please try again.");
+                    alert("ERROR! Couldn't remove session. Please try again.");
                 }
             };
             request.send(JSON.stringify(inputsAsArray));
         }
 
-        // Set event using data from modal form
-        function setEvent()
+        // Update event using data from modal form
+        function updateEvent()
         {   
             // Get inputs
             var inputsAsArray = {};
-            var inputs = document.getElementById("addHoursModalForm").elements;
+            var inputs = document.getElementById("editSessionModalForm").elements;
             for(var i = 0; i < inputs.length - 1; i++)
             {
                 var item = inputs.item(i);
                 inputsAsArray[item.name] = item.value.trim();
             }
-
 
             // Add all saved state data as prev to input array
             inputsAsArray["Notes"] = document.getElementById("notesModalBox").value;
@@ -865,7 +1410,7 @@
 
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "editHours", false);
+            request.open("POST", "editSession", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
@@ -873,34 +1418,33 @@
                 if (this.readyState == 4 && this.status == 200) 
                 {
                     // Set event data
-                    var classData = JSON.parse(document.getElementById("addHoursClassesModalDropdown").value);
-                    var studentData = JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value);
+                    var classData = JSON.parse(document.getElementById("editSessionClassesModalDropdown").value);
+                    var studentData = JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value);
                     currentEvent.setProp("title", `${studentData["FirstName"]} ${studentData["LastName"].charAt(0)}. ${classData["Name"]} ${classData["Level"]}`);
-                    currentEvent.setStart(document.getElementById("addHoursModalDateTutored").value, {maintainDuration: true});
+                    currentEvent.setStart(document.getElementById("editSessionModalDateTutored").value, {maintainDuration: true});
 
                     // Save event extended data
-                    currentEvent.setExtendedProp("Date", document.getElementById("addHoursModalDateTutored").value)
+                    currentEvent.setExtendedProp("Date", document.getElementById("editSessionModalDateTutored").value)
                     currentEvent.setExtendedProp("StartTime", document.getElementById("startTimeModalPicker").value)
                     currentEvent.setExtendedProp("EndTime", document.getElementById("endTimeModalPicker").value)
                     currentEvent.setExtendedProp("Notes", document.getElementById("notesModalBox").value)
 
                     // Save class and student id if not empty
-                    if (document.getElementById("addHoursStudentsModalDropdown").value != "")
+                    if (document.getElementById("editSessionStudentsModalDropdown").value != "")
                     {
-                        currentEvent.setExtendedProp("StudentId", JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value)["Id"])   
-                        currentEvent.setExtendedProp("StudentPrice", JSON.parse(document.getElementById("addHoursStudentsModalDropdown").value)["Price"])
+                        currentEvent.setExtendedProp("StudentId", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Id"])   
+                        currentEvent.setExtendedProp("StudentPrice", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Price"])
                     }
-                    if (document.getElementById("addHoursClassesModalDropdown").value != "")
+                    if (document.getElementById("editSessionClassesModalDropdown").value != "")
                     {
-                        currentEvent.setExtendedProp("ClassId", JSON.parse(document.getElementById("addHoursClassesModalDropdown").value)["Id"])
+                        currentEvent.setExtendedProp("ClassId", JSON.parse(document.getElementById("editSessionClassesModalDropdown").value)["Id"])
                     }
 
                     // Close Modal
-                    modal.hide();
+                    eventModal.hide();
 
                     // Refresh stats
                     getDashboard();
-                    getTutorTotals();
 
                     // Show server response
                     alert(this.responseText);
@@ -912,6 +1456,20 @@
                 }
             };
             request.send(JSON.stringify(inputsAsArray));
+        }
+
+        // Submit action for update contract modal
+        function updateContract()
+        {
+            return false;
+        }
+        
+        // Set profile header
+        function setUserProfile()
+        {
+            // Set profile header
+            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
+            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
         }
 
         // Submit action for update profile form
@@ -931,16 +1489,19 @@
 
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "updateUserInfo", false);
+            request.open("POST", "updateUserProfile", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
+                    // Update tutor data
                     tutorData = JSON.parse(this.responseText);
+
+                    // Update name text areas
+                    document.getElementById("hiText").innerHTML = "Hi " + tutorData["FirstName"] + "!";
                     setUserProfile();
-                    alert("SUCCESS! Profile has been updated.")
                 }
                 else
                 {
@@ -986,6 +1547,48 @@
             return false;
         };
         
+        // Submit action for update student form
+        function updateStudent()
+        {
+            // Get inputs
+            var inputs = document.getElementById("updateStudentForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Add student id
+            inputsAsArray["studentId"] = currentAdminStudentId;
+
+            // Send to server
+            request = new XMLHttpRequest();
+            request.open("POST", "updateStudent", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Update student card
+                    document.getElementById(`studentCarousel${currentAdminStudentId}First`).innerHTML = inputsAsArray["FirstName"];
+                    document.getElementById(`studentCarousel${currentAdminStudentId}Last`).innerHTML = inputsAsArray["LastName"];
+                    document.getElementById(`studentCarousel${currentAdminStudentId}Phone`).innerHTML = inputsAsArray["PhoneNumber"];
+                    document.getElementById(`studentCarousel${currentAdminStudentId}Email`).innerHTML = inputsAsArray["Email"];
+
+                    // Close edit student modal
+                    studentModal.hide();
+                }
+                else
+                {
+                    alert(this.responseText);
+                }
+            };
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
+
         // Submit action for add tutor form
         function addTutor()
         {
@@ -1007,8 +1610,6 @@
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    tInfo = JSON.parse(this.responseText);
-                    tInfo = tInfo[0];
                     alert("Tutor added successfully!");
                 }
                 else
@@ -1041,10 +1642,6 @@
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    sInfo = JSON.parse(this.responseText);
-                    sInfo = sInfo[0];
-                    document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                    document.getElementById("getCostStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
                     alert("Student added successfully!");
                 }
                 else
@@ -1077,9 +1674,6 @@
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    cInfo = JSON.parse(this.responseText);
-                    cInfo = cInfo[0];
-                    document.getElementById("classesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
                     alert("Class added successfully!");
                 }
                 else
@@ -1091,11 +1685,11 @@
             return false;
         };
 
-        // Submit action for add hours form
-        function addHours()
+        // Submit action for add session form
+        function addSession()
         {
             // Get inputs
-            var inputs = document.getElementById("addHoursForm").elements;
+            var inputs = document.getElementById("addSessionForm").elements;
             var inputsAsArray = {};
             for(var i = 0; i < inputs.length - 1; i++)
             {
@@ -1108,7 +1702,7 @@
 
             // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "addHours", false);
+            request.open("POST", "addSession", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
@@ -1128,82 +1722,102 @@
             return false;
         };
 
-        // Get from server to populate select inputs
-        function getTutors()
+        // Submit action for add session form
+        function addAdminSession()
         {
+            // Get inputs
+            var inputs = document.getElementById("addAdminSessionForm").elements;
+            var inputsAsArray = {};
+            for(var i = 0; i < inputs.length - 1; i++)
+            {
+                var item = inputs.item(i);
+                inputsAsArray[item.name] = item.value.trim();
+            }
+
+            // Add tutor data
+            inputsAsArray["Tutor"] = JSON.stringify(tutorData);
+
+            // Send to server
             request = new XMLHttpRequest();
-            request.open("POST", "getTutors", false);
+            request.open("POST", "addAdminSession", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
-                    tutorsInfo = JSON.parse(this.responseText);
-                    for (let i = 0; i < tutorsInfo.length; i++)
-                    {
-                        tInfo = tutorsInfo[i];
-                        // document.getElementById("allFinancesTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
-                    }
+                    alert(this.responseText);
+                    getDashboard();
+                    getTutorTotals();
+                }
+                else
+                {
+                    alert(this.responseText);
                 }
             };
-            request.send(JSON.stringify());
-        }
+            request.send(JSON.stringify(inputsAsArray));
+            return false;
+        };
 
-        // Get from server to populate select inputs
-        function getStudents()
+        // Get from server to populate edit inputs
+        function getStudent()
         {
             request = new XMLHttpRequest();
-            request.open("POST", "getStudents", false);
+            request.open("POST", "getStudent", false);
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
+                    // Get students as list
                     studentsInfo = JSON.parse(this.responseText);
-                    for (let i = 0; i < studentsInfo.length; i++)
+
+                    // If student returned
+                    if (studentsInfo.length == 1)
                     {
-                        sInfo = studentsInfo[i];
-                        document.getElementById("addHoursStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                        document.getElementById("addHoursStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
-                        document.getElementById("invoiceStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                        // Update input fields
+                        document.getElementById("editStudentFirstName").value = studentsInfo[0]["FirstName"];
+                        document.getElementById("editStudentLastName").value = studentsInfo[0]["LastName"];
+                        document.getElementById("editStudentBirthday").value = studentsInfo[0]["Birthday"].split('T')[0];
+                        document.getElementById("editStudentEmail").value = studentsInfo[0]["Email"];
+                        document.getElementById("editStudentPrice").value = studentsInfo[0]["Price"];
+                        document.getElementById("editStudentPhone").value = studentsInfo[0]["PhoneNumber"];
+                    }
+                    // Else no student found
+                    else
+                    {
+                        // Update input fields
+                        document.getElementById("editStudentFirstName").value = "Not Found";
+                        document.getElementById("editStudentLastName").value = "Not Found";
+                        document.getElementById("editStudentBirthday").value = "";
+                        document.getElementById("editStudentEmail").value = "Not Found";
+                        document.getElementById("editStudentPrice").value = "Not Found";
+                        document.getElementById("editStudentPhone").value = "Not Found";
                     }
                 }
+                else
+                {
+                    // Update input fields
+                    document.getElementById("editStudentFirstName").value = "undefined";
+                    document.getElementById("editStudentLastName").value = "undefined";
+                    document.getElementById("editStudentBirthday").value = "undefined";
+                    document.getElementById("editStudentEmail").value = "undefined";
+                    document.getElementById("editStudentPrice").value = "undefined";
+                    document.getElementById("editStudentPhone").value = "undefined";
+                }
             };
-            request.send(JSON.stringify());
+            request.send(JSON.stringify({"studentId": currentAdminStudentId}));
         }
 
-        // Get from server to populate select inputs
-        function getClasses()
-        {
-            request = new XMLHttpRequest();
-            request.open("POST", "getClasses", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    classesInfo = JSON.parse(this.responseText);
-                    for (let i = 0; i < classesInfo.length; i++)
-                    {
-                        cInfo = classesInfo[i];
-                        document.getElementById("addHoursClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
-                        document.getElementById("addHoursClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
-                    }
-                }
-            };
-            request.send(JSON.stringify());
-        }
-        
         // Submit action for get cost form
         function getInvoice()
         {
             // Get inputs
-            var inputs = document.getElementById("getInvoiceForm").elements;
             var inputsAsArray = {};
-            for(var i = 0; i < inputs.length - 1; i++)
+            var inputs = document.getElementById("getInvoiceForm").elements;
+            inputsAsArray["studentId"] = currentAdminStudentId; 
+            for (var i = 0; i < inputs.length - 1; i++)
             {
                 var item = inputs.item(i);
                 inputsAsArray[item.name] = item.value.trim();
@@ -1215,16 +1829,20 @@
             request.setRequestHeader('Content-type', 'application/json');
             request.onreadystatechange = function()
             {
+                // Get invoice table
+                var invoiceTableBody = document.getElementById("invoiceTableBody");
+
                 // Successful response
                 if (this.readyState == 4 && this.status == 200) 
                 {
+                    // Init stuff
+                    var invoiceData = JSON.parse(this.responseText);
+                    var totalPrice = 0;
+
                     // Clear table
-                    var invoiceTableBody = document.getElementById("invoiceTableBody");
                     invoiceTableBody.innerHTML = "";
 
                     // Go through each row and add to table
-                    var invoiceData = JSON.parse(this.responseText);
-                    var totalPrice = 0;
                     for (let i = 0; i < invoiceData.length; i++)
                     {
                         // Get date
@@ -1235,7 +1853,7 @@
                         `<tr>
                             <th>${i + 1}</th>
                             <th>${classDate.toISOString().split('T')[0]}</th>
-                            <th>${invoiceData[i]["FirstName"]} ${invoiceData[i]["LastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
+                            <th>${invoiceData[i]["TutorFirstName"]} ${invoiceData[i]["TutorLastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
                             <th>${invoiceData[i]["StartTime"].substring(0, 5)}</th>
                             <th>${invoiceData[i]["EndTime"].substring(0, 5)}</th>
                             <th>$${invoiceData[i]["MoneyGenerated"]}</th>
@@ -1245,20 +1863,48 @@
                         totalPrice += invoiceData[i]["MoneyGenerated"];
                     }
 
-                    // If not empty set total price
+                    // If not empty
                     if (invoiceData.length != 0)
                     {
-                        document.getElementById("invoiceTotal").innerHTML = `$${Number(totalPrice).toLocaleString('en')}`;
+                        // Add total
+                        invoiceTableBody.innerHTML +=
+                        `<tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>Total</th>
+                            <th>$${Number(totalPrice).toLocaleString('en')}</th>
+                        </tr>`;
                     }
+                    // Empty
                     else
                     {
-                        document.getElementById("invoiceTotal").innerHTML = `$0`;
-                        alert("No classes logged during this time.");
+                        // Clear table
+                        invoiceTableBody.innerHTML =
+                        `<tr>
+                            <th></th>
+                            <th></th>
+                            <th>No</th>
+                            <th>sessions</th>
+                            <th>logged</th>
+                            <th></th>
+                        </tr>`;
                     }
                 }
+                // Server error
                 else
                 {
-                    alert("ERROR! Couldn't fetch data, please try again!");
+                    // Clear table
+                    invoiceTableBody.innerHTML =
+                    `<tr>
+                        <th></th>
+                        <th>ERROR!</th>
+                        <th>Couldn't</th>
+                        <th>fetch</th>
+                        <th>data</th>
+                        <th></th>
+                    </tr>`;
                 }
             };
             request.send(JSON.stringify(inputsAsArray));
@@ -1432,59 +2078,287 @@
 
             // Get dashboard statistics
             getDashboard();
-
-            // Get values for dropdowns
-            getStudents();
-            getClasses();
-            getTutors();
         }
         
         // Get info for tutor dashboard
-        function tutorDashboardFunction()
+        function profileDashboardFunction()
         {
-            // Set profile info
-            document.getElementById("userProfileName").innerHTML = tutorData["FirstName"] + " " + tutorData["LastName"];
-            document.getElementById("userProfileEmail").innerHTML = tutorData["Email"];
-            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
-            document.getElementById("userProfileLastName").value = tutorData["LastName"];
-            document.getElementById("userProfileEmail").value = tutorData["Email"];
-            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
+            // Set profile header text
+            setUserProfile();
 
             // Get tutor stats
             getTutorTotals();
         }
         
-        // Get info for add hours dashboard
-        function addHoursFunction()
+        // Get info for add session dashboard
+        function addSessionFunction()
+        {
+            // Clear dropdowns
+            document.getElementById("addSessionStudentsDropdown").innerHTML = `<option value="" disabled selected></option>`;
+            document.getElementById("addSessionClassesDropdown").innerHTML = `<option value="" disabled selected></option>`;
+
+            // Set today date in add hour form
+            var today = new Date();
+            var day = String(today.getDate()).padStart(2, '0');
+            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var year = today.getFullYear();
+            document.getElementById("addSessionDateTutored").value = `${year}-${month}-${day}`;
+
+            // Get values for students dropdown
+            request = new XMLHttpRequest();
+            request.open("POST", "getStudents", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Get students as list
+                    studentsInfo = JSON.parse(this.responseText);
+
+                    for (let i = 0; i < studentsInfo.length; i++)
+                    {
+                        // Get student
+                        sInfo = studentsInfo[i];
+
+                        // Add student to dropdowns
+                        document.getElementById("addSessionStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+
+            // Get values for classes dropdown
+            request = new XMLHttpRequest();
+            request.open("POST", "getClasses", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    classesInfo = JSON.parse(this.responseText);
+                    for (let i = 0; i < classesInfo.length; i++)
+                    {
+                        cInfo = classesInfo[i];
+                        document.getElementById("addSessionClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+        
+        // Get info for admin dashboard
+        function adminDashboardFunction()
+        {
+            // Get company totals
+            getCompanyTotals();
+        }
+
+        // Get info for admin add
+        function adminAddFunction()
         {
             // Set today date in add hour form
             var today = new Date();
             var day = String(today.getDate()).padStart(2, '0');
             var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
             var year = today.getFullYear();
-            document.getElementById("addHoursDateTutored").value = `${year}-${month}-${day}`;
+            document.getElementById("addAdminSessionDateTutored").value = `${year}-${month}-${day}`;
+
+            // Clear dropdowns
+            document.getElementById("addAdminSessionStudentsDropdown").innerHTML = `<option value="" disabled selected></option>`;
+            document.getElementById("addAdminSessionClassesDropdown").innerHTML = `<option value="" disabled selected></option>`;
+            document.getElementById("addAdminSessionTutorsDropdown").innerHTML = `<option value="" disabled selected></option>`;
+
+            // Get values for students dropdown
+            request = new XMLHttpRequest();
+            request.open("POST", "getStudents", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Get students as list
+                    studentsInfo = JSON.parse(this.responseText);
+
+                    for (let i = 0; i < studentsInfo.length; i++)
+                    {
+                        // Get student
+                        sInfo = studentsInfo[i];
+
+                        // Add student to dropdowns
+                        document.getElementById("addAdminSessionStudentsDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+
+            // Get values for classes dropdown
+            request = new XMLHttpRequest();
+            request.open("POST", "getClasses", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    classesInfo = JSON.parse(this.responseText);
+                    for (let i = 0; i < classesInfo.length; i++)
+                    {
+                        cInfo = classesInfo[i];
+                        document.getElementById("addAdminSessionClassesDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+
+            // Get values for tutors dropdown
+            request = new XMLHttpRequest();
+            request.open("POST", "getTutors", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Get tutors as list
+                    tutorsInfo = JSON.parse(this.responseText);
+
+                    // Go through tutor list
+                    for (let i = 0; i < tutorsInfo.length; i++)
+                    {
+                        // Get tutor
+                        tInfo = tutorsInfo[i];
+
+                        // Add to tutor dropdown
+                        document.getElementById("addAdminSessionTutorsDropdown").options.add(new Option(`${tInfo["FirstName"]} ${tInfo["LastName"]} (${tInfo["Email"]})`, JSON.stringify(tInfo)));
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+
+        // Get info for admin students
+        function adminStudentsFunction()
+        {
+            // Clear area
+            document.getElementById("adminStudentsCarousel").innerHTML = "";
+            
+            // Get students
+            request = new XMLHttpRequest();
+            request.open("POST", "getStudents", false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.onreadystatechange = function()
+            {
+                // Successful response
+                if (this.readyState == 4 && this.status == 200) 
+                {
+                    // Get students as list
+                    studentsInfo = JSON.parse(this.responseText);
+
+                    // Go through student list
+                    for (let i = 0; i < studentsInfo.length; i++)
+                    {
+                        // Get student
+                        sInfo = studentsInfo[i];
+
+                        // Add to student list area
+                        document.getElementById("adminStudentsCarousel").innerHTML +=
+                        `<div class="col-lg-6 col-xl-4 col-xxl-3">
+                            <div class="card card-default mt-7">
+                                <div class="card-body text-center">
+                                    <a class="d-block mb-2">
+                                        <div class="image mb-3 d-inline-flex mt-n8">
+                                        </div>
+                                        <h3 id="studentCarousel${sInfo["Id"]}First" class="student-tags">${sInfo["FirstName"]}</h3>
+                                        <h3 id="studentCarousel${sInfo["Id"]}Last" class="student-tags">${sInfo["LastName"]}</h3>
+                                        <p id="studentCarousel${sInfo["Id"]}Phone" class="mt-3 text-smoke student-tags">${sInfo["PhoneNumber"]}</p>
+                                        <p id="studentCarousel${sInfo["Id"]}Email" class="mb-5 text-smoke student-tags">${sInfo["Email"]}</p>
+                                    </a>
+                                    <div class="row justify-content-center">
+                                        <div class="col-4">
+                                            <i class="mdi mdi-account-edit mdi-24px mdi-hover" style="cursor: pointer;"
+                                            onclick="openEditStudentModal(${sInfo["Id"]})"></i>
+                                        </div>
+                                        <div id="studentCarousel${sInfo["Id"]}Invoice" class="col-4">
+                                            <i class="mdi mdi-coin mdi-24px mdi-hover" style="cursor: pointer;"
+                                            onclick="openInvoiceModal(${sInfo["Id"]})"></i>
+                                        </div>
+                                        <div class="col-4">
+                                            <i class="mdi mdi-file-document mdi-24px mdi-hover" style="cursor: pointer;"
+                                            onclick="openContractModal(${sInfo["Id"]})"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                }
+            };
+            request.send(JSON.stringify());
+        }
+
+        // Get info for profile info
+        function profileFunction()
+        {
+            // Set profile info
+            document.getElementById("userProfileFirstName").value = tutorData["FirstName"];
+            document.getElementById("userProfileLastName").value = tutorData["LastName"];
+            document.getElementById("userProfileEmail").value = tutorData["Email"];
+            document.getElementById("userProfilePhone").value = tutorData["PhoneNumber"];
         }
         
-        // Get info for admin dashboard
-        function adminDashboardFunction()
+        // Function to run when profile settings item is clicked
+        function profileMenuNav(buttonToMakeActive, elementsToMakeVisible, functionToRun)
         {
-            // Set start date in invoice
-            var today = new Date();
-            today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6:1));
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("invoiceStartDate").value = `${year}-${month}-${day}`;
+            // Get admin body area
+            var profileBodyArea = document.getElementById("profileBodyArea");
+            document.getElementById(currentProfileButton).className = "nav-link";
+            document.getElementById(buttonToMakeActive).className = "nav-link active";
+            currentProfileButton = buttonToMakeActive;
 
-            // Set end date in invoice
-            today.setDate(today.getDate() + 6);
-            var day = String(today.getDate()).padStart(2, '0');
-            var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var year = today.getFullYear();
-            document.getElementById("invoiceEndDate").value = `${year}-${month}-${day}`;
+            // Go through children
+            for (let i = 0; i < profileBodyArea.children.length; i++)
+            {
+                if (elementsToMakeVisible.includes(i))
+                {
+                    profileBodyArea.children[i].style.display = "block";
+                }
+                else
+                {
+                    profileBodyArea.children[i].style.display = "none";
+                }
+            }
 
-            // Get company totals
-            getCompanyTotals();
+            // Run function
+            setTimeout(function() {window[functionToRun]();}, asyncFunctionTimeout);
+        }
+
+        // Function to run when admin settings item is clicked
+        function adminMenuNav(buttonToMakeActive, elementsToMakeVisible, functionToRun)
+        {
+            // Get admin body area
+            var adminBodyArea = document.getElementById("adminBodyArea");
+            document.getElementById(currentAdminButton).className = "nav-link";
+            document.getElementById(buttonToMakeActive).className = "nav-link active";
+            currentAdminButton = buttonToMakeActive;
+
+            // Go through children
+            for (let i = 0; i < adminBodyArea.children.length; i++)
+            {
+                if (elementsToMakeVisible.includes(i))
+                {
+                    adminBodyArea.children[i].style.display = "block";
+                }
+                else
+                {
+                    adminBodyArea.children[i].style.display = "none";
+                }
+            }
+
+            // Run function
+            setTimeout(function() {window[functionToRun]();}, asyncFunctionTimeout);
         }
 
         // Function to run when menu item is clicked
@@ -1498,13 +2372,25 @@
                 currentDashboardButton = elementToMakeActive;
             }
 
+            // If profile dashboard
+            if (dashboardName == "profileArea")
+            {
+                profileMenuNav('profileInfoButton', [0], '');
+            }
+
+            // If admin dashboard
+            if (dashboardName == "adminDashboardArea")
+            {
+                adminMenuNav('adminInfoButton', [0], '');
+            }
+
             // Hide old dashboard show new and adjust current dashboard var accordingly
             document.getElementById(currentDashboard).style.display = "none";
             document.getElementById(dashboardName).style.display = "block";
             currentDashboard = dashboardName;
 
             // Run function
-            setTimeout(function() {window[functionToRun]();}, 150);
+            setTimeout(function() {window[functionToRun]();}, asyncFunctionTimeout);
         }
     </script>
 </html>

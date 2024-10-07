@@ -54,6 +54,23 @@ const checkLoginCredentials = async (email, password) =>
     }));
 }
 
+const checkAdminCredentials = async (tutorData) =>
+{
+    const QUERY = mysql.format("SELECT * FROM Tutors WHERE Id = ? and AuthToken = ?", [tutorData["email"], tutorData["password"]]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+    {
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
 const checkStudentExists = async (firstName, lastName) =>
 {
     const QUERY = `SELECT * FROM Students WHERE FirstName = "${firstName}" AND LastName = "${lastName}"`;
@@ -105,39 +122,73 @@ const checkTutorExists = async (email) =>
   }));
 }
 
+const checkStudentHadClass = async (studentId, startDate, endDate) =>
+{
+    const QUERY = mysql.format("SELECT * FROM Hours WHERE StudentId = ? and Date >= ? and Date <= ? limit 1", [studentId, startDate, endDate]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
+    {
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
 // Update functions
 const updateUserProfile = async (newProfileData, tutorData) =>
 {
-  const QUERY = `UPDATE Tutors SET FirstName = "${newProfileData["FirstName"]}", LastName = "${newProfileData["LastName"]}", PhoneNumber = "${newProfileData["Phone"]}" WHERE AuthToken = ${tutorData["AuthToken"]}`;
+  const QUERY = `UPDATE Tutors SET FirstName = "${newProfileData["FirstName"]}", LastName = "${newProfileData["LastName"]}", PhoneNumber = "${newProfileData["Phone"]}" WHERE AuthToken = "${tutorData["AuthToken"]}"`;
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
-    if (err) 
+    if (err)
     {
-      reject(err);
+        reject(err);
     } 
-    else 
+    else
     {
-      resolve(results);
-      return results;
+        resolve(results);
+        return results;
     }
   }));
 }
 
 const updateUserPassword = async (tutorData, oldPassword, newPassword) =>
 {
-  const QUERY = `UPDATE Tutors SET Password = "${newPassword}" WHERE AuthToken = ${tutorData["AuthToken"]} AND Password = "${oldPassword}"`;
+  const QUERY = `UPDATE Tutors SET Password = "${newPassword}" WHERE AuthToken = "${tutorData["AuthToken"]}" AND Password = "${oldPassword}"`;
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
-    if (err) 
+    if (err)
     {
-      reject(err);
+        reject(err);
     } 
-    else 
+    else
     {
-      resolve(results);
-      return results;
+        resolve(results);
+        return results;
     }
   }));
+}
+
+const updateStudent = async (studentData) =>
+{
+    const QUERY = mysql.format("update Students set FirstName = ?, LastName = ?, Email = ?, Price = ?, Birthday = ?, PhoneNumber = ? where Id = ?", [studentData["FirstName"], studentData["LastName"], studentData["Email"], studentData["Price"], studentData["Birthday"], studentData["PhoneNumber"], studentData["studentId"]]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err) 
+        {
+            reject(err);
+        } 
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 // Add functions
@@ -192,7 +243,7 @@ const addClass = async (className, classLevel) =>
   }));
 }
 
-const addHours = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
+const addSession = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
 {
     const QUERY = `INSERT INTO Hours VALUES(${tutorData["Id"]}, ${studentData["Id"]}, ${classData["Id"]}, "${hoursData["startTime"]}", "${hoursData["endTime"]}", "${hoursData["Date"]}", "${hoursData["Notes"]}", ${moneyGenerated})`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
@@ -209,7 +260,7 @@ const addHours = async (tutorData, hoursData, studentData, classData, moneyGener
     }));
 }
 
-const editHours = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
+const editSession = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
 {
     const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}"`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
@@ -226,7 +277,7 @@ const editHours = async (tutorData, hoursData, studentData, classData, moneyGene
     }));
 }
 
-const deleteHours = async (tutorData, hoursData, moneyGenerated) =>
+const deleteSession = async (tutorData, hoursData, moneyGenerated) =>
 {
     const QUERY = `DELETE FROM Hours WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["StudentId"]} and ClassId = ${hoursData["ClassId"]} and StartTime = "${hoursData["startTime"]}" and EndTime = "${hoursData["endTime"]}" and Date = "${hoursData["Date"]}" and Notes = "${hoursData["Notes"]}" and MoneyGenerated = ${moneyGenerated}`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
@@ -261,9 +312,9 @@ const getStudents = async () =>
   }));
 }
 
-const getStudent = async (id) =>
+const getStudent = async (studentId) =>
 {
-  const QUERY = `SELECT * FROM Students where Id = ${id}`;
+  const QUERY = `SELECT * FROM Students where Id = ${studentId}`;
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
     if (err) 
@@ -395,7 +446,7 @@ const getAllHours = async (tutorData) =>
           return results;
         }
       }));
-    }
+}
 
 const getHoursWithinDates = async (tutorData, startDate, endDate) =>
 {
@@ -448,9 +499,9 @@ const getTutorFinances = async (tutorData, filterData) =>
   }));
 }
 
-const getInvoice = async (studentData, startDate, endDate) =>
+const getInvoice = async (studentId, startDate, endDate) =>
 {
-  const QUERY = `select Date, Tutors.FirstName, Tutors.LastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Tutors on Hours.TutorId = Tutors.Id where StudentId = ${studentData["Id"]} and Date >= "${startDate}" and Date <= "${endDate}"`;
+  const QUERY = `select Date, Tutors.FirstName as TutorFirstName, Tutors.LastName as TutorLastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Tutors on Hours.TutorId = Tutors.Id where StudentId = ${studentId} and Date >= "${startDate}" and Date <= "${endDate}"`;
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
   {
     if (err) 
@@ -510,12 +561,8 @@ app.post('/:placeholder', (req, res) =>
             // Else redirect
             if (result.length == 1)
             {
+                // Dashboard file name as var
                 var dashboardFileToUse = "dashboard.html";
-                // If user not admin cut out
-                if (result[0]["Id"] <= 2)
-                {
-                    dashboardFileToUse = "dashboardAdmin.html"
-                }
 
                 // Create copy of dashboard html and insert tutor user data
                 fs.copyFile(path.join(initalPath, dashboardFileToUse), path.join(initalPath, `dashboard${result[0]["Id"]}.html`), (err) =>
@@ -527,10 +574,30 @@ app.post('/:placeholder', (req, res) =>
                     // Successful copy
                     else
                     {
-                        // Add tutor data
+                        // Get file as string
                         var data = fs.readFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), "utf-8");
-                        fs.writeFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`),
-                        data.replace("var tutorData = [];", `var tutorData = ${JSON.stringify(result[0])};`), "utf-8");
+
+                        // Add tutor data to string
+                        data = data.replace("var tutorData = [];", `var tutorData = ${JSON.stringify(result[0])};`)
+
+                        // If user admin
+                        if (result[0]["Admin"] = 1)
+                        {
+                            // Add admin button
+                            data = data.replace("</li putAdminButtonBelowHere>", 
+                            `</li>
+                            <li
+                                id="adminButton"
+                            >
+                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('adminDashboardArea', 'adminButton', 'adminDashboardFunction');">
+                                    <i class="mdi mdi-account-supervisor"></i>
+                                    <span class="nav-text">Admin</span>
+                                </a>
+                            </li>`, "utf-8");
+                        }
+
+                        // Write changes
+                        fs.writeFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), data, "utf-8");
 
                         // Send back file and delete
                         res.sendFile(path.join(initalPath, `dashboard${result[0]["Id"]}.html`));
@@ -563,6 +630,28 @@ app.post('/:placeholder', (req, res) =>
             {
                 res.status(200).end(JSON.stringify(result));
             }
+        })
+    }
+    else if (req.originalUrl == "/getStudent")
+    {
+        getStudent(req.body["studentId"]).then(result =>
+        {
+            res.status(200).end(JSON.stringify(result));
+        })
+        .catch(error =>
+        {
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/checkStudentHadClass")
+    {
+        checkStudentHadClass(req.body["studentId"], req.body["startDate"], req.body["endDate"]).then(result =>
+        {
+            res.status(200).end(JSON.stringify(result));
+        })
+        .catch(error =>
+        {
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/getClasses")
@@ -753,13 +842,12 @@ app.post('/:placeholder', (req, res) =>
     }
     else if (req.originalUrl == "/getInvoice")
     {
-        studentData = JSON.parse(req.body["Student"]);
-        getInvoice(studentData, req.body["startDate"], req.body["endDate"]).then(result =>
+        getInvoice(req.body["studentId"], req.body["startDate"], req.body["endDate"]).then(result =>
         {
             res.status(200).end(JSON.stringify(result));
         })
     }
-    else if (req.originalUrl == "/updateUserInfo")
+    else if (req.originalUrl == "/updateUserProfile")
     {
         tutorData = JSON.parse(req.body["Tutor"]);
         updateUserProfile(req.body, tutorData).then(result =>
@@ -805,6 +893,20 @@ app.post('/:placeholder', (req, res) =>
             // Else successfully changed password
             res.status(200).end("SUCCESS! Password has been updated.");
         })
+    }
+    else if (req.originalUrl == "/updateStudent")
+    {
+        updateStudent(req.body).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end();
+            }
+            else
+            {
+                res.status(400).end("ERROR! Profile could not be updated. Try again.")
+            }
+        });
     }
     else if (req.originalUrl == "/addTutor")
     {
@@ -855,7 +957,7 @@ app.post('/:placeholder', (req, res) =>
                 {
                     getStudent(result.insertId).then(result =>
                     {
-                        res.status(200).end(JSON.stringify(result));
+                        res.status(200).end();
                     })
                 }
                 else
@@ -891,7 +993,7 @@ app.post('/:placeholder', (req, res) =>
             })
         })
     }
-    else if (req.originalUrl == "/addHours")
+    else if (req.originalUrl == "/addSession")
     {
         // Convert data to usuable types
         tutorData = JSON.parse(req.body["Tutor"]);
@@ -910,7 +1012,7 @@ app.post('/:placeholder', (req, res) =>
 
         // Calculate money generated and add hours
         moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
-        addHours(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
+        addSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
         {
             if (result.affectedRows == 1)
             {
@@ -918,7 +1020,7 @@ app.post('/:placeholder', (req, res) =>
             }
         })
     }
-    else if (req.originalUrl == "/editHours")
+    else if (req.originalUrl == "/editSession")
     {
         // Convert data to usuable types
         tutorData = JSON.parse(req.body["Tutor"]);
@@ -939,15 +1041,15 @@ app.post('/:placeholder', (req, res) =>
 
         // Calculate money generated and add hours
         moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
-        editHours(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
+        editSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
         {
             if (result.affectedRows == 1)
             {
-                res.status(200).end("SUCCESS! Hours have been edited.");
+                res.status(200).end("SUCCESS! Session has been edited.");
             }
         })
     }
-    else if (req.originalUrl == "/deleteHours")
+    else if (req.originalUrl == "/deleteSession")
     {
         // Get and convert data to usuable types
         tutorData = JSON.parse(req.body["Tutor"]);
@@ -957,7 +1059,7 @@ app.post('/:placeholder', (req, res) =>
 
         // Delete Hours
         moneyGenerated = req.body["StudentPrice"] * (timeElapsed / 3600000);
-        deleteHours(tutorData, req.body, moneyGenerated).then(result =>
+        deleteSession(tutorData, req.body, moneyGenerated).then(result =>
         {
             if (result.affectedRows == 1)
             {
