@@ -1,15 +1,17 @@
 // Import stuff
 const port = 3001;
 const fs = require('fs');
-const ip = require('ip');
+require('dotenv').config();
 const http = require('http');
-const https = require('https');
-const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
+const https = require('https');
+const express = require('express');
 const { error } = require('console');
 var nodemailer = require('nodemailer');
 let initalPath = path.join(__dirname, "public");
+
+// App stuff
 const app = express();
 app.use(express.json());
 app.use(express.static(initalPath));
@@ -32,7 +34,7 @@ var emailer = nodemailer.createTransport(
     service: "gmail",
     auth: {
         user: "mindmantratutoring@gmail.com",
-        pass: "",
+        pass: process.env.GMAILER_PASSWORD,
     }
 });
 
@@ -1628,19 +1630,19 @@ app.post('/:placeholder', (req, res) =>
 })
 
 // Start listening on port
-app.listen(port, () => 
-{
-    console.log("\n");
-    console.log(`Listening on port: ${port}`);
-    console.log(`Network access via: ${ip.address()}:${port}!`);
-    https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
-    {
-        resp.on('data', function(externalIp) 
-        {
-          console.log(`External access if port forwarded: ${externalIp}:${port}`)
-        });
-    });
-})
+// app.listen(port, () => 
+// {
+//     console.log("\n");
+//     console.log(`Listening on port: ${port}`);
+//     console.log(`Network access via: ${ip.address()}:${port}!`);
+//     https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
+//     {
+//         resp.on('data', function(externalIp) 
+//         {
+//           console.log(`External access if port forwarded: ${externalIp}:${port}`)
+//         });
+//     });
+// })
 
 
 // const certs =
@@ -1650,16 +1652,16 @@ app.listen(port, () =>
 // };
 
 // https.createServer(certs, app).listen(443);
-// http.createServer(app).listen(80);
+http.createServer(app).listen(80);
 
-// console.log("\n");
-// console.log("Server started!");
+console.log("\n");
+console.log("Server started!");
 
-// // Get external ip
-// https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
-// {
-//     resp.on('data', function(externalIp) 
-//     {
-//         console.log(`External access if port forwarded: ${externalIp}`)
-//     });
-// });
+// Get external ip
+https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
+{
+    resp.on('data', function(externalIp) 
+    {
+        console.log(`External access if port forwarded: ${externalIp}`)
+    });
+});

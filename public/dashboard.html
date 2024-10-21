@@ -898,7 +898,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <!-- <button id="sendInvoiceButton" type="button" class="btn btn-secondary" onclick="sendInvoice();">Send Email</button> -->
+                            <button id="sendInvoiceButton" type="button" class="btn btn-secondary" disabled onclick="sendInvoice();">Send Email</button>
                         </div>
                     </div>
                 </div>
@@ -1438,6 +1438,9 @@
             // Reset text
             document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
 
+            // Update form submit action
+            document.getElementById("getInvoiceForm").onsubmit = function() {return getStudentInvoice()};
+
             // Toggle off settings if on
             if (document.getElementById("getInvoiceForm").classList.contains("make-hidden") == false)
             {
@@ -1512,6 +1515,9 @@
         {
             // Reset text
             document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
+
+            // Update form submit action
+            document.getElementById("getInvoiceForm").onsubmit = function() {return getTutorInvoice()};
 
             // Toggle off settings if on
             if (document.getElementById("getInvoiceForm").classList.contains("make-hidden") == false)
