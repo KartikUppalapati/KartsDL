@@ -32,7 +32,8 @@ var con = mysql.createPool(
 var emailer = nodemailer.createTransport(
 {
     service: "gmail",
-    auth: {
+    auth:
+    {
         user: "mindmantratutoring@gmail.com",
         pass: process.env.GMAILER_PASSWORD,
     }
@@ -1634,7 +1635,6 @@ app.post('/:placeholder', (req, res) =>
 // {
 //     console.log("\n");
 //     console.log(`Listening on port: ${port}`);
-//     console.log(`Network access via: ${ip.address()}:${port}!`);
 //     https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
 //     {
 //         resp.on('data', function(externalIp) 
