@@ -5,7 +5,9 @@
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        
         <link rel="stylesheet" href="index.css">
+        <link href="images/favicon.png" rel="shortcut icon"/>
     </head>
     <body>
         <div class="container">
@@ -15,13 +17,13 @@
                     <form id="loginForm" class="loginForm" action="login" method="post">
                         <input name="Email" placeholder="Email" required="" type="text" autofocus>
                         <input name="Password" placeholder="Password" type = "Password" required="" type="text">
-                        <div class="loginFormButtons">
-                            <button type="submit">Submit</button>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <label style="cursor: pointer;" onclick="resetPassword()">Forgot Password?</label>
+            <label class="forgotLabel" onclick="resetPassword()">Forgot Password?</label>
         </div>
     </body>
 

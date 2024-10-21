@@ -18,6 +18,7 @@
     "firebase-admin": "^11.6.0",
     "ip": "^1.1.8",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.9.15",
     "nodemon": "^2.0.22"
   },
   "bugs": {

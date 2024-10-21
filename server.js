@@ -3,16 +3,17 @@ const port = 3001;
 const fs = require('fs');
 const ip = require('ip');
 const http = require('http');
+const https = require('https');
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
 const { error } = require('console');
+var nodemailer = require('nodemailer');
 let initalPath = path.join(__dirname, "public");
 const app = express();
 app.use(express.json());
 app.use(express.static(initalPath));
 app.use(express.urlencoded({extended: false}));
-app.use(express.json());
 
 // Connect to database
 var con = mysql.createPool(
@@ -25,8 +26,19 @@ var con = mysql.createPool(
   database: "testdb"
 });
 
+// Set up emailer
+var emailer = nodemailer.createTransport(
+{
+    service: "gmail",
+    auth: {
+        user: "mindmantratutoring@gmail.com",
+        pass: "",
+    }
+});
+
+
 // Sql query stuff
-// const tempQuery = `select * from Students`;
+// const tempQuery = mysql.format("select * from Tutors", []);
 // con.query(tempQuery, (err, result) =>
 // {
 //   console.table(result);
@@ -56,7 +68,7 @@ const checkLoginCredentials = async (email, password) =>
 
 const checkAdminCredentials = async (tutorData) =>
 {
-    const QUERY = mysql.format("SELECT * FROM Tutors WHERE Id = ? and AuthToken = ?", [tutorData["email"], tutorData["password"]]);
+    const QUERY = mysql.format("SELECT * FROM Tutors WHERE Id = ? and Email = ? and AuthToken = ? and Admin = 1", [tutorData["Id"], tutorData["Email"], tutorData["AuthToken"]]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
         if (err)
@@ -174,9 +186,43 @@ const updateUserPassword = async (tutorData, oldPassword, newPassword) =>
   }));
 }
 
+const updateUserPasswordReset = async (email, newPassword) =>
+{
+    const QUERY = `UPDATE Tutors SET Password = "${newPassword}" WHERE Email = "${email}"`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err)
+        {
+            reject(err);
+        } 
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
 const updateStudent = async (studentData) =>
 {
     const QUERY = mysql.format("update Students set FirstName = ?, LastName = ?, Email = ?, Price = ?, Birthday = ?, PhoneNumber = ? where Id = ?", [studentData["FirstName"], studentData["LastName"], studentData["Email"], studentData["Price"], studentData["Birthday"], studentData["PhoneNumber"], studentData["studentId"]]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err) 
+        {
+            reject(err);
+        } 
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const updateTutor = async (tutorData) =>
+{
+    const QUERY = mysql.format("update Tutors set FirstName = ?, LastName = ?, Email = ?, Percentage = ?, PhoneNumber = ? where Id = ?", [tutorData["FirstName"], tutorData["LastName"], tutorData["Email"], tutorData["Percentage"], tutorData["PhoneNumber"], tutorData["tutorId"]]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err) 
@@ -211,7 +257,7 @@ const addStudent = async (studentData) =>
 
 const addTutor = async (tutorData, tempPassword, newAuthToken) =>
 {
-  const QUERY = `INSERT INTO Tutors VALUES("NULL", "${tutorData.FirstName}", "${tutorData.LastName}", "${tutorData.Email}", "${tempPassword}", ${tutorData.Percentage}, ${newAuthToken}, "${tutorData.Phone}")`;
+  const QUERY = mysql.format(`INSERT INTO Tutors VALUES("NULL", "?", "?", "?", "?", "?", "?", "?", 0`, [tutorData.FirstName, tutorData.LastName, tutorData.Email, tempPassword, tutorData.Percentage, tutorData.Phone, newAuthToken]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
     if (err) 
@@ -260,7 +306,7 @@ const addSession = async (tutorData, hoursData, studentData, classData, moneyGen
     }));
 }
 
-const editSession = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
+const updateSession = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
 {
     const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}"`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
@@ -297,53 +343,70 @@ const deleteSession = async (tutorData, hoursData, moneyGenerated) =>
 // Get functions
 const getStudents = async () =>
 {
-  const QUERY = `SELECT * FROM Students`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-  {
-    if (err) 
+    const QUERY = `SELECT * FROM Students`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      reject(err)
-    } 
-    else 
+        if (err)
+        {
+            reject(err);
+        }
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const getStudentsWithInvoice = async (startDate, endDate) =>
+{
+    const QUERY = mysql.format("select distinct StudentId from Students inner join Hours on Students.Id = Hours.StudentId where Date >= ? and Date <= ?", [startDate, endDate]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      resolve(results);
-      return results;
-    }
-  }));
+        if (err)
+        {
+            reject(err);
+        }
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 const getStudent = async (studentId) =>
 {
-  const QUERY = `SELECT * FROM Students where Id = ${studentId}`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-  {
-    if (err) 
+    const QUERY = mysql.format("select * from Students where Id = ?", [studentId]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      reject(err)
-    } 
-    else 
-    {
-      resolve(results);
-      return results;
-    }
-  }));
+        if (err)
+        {
+            reject(err);
+        }
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 const getClasses = async () =>
 {
-  const QUERY = `SELECT * FROM Classes`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
-  {
-    if (err) 
+    const QUERY = "SELECT * FROM Classes";
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
-      reject(err)
-    } 
-    else 
-    {
-      resolve(results);
-      return results;
-    }
-  }));
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
 }
 
 const getClass = async (id) =>
@@ -380,9 +443,26 @@ const getTutors = async () =>
   }));
 }
 
-const getTutor = async (id) =>
+const getTutorsWithInvoice = async (startDate, endDate) =>
 {
-  const QUERY = `SELECT * FROM Tutors where Id = ${id}`;
+    const QUERY = mysql.format("select distinct TutorId from Tutors inner join Hours on Tutors.Id = Hours.TutorId where Date >= ? and Date <= ?", [startDate, endDate]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err)
+        {
+            reject(err);
+        }
+        else 
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const getTutor = async (tutorId) =>
+{
+  const QUERY = mysql.format("select * from Tutors where Id = ?", [tutorId]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
     if (err) 
@@ -431,21 +511,21 @@ const getCompanyTotals = async () =>
     }));
 }
 
-const getAllHours = async (tutorData) =>
+const getAllSessions = async (tutorData, queryLimit) =>
+{
+    const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? order by Date desc LIMIT ?", [tutorData["Id"], queryLimit]);
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
-      const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? order by Date desc", [tutorData["Id"]]);
-      return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-      {
         if (err) 
         {
-          reject(err);
+            reject(err);
         }
         else 
         {
-          resolve(results);
-          return results;
+            resolve(results);
+            return results;
         }
-      }));
+    }));
 }
 
 const getHoursWithinDates = async (tutorData, startDate, endDate) =>
@@ -499,21 +579,52 @@ const getTutorFinances = async (tutorData, filterData) =>
   }));
 }
 
-const getInvoice = async (studentId, startDate, endDate) =>
+const getStudentInvoice = async (studentId, startDate, endDate) =>
 {
-  const QUERY = `select Date, Tutors.FirstName as TutorFirstName, Tutors.LastName as TutorLastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Tutors on Hours.TutorId = Tutors.Id where StudentId = ${studentId} and Date >= "${startDate}" and Date <= "${endDate}"`;
-  return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
-  {
-    if (err) 
+    const QUERY = `select Date, Tutors.FirstName as TutorFirstName, Tutors.LastName as TutorLastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Tutors on Hours.TutorId = Tutors.Id where StudentId = ${studentId} and Date >= "${startDate}" and Date <= "${endDate}"`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
-      reject(err)
-    }
-    else 
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const getTutorInvoice = async (tutorId, startDate, endDate) =>
+{
+    const QUERY = `select Date, Students.FirstName as StudentFirstName, Students.LastName as StudentLastName, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated from Hours inner join Classes on Hours.ClassId = Classes.Id inner join Students on Hours.StudentId = Students.Id where TutorId = ${tutorId} and Date >= "${startDate}" and Date <= "${endDate}"`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
-      resolve(results);
-      return results;
+        if (err)
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+// Helper functions for date
+Date.prototype.GetFirstDayOfWeek = function()
+{
+    return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1))));
+}
+Date.prototype.GetLastDayOfWeek = function()
+{
+    if (new Date().getDay() == 0)
+    {
+        return new Date();
     }
-  }));
+    return (new Date(this.setDate(this.getDate() - this.getDay() +7)));
 }
 
 // URL director for get
@@ -530,20 +641,6 @@ app.get('/:placeholder', (req, res) =>
     }
 })
 
-// Functions for date
-Date.prototype.GetFirstDayOfWeek = function()
-{
-    return (new Date(this.setDate(this.getDate() - this.getDay()+ (this.getDay() == 0 ? -6:1))));
-}
-Date.prototype.GetLastDayOfWeek = function()
-{
-    if (new Date().getDay() == 0)
-    {
-        return new Date();
-    }
-    return (new Date(this.setDate(this.getDate() - this.getDay() +7)));
-}
-
 // URL director for post
 app.post('/:placeholder', (req, res) => 
 {
@@ -555,7 +652,6 @@ app.post('/:placeholder', (req, res) =>
             if (result.length == 0)
             {
                 res.sendFile(path.join(initalPath, "indexLoginError.html"));
-                return;
             }
         
             // Else redirect
@@ -590,8 +686,8 @@ app.post('/:placeholder', (req, res) =>
                                 id="adminButton"
                             >
                                 <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('adminDashboardArea', 'adminButton', 'adminDashboardFunction');">
-                                    <i class="mdi mdi-account-supervisor"></i>
-                                    <span class="nav-text">Admin</span>
+                                    <i class="mdi mdi-account-multiple-outline"></i>
+                                    <span class="nav-text">Admin Settings</span>
                                 </a>
                             </li>`, "utf-8");
                         }
@@ -626,20 +722,67 @@ app.post('/:placeholder', (req, res) =>
     {
         getStudents().then(result =>
         {
-            if (result.length > 0)
+            res.status(200).end(JSON.stringify(result));
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/getStudentsWithInvoice")
+    {
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
             {
-                res.status(200).end(JSON.stringify(result));
+                getStudentsWithInvoice(req.body["startDate"], req.body["endDate"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
             }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/getStudent")
     {
-        getStudent(req.body["studentId"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            res.status(200).end(JSON.stringify(result));
+            if (result.length == 1)
+            {
+                getStudent(req.body["studentId"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
         })
-        .catch(error =>
+        .catch(errorWithQuery =>
         {
+            console.log(errorWithQuery.message);
             res.status(400).end();
         })
     }
@@ -649,8 +792,9 @@ app.post('/:placeholder', (req, res) =>
         {
             res.status(200).end(JSON.stringify(result));
         })
-        .catch(error =>
+        .catch(errorWithQuery =>
         {
+            console.log(errorWithQuery.message);
             res.status(400).end();
         })
     }
@@ -658,20 +802,96 @@ app.post('/:placeholder', (req, res) =>
     {
         getClasses().then(result =>
         {
-            if (result.length > 0)
-            {
-                res.status(200).end(JSON.stringify(result));
-            }
+            res.status(200).end(JSON.stringify(result));
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/getTutors")
     {
-        getTutors().then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.length > 0)
+            if (result.length == 1)
             {
-                res.status(200).end(JSON.stringify(result));
+                getTutors().then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
             }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/getTutor")
+    {
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
+            {
+                getTutor(req.body["tutorId"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/getTutorsWithInvoice")
+    {
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
+            {
+                getTutorsWithInvoice(req.body["startDate"], req.body["endDate"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/getTutorTotals")
@@ -688,20 +908,45 @@ app.post('/:placeholder', (req, res) =>
                 res.status(400).end("ERROR! Unable to fetch tutor totals!")
             }
         })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
     else if (req.originalUrl == "/getCompanyTotals")
     {
-        tutorData = JSON.parse(req.body["Tutor"]);
-        getCompanyTotals(tutorData["Id"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.length > 0)
+            if (result.length == 1)
             {
-                res.status(200).end(JSON.stringify(result[0]));
+                getCompanyTotals().then(result =>
+                {
+                    if (result.length > 0)
+                    {
+                        res.status(200).end(JSON.stringify(result[0]));
+                    }
+                    else
+                    {
+                        res.status(400).end("ERROR! Unable to fetch company totals!")
+                    }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
             }
             else
             {
-                res.status(400).end("ERROR! Unable to fetch company totals!")
+                res.status(400).end("Not Admin.");
             }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/getDashboard")
@@ -785,10 +1030,15 @@ app.post('/:placeholder', (req, res) =>
             outputsArray["calendarHours"] = result;
             res.status(200).end(JSON.stringify(outputsArray));
         })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
-    else if (req.originalUrl == "/getAllHours")
+    else if (req.originalUrl == "/getAllSessions")
     {
-        getAllHours(JSON.parse(req.body["Tutor"])).then(result =>
+        getAllSessions(JSON.parse(req.body["Tutor"]), req.body["QueryLimit"]).then(result =>
         {
             if (result.length > 0)
             {
@@ -799,6 +1049,11 @@ app.post('/:placeholder', (req, res) =>
                 res.status(400).end("Tutor has no hours");
             }
         })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
     else if (req.originalUrl == "/getAllFinances")
     {
@@ -808,20 +1063,24 @@ app.post('/:placeholder', (req, res) =>
             tutorData = JSON.parse(req.body["Tutor"]);
             getTutorFinances(tutorData, req.body).then(result =>
             {
-            if (result[0]["SUM(MoneyGenerated)"] != null)
-            {
-                totalMoneyGenerated = result[0]["SUM(MoneyGenerated)"];
-                tutorCut = tutorData["Percentage"];
-                tutorMoneyMade = totalMoneyGenerated * (tutorCut / 100);
-                companyProfit = totalMoneyGenerated - tutorMoneyMade;
-                res.status(200).end(`${tutorData["FirstName"]} generated a total of $${totalMoneyGenerated}. Their cut was ${tutorCut}% and made $${tutorMoneyMade}. The company profitted $${companyProfit}`);
-            }
-            else
-            {
-                res.status(400).end("No money was made during this time frame");
-            }
+                if (result[0]["SUM(MoneyGenerated)"] != null)
+                {
+                    totalMoneyGenerated = result[0]["SUM(MoneyGenerated)"];
+                    tutorCut = tutorData["Percentage"];
+                    tutorMoneyMade = totalMoneyGenerated * (tutorCut / 100);
+                    companyProfit = totalMoneyGenerated - tutorMoneyMade;
+                    res.status(200).end(`${tutorData["FirstName"]} generated a total of $${totalMoneyGenerated}. Their cut was ${tutorCut}% and made $${tutorMoneyMade}. The company profitted $${companyProfit}`);
+                }
+                else
+                {
+                    res.status(400).end("No money was made during this time frame");
+                }
             })
-            return;
+            .catch(errorWithQuery =>
+            {
+                console.log(errorWithQuery.message);
+                res.status(400).end();
+            })
         }
 
         // Else get all company finances
@@ -840,17 +1099,122 @@ app.post('/:placeholder', (req, res) =>
             }
         })
     }
-    else if (req.originalUrl == "/getInvoice")
+    else if (req.originalUrl == "/getStudentInvoice")
     {
-        getInvoice(req.body["studentId"], req.body["startDate"], req.body["endDate"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            res.status(200).end(JSON.stringify(result));
+            if (result.length == 1)
+            {
+                getStudentInvoice(req.body["studentId"], req.body["startDate"], req.body["endDate"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/getTutorInvoice")
+    {
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
+            {
+                getTutorInvoice(req.body["tutorId"], req.body["startDate"], req.body["endDate"]).then(result =>
+                {
+                    res.status(200).end(JSON.stringify(result));
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/sendInvoice")
+    {
+        // Set up email
+        var mailOptions =
+        {
+            from: "mindmantratutoring@gmail.com",
+            to: "kartik0109@gmail.com",
+            subject: `Payment Due: Invoice for ${req.body["Name"]}`,
+            html:
+            `
+                <div>
+                    Hello,<br><br>
+                    Please see below the invoice for tutoring services provided by MMT on
+                    ${req.body["StartDate"].replaceAll("-", "/")}-${req.body["EndDate"].replaceAll("-", "/")}.<br><br>
+                </div>
+
+                <br><br>
+                ${req.body["Html"]}
+                <br><br>
+
+                <div>
+                    Thank you for your prompt attention to this matter.<br>
+                    Please feel free to reach out if you have any questions.
+                </div>
+            `
+        };
+
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
+            {
+                // Send email
+                emailer.sendMail(mailOptions, function(error, info)
+                {
+                    if (error)
+                    {
+                        console.log('Error:', error);
+                        res.status(400).end();
+                    }
+                    else
+                    {
+                        res.status(200).end();
+                    }
+                });
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/updateUserProfile")
     {
-        tutorData = JSON.parse(req.body["Tutor"]);
-        updateUserProfile(req.body, tutorData).then(result =>
+        updateUserProfile(req.body, req.body["tutor"]).then(result =>
         {
             if (result.affectedRows == 1)
             {
@@ -863,7 +1227,12 @@ app.post('/:placeholder', (req, res) =>
             {
                 res.status(400).end("ERROR! Profile could not be updated. Try again.")
             }
-        });
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
     else if (req.originalUrl == "/updatePassword")
     {
@@ -881,116 +1250,290 @@ app.post('/:placeholder', (req, res) =>
             return;
         }
 
-        updateUserPassword(JSON.parse(req.body["Tutor"]), req.body["OldPassword"], req.body["NewPassword"]).then(result =>
+        updateUserPassword(JSON.parse(req.body["tutor"]), req.body["OldPassword"], req.body["NewPassword"]).then(result =>
         {
             // If no rows changed then error
             if (result.affectedRows == 0)
             {
-                res.status(400).end("ERROR! Old password doesn't match!")
-                return;
+                res.status(400).end("Old password incorrect.")
             }
-            
-            // Else successfully changed password
-            res.status(200).end("SUCCESS! Password has been updated.");
+            else
+            {
+                // Else successfully changed password
+                res.status(200).end("Password updated.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/updatePasswordReset")
+    {
+        // Create random temp password
+        var updatedPassword = Math.random().toString(36).slice(2).substring(0, 10)
+
+        // Update password
+        updateUserPasswordReset(req.body["Email"], updatedPassword).then(result =>
+        {
+            // If password updated
+            if (result.affectedRows == 1)
+            {
+                // Set email
+                var mailOptions =
+                {
+                    from: "mindmantratutoring@gmail.com",
+                    to: req.body["Email"],
+                    subject: "Password Reset",
+                    text: "Your password has been reset to " + updatedPassword + ". Please log in and update it."
+                };
+
+                // Send email
+                emailer.sendMail(mailOptions, function(error, info)
+                {
+                    if (error)
+                    {
+                        console.log('Error:', error);
+                        res.sendFile(path.join(initalPath, "resetPasswordError.html"));
+                    }
+                    else
+                    {
+                        // Update page
+                        res.sendFile(path.join(initalPath, "resetPasswordSuccess.html"));
+                    }
+                });
+            }
+            else
+            {
+                res.sendFile(path.join(initalPath, "resetPasswordError.html"));
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.sendFile(path.join(initalPath, "resetPasswordError.html"));
         })
     }
     else if (req.originalUrl == "/updateStudent")
     {
-        updateStudent(req.body).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.affectedRows == 1)
+            if (result.length == 1)
             {
-                res.status(200).end();
+                updateStudent(req.body).then(result =>
+                {
+                    if (result.affectedRows == 1)
+                    {
+                        res.status(200).end("Student profile updated.");
+                    }
+                    else
+                    {
+                        res.status(400).end("Student profile could not be updated.")
+                    }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
             }
             else
             {
-                res.status(400).end("ERROR! Profile could not be updated. Try again.")
+                res.status(400).end("Not Admin.");
             }
-        });
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/updateTutor")
+    {
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
+        {
+            if (result.length == 1)
+            {
+                updateTutor(req.body).then(result =>
+                {
+                    if (result.affectedRows == 1)
+                    {
+                        res.status(200).end("Tutor profile updated.");
+                    }
+                    else
+                    {
+                        res.status(400).end("Tutor profile could not be updated.")
+                    }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
     else if (req.originalUrl == "/addTutor")
     {
         if (Number(req.body["Percentage"]) > 100)
         {
-            res.status(400).end("ERROR! Percentage too big. Percentage must be within 0 - 100.");
+            res.status(400).end("Percentage too big: must be within 0 - 100.");
             return;
         }
 
-        checkTutorExists(req.body["Email"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.length > 0)
+            if (result.length == 1)
             {
-                res.status(400).end("ERROR! Tutor already exists.");
-                return;
-            }
-            
-            var newAuthToken = Math.floor(Math.random() * 90000) + 10000;
-            addTutor(req.body, "password", newAuthToken).then(result =>
-            {
-                if (result.affectedRows == 1)
+                checkTutorExists(req.body["Email"]).then(result =>
                 {
-                    getTutor(result.insertId).then(result =>
+                    if (result.length > 0)
                     {
-                        res.status(200).end(JSON.stringify(result));
+                        res.status(400).end("Tutor already exists.");
+                    }
+                    
+                    var tempPassword = Math.random().toString(36).slice(2).substring(0, 10);
+                    addTutor(req.body, tempPassword, Math.random().toString(36).slice(2).substring(0, 10)).then(result =>
+                    {
+                        if (result.affectedRows == 1)
+                        {
+                            res.status(200).end("Tutor added.");
+                        }
+                        else
+                        {
+                            res.status(400).end("Unable to add tutor.");
+                        }
                     })
-                }
-                else
+                    .catch(errorWithQuery =>
+                    {
+                        console.log(errorWithQuery.message);
+                        res.status(400).end();
+                    })
+                })
+                .catch(errorWithQuery =>
                 {
-                    res.status(400).end("ERROR! Unable to add tutor. Try again.");
-                }
-            })
-        }) 
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
     else if (req.originalUrl == "/addStudent")
     {
-        checkStudentExists(req.body["FirstName"], req.body["LastName"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.length > 0)
+            if (result.length == 1)
             {
-                res.status(400).end("ERROR! Student already exists.");
-                return;
-            }
-        
-            addStudent(req.body).then(result =>
-            {
-                if (result.affectedRows == 1)
+                checkStudentExists(req.body["FirstName"], req.body["LastName"]).then(result =>
                 {
-                    getStudent(result.insertId).then(result =>
+                    if (result.length > 0)
                     {
-                        res.status(200).end();
+                        res.status(400).end("Student already exists.");
+                    }
+                
+                    addStudent(req.body).then(result =>
+                    {
+                        if (result.affectedRows == 1)
+                        {
+                            res.status(200).end("Student added.");
+                        }
+                        else
+                        {
+                            res.status(400).end("Unable to add student.");
+                        }
                     })
-                }
-                else
+                    .catch(errorWithQuery =>
+                    {
+                        console.log(errorWithQuery.message);
+                        res.status(400).end();
+                    })
+                })
+                .catch(errorWithQuery =>
                 {
-                    res.status(400).end("ERROR! Unable to add student. Try again.");
-                }
-            })
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/addClass")
     {
-        checkClassExists(req.body["Name"], req.body["Level"]).then(result =>
+        // Check if admin
+        checkAdminCredentials(req.body["tutor"]).then(result =>
         {
-            if (result.length > 0)
+            if (result.length == 1)
             {
-                res.status(400).end("ERROR! Class already exists.");
-                return;
-            }
-        
-            addClass(req.body["Name"], req.body["Level"]).then(result =>
-            {
-                if (result.affectedRows == 1)
+                checkClassExists(req.body["Name"], req.body["Level"]).then(result =>
                 {
-                    getClass(result.insertId).then(result =>
+                    if (result.length > 0)
                     {
-                        res.status(200).end(JSON.stringify(result));
+                        res.status(400).end("Class already exists.");
+                    }
+                
+                    addClass(req.body["Name"], req.body["Level"]).then(result =>
+                    {
+                        if (result.affectedRows == 1)
+                        {
+                            res.status(200).end("Class added.");
+                        }
+                        else
+                        {
+                            res.status(400).end("Unable to add class.");
+                        }
                     })
-                }
-                else
+                    .catch(errorWithQuery =>
+                    {
+                        console.log(errorWithQuery.message);
+                        res.status(400).end();
+                    })
+                })
+                .catch(errorWithQuery =>
                 {
-                    res.status(400).end("ERROR! Unable to add class. Try again.");
-                }
-            })
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                })
+            }
+            else
+            {
+                res.status(400).end("Not Admin.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/addSession")
@@ -1006,7 +1549,7 @@ app.post('/:placeholder', (req, res) =>
         timeElapsed = endTime - startTime;
         if (timeElapsed <= 0)
         {
-            res.status(400).end("ERROR! End time must be after start time.");
+            res.status(400).end("End time must be after start time.");
             return;
         }
 
@@ -1016,11 +1559,16 @@ app.post('/:placeholder', (req, res) =>
         {
             if (result.affectedRows == 1)
             {
-                res.status(200).end("SUCCESS! Hours have been logged.");
+                res.status(200).end("Session added.");
             }
         })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
     }
-    else if (req.originalUrl == "/editSession")
+    else if (req.originalUrl == "/updateSession")
     {
         // Convert data to usuable types
         tutorData = JSON.parse(req.body["Tutor"]);
@@ -1035,18 +1583,23 @@ app.post('/:placeholder', (req, res) =>
         timeElapsed = endTime - startTime;
         if (timeElapsed <= 0)
         {
-            res.status(400).end("ERROR! End time must be after start time.");
+            res.status(400).end("End time must be after start time.");
             return;
         }
 
         // Calculate money generated and add hours
         moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
-        editSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
+        updateSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
         {
             if (result.affectedRows == 1)
             {
-                res.status(200).end("SUCCESS! Session has been edited.");
+                res.status(200).end("Session updated.");
             }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
     else if (req.originalUrl == "/deleteSession")
@@ -1063,8 +1616,13 @@ app.post('/:placeholder', (req, res) =>
         {
             if (result.affectedRows == 1)
             {
-                res.status(200).end("SUCCESS! Hours have been deleted.");
+                res.status(200).end("Session deleted.");
             }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
         })
     }
 })
@@ -1075,7 +1633,7 @@ app.listen(port, () =>
     console.log("\n");
     console.log(`Listening on port: ${port}`);
     console.log(`Network access via: ${ip.address()}:${port}!`);
-    http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp)
+    https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
     {
         resp.on('data', function(externalIp) 
         {
@@ -1083,3 +1641,25 @@ app.listen(port, () =>
         });
     });
 })
+
+
+// const certs =
+// {
+//     key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
+//     cert: fs.readFileSync(__dirname + '/public.cert', 'utf8')
+// };
+
+// https.createServer(certs, app).listen(443);
+// http.createServer(app).listen(80);
+
+// console.log("\n");
+// console.log("Server started!");
+
+// // Get external ip
+// https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
+// {
+//     resp.on('data', function(externalIp) 
+//     {
+//         console.log(`External access if port forwarded: ${externalIp}`)
+//     });
+// });

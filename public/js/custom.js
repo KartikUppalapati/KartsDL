@@ -368,27 +368,6 @@ $(document).ready(function () {
   /*======== 13. PROGRESS BAR ========*/
   NProgress.done();
 
-  /*======== 14. DATA TABLE ========*/
-  var table = $("#hoursTable");
-  if (table.length != 0) {
-    table.DataTable({
-      info: true,
-      autoWidth: false,
-      lengthChange: false,
-      lengthMenu: [[5, 10, 15, "All"]],
-      scrollX: true,
-      order: [[0, "desc"]],
-      columnDefs: 
-      [
-        {
-            targets: "_all",
-            orderable: false
-        },
-      ],
-      language: {search: "_INPUT_", searchPlaceholder: "Search"},
-    });
-  }
-
   var productSale = $("#product-sale");
   if (productSale.length != 0) {
     productSale.DataTable({

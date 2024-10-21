@@ -1,17 +1,4 @@
-/**
- * WEBSITE: https://themefisher.com
- * TWITTER: https://twitter.com/themefisher
- * FACEBOOK: https://www.facebook.com/themefisher
- * GITHUB: https://github.com/themefisher/
- */
-
 @charset "UTF-8";
-/*!
- * Bootstrap v4.6.1 (https://getbootstrap.com/)
- * Copyright 2011-2021 The Bootstrap Authors
- * Copyright 2011-2021 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
 :root {
   --blue: #007bff;
   --indigo: #6610f2;
@@ -2491,7 +2478,7 @@ fieldset:disabled a.btn {
   pointer-events: none;
 }
 
-.btn-primary {
+.btn-primary{
   color: #ffffff;
   background-color: #9e6de0;
   border-color: #9e6de0;
@@ -17035,19 +17022,6 @@ input[type=radio] {
   font-size: 24px;
 }
 
-div.copied {
-  position: fixed;
-  top: 100px;
-  left: 50%;
-  width: 200px;
-  text-align: center;
-  color: #ffffff;
-  background-color: #0acb8e;
-  padding: 10px 15px;
-  border-radius: 4px;
-  margin-left: -100px;
-}
-
 /*===== TODO LIST ======*/
 .todo-list .todo-single-item:last-child {
   margin-bottom: 0px;
@@ -17449,6 +17423,36 @@ html[dir=rtl] .sidebar li > a .caret:before {
     background-color: var(--primary);
 } */
 
+div.successMessage
+{
+    top: 15px;
+    width: 250px;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-left: -50px;
+    background-color: #0acb8e;
+}
+
+div.errorMessage
+{
+    top: 15px;
+    width: 250px;
+    color: #ffffff;
+    position: fixed;
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-left: -50px;
+    background-color: var(--danger);
+}
+
+.dropdown p:hover
+{
+    color: var(--primary);
+}
+
 .make-hidden
 {
     display: none;
@@ -17463,7 +17467,7 @@ html[dir=rtl] .sidebar li > a .caret:before {
 
 .notify-bottom
 {
-    border-bottom: 5px solid var(--primary);
+    border-bottom: 5px solid var(--info-dark);
 }
 
 .mdi-hover:hover

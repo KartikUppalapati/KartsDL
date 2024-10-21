@@ -32,15 +32,24 @@ body
     background-color: #ffffff;
 }
 
-.loginError
+.errorMessageInput
 {
-    width: 67%;
-    padding: 15px;
-    font-size: 14pt;
+    padding: 5px;
+    text-align: center;
+    border-bottom: none;
     border-radius: 10px;
-    margin-bottom: 35px;
-    margin-left: 14.5%;
     background-color: #F2DEDE;
+}
+
+.successMessageInput
+{
+    opacity: .9;
+    padding: 5px;
+    color: white;
+    text-align: center;
+    border-bottom: none;
+    border-radius: 10px;
+    background-color: #0acb8e;
 }
 
 input
@@ -56,48 +65,64 @@ input
     border-bottom: 5px solid black;
 }
 
-input:-webkit-autofill:focus
-{
-    border-bottom: 5px solid #95a4ff;
-    -webkit-text-fill-color: #2A293E;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-.loginFormButtons
-{
-    text-align: center;
-}
-
-.loginForm button
-{
-    color: white;
-    margin: 0;
-    outline: none;
-    margin-top: 15px;
-    margin-bottom: -10px;
-    line-height: 28pt;
-    letter-spacing: 2px;
-    background: #9e6de0;
-    border: 1px solid black;
-    transition: 0.1s all ease-in-out;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.loginForm button:active
-{
-    top: 3px;
-    box-shadow: none;
-}
-
-.loginForm button:hover
+.forgotLabel:hover
 {
     cursor: pointer;
-    color: white;
-    background: #6f42c1;
-    border: 1px solid black;
+    color: #8243d7;
+}
+
+.btn
+{
+    display: inline-block;
+    font-weight: 400;
+    color: #8a909d;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+        -moz-user-select: none;
+            user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.56rem 1.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce)
+{
+    .btn {
+        transition: none;
+    }
+}
+.btn:hover
+{
+    cursor: pointer;
+    color: #8a909d;
+    text-decoration: none;
+}
+.btn:focus, .btn.focus
+{
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem transparent;
+}
+
+.btn-primary
+{
+    color: #ffffff;
+    background-color: #9e6de0;
+    border-color: #9e6de0;
+}
+.btn-primary:hover
+{
+    color: #ffffff;
+    background-color: #894dd9;
+    border-color: #8243d7;
+}
+.btn-primary:focus
+{
+    color: #ffffff;
+    background-color: #894dd9;
+    border-color: #8243d7;
+    box-shadow: 0 0 0 0.2rem rgba(173, 131, 229, 0.5);
 }

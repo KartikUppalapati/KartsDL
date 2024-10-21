@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title>MMT Hours</title>
+        <title>MMT Login</title>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -14,19 +14,17 @@
             <div class="loginBox">
                 <h1 style="font-size: 40px; padding-top: 15px;">Mind Mantra Tutoring</h1>
                 <div class="loginDiv">
-                    <div class="loginError">
-                        Email or password was incorrect. Please try again.
-                    </div>
                     <form id="loginForm" class="loginForm" action="login" method="post">
+                        <input class="errorMessageInput" disabled value="Login Failed. Try Again.">
                         <input name="Email" placeholder="Email" required="" type="text" autofocus>
                         <input name="Password" placeholder="Password" type = "Password" required="" type="text">
-                        <div class="loginFormButtons">
-                            <button type="submit">Submit</button>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <label style="cursor: pointer;" onclick="resetPassword()">Forgot Password?</label>
+            <label class="forgotLabel" onclick="resetPassword()">Forgot Password?</label>
         </div>
     </body>
 
