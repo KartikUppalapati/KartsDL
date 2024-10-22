@@ -34,11 +34,14 @@ body
 
 .errorMessageInput
 {
+    opacity: .9;
     padding: 5px;
+    color: white;
     text-align: center;
     border-bottom: none;
     border-radius: 10px;
-    background-color: #F2DEDE;
+    /* background-color: #F2DEDE; */
+    background-color: #fe5461;
 }
 
 .successMessageInput
@@ -61,7 +64,7 @@ input
     font-size: 14pt;
     line-height: 28pt;
     margin-bottom: 28pt;
-    background-color: #f8f4e5;
+    /* background-color: #f8f4e5; */
     border-bottom: 5px solid black;
 }
 

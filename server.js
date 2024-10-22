@@ -6,6 +6,7 @@ const http = require('http');
 const path = require('path');
 const mysql = require('mysql');
 const https = require('https');
+const cron = require('node-cron');
 const express = require('express');
 const { error } = require('console');
 var nodemailer = require('nodemailer');
@@ -16,6 +17,29 @@ const app = express();
 app.use(express.json());
 app.use(express.static(initalPath));
 app.use(express.urlencoded({extended: false}));
+
+// Schedule weekly things
+// cron.schedule('0 5 * * Monday', () =>
+// {
+//     // Get last monday
+//     var today = new Date();
+//     today.setDate(today.getDate() - 7);
+//     var day = String(today.getDate()).padStart(2, '0');
+//     var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+//     var year = today.getFullYear();
+//     var startDate = `${year}-${month}-${day}`;
+
+//     // Get sunday
+//     today.setDate(today.getDate() + 6);
+//     var day = String(today.getDate()).padStart(2, '0');
+//     var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+//     var year = today.getFullYear();
+//     var endDate = `${year}-${month}-${day}`;
+
+//     // Call functions
+//     sendStudentsInvoice(startDate, endDate);
+//     sendTutorsInvoice(startDate, endDate);
+// });
 
 // Connect to database
 var con = mysql.createPool(
@@ -363,7 +387,7 @@ const getStudents = async () =>
 
 const getStudentsWithInvoice = async (startDate, endDate) =>
 {
-    const QUERY = mysql.format("select distinct StudentId from Students inner join Hours on Students.Id = Hours.StudentId where Date >= ? and Date <= ?", [startDate, endDate]);
+    const QUERY = mysql.format("select distinct StudentId, FirstName, LastName, Email from Students inner join Hours on Students.Id = Hours.StudentId where Date >= ? and Date <= ?", [startDate, endDate]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err)
@@ -448,7 +472,7 @@ const getTutors = async () =>
 
 const getTutorsWithInvoice = async (startDate, endDate) =>
 {
-    const QUERY = mysql.format("select distinct TutorId from Tutors inner join Hours on Tutors.Id = Hours.TutorId where Date >= ? and Date <= ?", [startDate, endDate]);
+    const QUERY = mysql.format("select distinct TutorId, FirstName, LastName, Email from Tutors inner join Hours on Tutors.Id = Hours.TutorId where Date >= ? and Date <= ?", [startDate, endDate]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err)
@@ -616,6 +640,336 @@ const getTutorInvoice = async (tutorId, startDate, endDate) =>
     }));
 }
 
+// Weekly functions
+function sendStudentsInvoice(startDate, endDate)
+{
+    // Get list of students with invoice
+    getStudentsWithInvoice(startDate, endDate).then(students =>
+    {
+        // Iterate through student list
+        for (var i = 0; i < students.length; i++)
+        {
+            // Get tutor info
+            var studentInfo = students[i];
+            
+            // Get invoice for id
+            getStudentInvoice(studentInfo["StudentId"], startDate, endDate, studentInfo).then(invoice =>
+            {
+                // If invoice not empty
+                if (invoice.length > 0)
+                {
+                    // Initialize things
+                    var total = 0;
+                    var invoiceHtml = "";
+                    var htmlData = fs.readFileSync(path.join(initalPath, "email.html"), "utf-8");
+
+                    // Iterate through invoice list
+                    for (var k = 0; k < invoice.length; k++)
+                    {
+                        // Update invoice html
+                        invoiceHtml +=
+                        `<tr>
+                            <td align="left" valign="top" style="padding: 8px 0px 16px 16px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                <td>
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                    <td valign="top">
+                                    <table class="" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tr>
+                                    <th valign="top" style="font-weight: normal; text-align: left;">
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                        <td>
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                            <td valign="top">
+                                            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left; padding: 0px 0px 4px 0px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left" style="padding: 9px 0px 0px 0px;">
+                                                    <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-26" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; font-variant-ligatures: normal; color: #001942; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["TutorFirstName"]} ${invoice[k]["TutorLastName"]} ${invoice[k]["ClassName"]} ${invoice[k]["Level"]}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left">
+                                                    <div class="pc-font-alt" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 14px; font-weight: normal; font-variant-ligatures: normal; color: #53627a; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["StartTime"].substring(0, 5)} - ${invoice[k]["EndTime"].substring(0, 5)}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left">
+                                                    <div class="pc-font-alt" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 14px; font-weight: normal; font-variant-ligatures: normal; color: #53627a; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["Date"].toISOString().split('T')[0]}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            </table>
+                                            </td>
+                                            </tr>
+                                        </table>
+                                        </td>
+                                        </tr>
+                                        </table>
+                                    </th>
+                                    </tr>
+                                    </table>
+                                    </td>
+                                </tr>
+                                </table>
+                                </td>
+                                </tr>
+                            </table>
+                            </td>
+                            <td align="right" valign="top" style="padding: 16px 16px 24px 16px;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                <tr>
+                                <td valign="top" align="right">
+                                <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-20" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 16px; font-weight: normal; font-variant-ligatures: normal; color: #001942; text-align: right; text-align-last: right;">
+                                <div>
+                                    <span style="color: #001942;">$${Number(invoice[k]["MoneyGenerated"]).toFixed(2)}</span>
+                                </div>
+                                </div>
+                                </td>
+                                </tr>
+                            </table>
+                            </td>
+                        </tr>`;
+
+                        // Update total
+                        total += invoice[k]["MoneyGenerated"];
+                    }
+
+                    // Update total
+                    htmlData = htmlData.replace("Invoice Below", `Invoice ${startDate.replaceAll("-", "/")} - ${endDate.replaceAll("-", "/")}`);
+                    htmlData = htmlData.replace("<!-- invoiceGoesHere -->", invoiceHtml);
+                    htmlData = htmlData.replace("$0", `$${Number(total).toFixed(2)}`);
+
+                    // Set up email
+                    var mailOptions =
+                    {
+                        from: "mindmantratutoring@gmail.com",
+                        to: studentInfo["Email"],
+                        subject: `Invoice for ${tutorInfo["FirstName"]} ${tutorInfo["LastName"]}: $${Number(total).toFixed(2)}`,
+                        html: htmlData
+                    };
+
+                    // Send email
+                    emailer.sendMail(mailOptions, function(error, info)
+                    {
+                        if (error)
+                        {
+                            console.log(error);
+                        }
+                    });
+                }
+            })
+            .catch(errorWithQuery =>
+            {
+                console.log(errorWithQuery.message);
+            })
+        }
+    })
+    .catch(errorWithQuery =>
+    {
+        console.log(errorWithQuery.message);
+    })
+}
+
+function sendTutorsInvoice(startDate, endDate)
+{
+    // Get list of tutors with invoice
+    getTutorsWithInvoice(startDate, endDate).then(tutors =>
+    {
+        // Iterate through tutor list
+        for (var i = 0; i < tutors.length; i++)
+        {
+            // Get tutor info
+            var tutorInfo = tutors[i];
+
+            // Get invoice for id
+            getTutorInvoice(tutorInfo["TutorId"], startDate, endDate, tutorInfo).then(invoice =>
+            {
+                // If invoice not empty
+                if (invoice.length > 0)
+                {
+                    // Initialize things
+                    var total = 0;
+                    var invoiceHtml = "";
+                    var htmlData = fs.readFileSync(path.join(initalPath, "email.html"), "utf-8");
+
+                    // Iterate through invoice list
+                    for (var k = 0; k < invoice.length; k++)
+                    {
+                        // Update invoice html
+                        invoiceHtml +=
+                        `<tr>
+                            <td align="left" valign="top" style="padding: 8px 0px 16px 16px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                <td>
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                    <td valign="top">
+                                    <table class="" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tr>
+                                    <th valign="top" style="font-weight: normal; text-align: left;">
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                        <td>
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                            <td valign="top">
+                                            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left; padding: 0px 0px 4px 0px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left" style="padding: 9px 0px 0px 0px;">
+                                                    <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-26" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; font-variant-ligatures: normal; color: #001942; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["StudentFirstName"]} ${invoice[k]["StudentLastName"]} ${invoice[k]["ClassName"]} ${invoice[k]["Level"]}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left">
+                                                    <div class="pc-font-alt" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 14px; font-weight: normal; font-variant-ligatures: normal; color: #53627a; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["StartTime"].substring(0, 5)} - ${invoice[k]["EndTime"].substring(0, 5)}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th align="left" valign="top" style="font-weight: normal; text-align: left;">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                                <tr>
+                                                <td valign="top" align="left">
+                                                    <div class="pc-font-alt" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 14px; font-weight: normal; font-variant-ligatures: normal; color: #53627a; text-align: left; text-align-last: left;">
+                                                    <div>
+                                                        <span>${invoice[k]["Date"].toISOString().split('T')[0]}</span>
+                                                    </div>
+                                                    </div>
+                                                </td>
+                                                </tr>
+                                                </table>
+                                                </th>
+                                            </tr>
+                                            </table>
+                                            </td>
+                                            </tr>
+                                        </table>
+                                        </td>
+                                        </tr>
+                                        </table>
+                                    </th>
+                                    </tr>
+                                    </table>
+                                    </td>
+                                </tr>
+                                </table>
+                                </td>
+                                </tr>
+                            </table>
+                            </td>
+                            <td align="right" valign="top" style="padding: 16px 16px 24px 16px;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
+                                <tr>
+                                <td valign="top" align="right">
+                                <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-20" style="line-height: 140%; letter-spacing: -0.03em; font-family: 'Poppins', Arial, Helvetica, sans-serif; font-size: 16px; font-weight: normal; font-variant-ligatures: normal; color: #001942; text-align: right; text-align-last: right;">
+                                <div>
+                                    <span style="color: #001942;">$${Number(invoice[k]["MoneyGenerated"]).toFixed(2)}</span>
+                                </div>
+                                </div>
+                                </td>
+                                </tr>
+                            </table>
+                            </td>
+                        </tr>`;
+
+                        // Update total
+                        total += invoice[k]["MoneyGenerated"];
+                    }
+
+                    // Update total
+                    htmlData = htmlData.replace("Invoice Below", `Invoice ${startDate.replaceAll("-", "/")} - ${endDate.replaceAll("-", "/")}`);
+                    htmlData = htmlData.replace("<!-- invoiceGoesHere -->", invoiceHtml);
+                    htmlData = htmlData.replace("$0", `$${Number(total).toFixed(2)}`);
+
+                    // Set up email
+                    var mailOptions =
+                    {
+                        from: "mindmantratutoring@gmail.com",
+                        to: tutorInfo["Email"],
+                        subject: `Invoice for ${tutorInfo["FirstName"]} ${tutorInfo["LastName"]}: $${Number(total).toFixed(2)}`,
+                        html: htmlData
+                    };
+
+                    // Send email
+                    emailer.sendMail(mailOptions, function(error, info)
+                    {
+                        if (error)
+                        {
+                            console.log(error);
+                        }
+                    });
+                }
+            })
+            .catch(errorWithQuery =>
+            {
+                console.log(errorWithQuery.message);
+            })
+        }
+    })
+    .catch(errorWithQuery =>
+    {
+        console.log(errorWithQuery.message);
+    })
+}
+
+function sendVenmo()
+{
+
+}
+
 // Helper functions for date
 Date.prototype.GetFirstDayOfWeek = function()
 {
@@ -640,7 +994,7 @@ app.get('/:placeholder', (req, res) =>
     // Not found
     else
     {
-        res.json("404 file not found");
+        res.status(200).sendFile(path.join(initalPath, "error404.html"));
     }
 })
 
@@ -1158,63 +1512,6 @@ app.post('/:placeholder', (req, res) =>
             res.status(400).end();
         })
     }
-    else if (req.originalUrl == "/sendInvoice")
-    {
-        // Set up email
-        var mailOptions =
-        {
-            from: "mindmantratutoring@gmail.com",
-            to: "kartik0109@gmail.com",
-            subject: `Payment Due: Invoice for ${req.body["Name"]}`,
-            html:
-            `
-                <div>
-                    Hello,<br><br>
-                    Please see below the invoice for tutoring services provided by MMT on
-                    ${req.body["StartDate"].replaceAll("-", "/")}-${req.body["EndDate"].replaceAll("-", "/")}.<br><br>
-                </div>
-
-                <br><br>
-                ${req.body["Html"]}
-                <br><br>
-
-                <div>
-                    Thank you for your prompt attention to this matter.<br>
-                    Please feel free to reach out if you have any questions.
-                </div>
-            `
-        };
-
-        // Check if admin
-        checkAdminCredentials(req.body["tutor"]).then(result =>
-        {
-            if (result.length == 1)
-            {
-                // Send email
-                emailer.sendMail(mailOptions, function(error, info)
-                {
-                    if (error)
-                    {
-                        console.log('Error:', error);
-                        res.status(400).end();
-                    }
-                    else
-                    {
-                        res.status(200).end();
-                    }
-                });
-            }
-            else
-            {
-                res.status(400).end("Not Admin.");
-            }
-        })
-        .catch(errorWithQuery =>
-        {
-            console.log(errorWithQuery.message);
-            res.status(400).end();
-        })
-    }
     else if (req.originalUrl == "/updateUserProfile")
     {
         updateUserProfile(req.body, req.body["tutor"]).then(result =>
@@ -1253,7 +1550,7 @@ app.post('/:placeholder', (req, res) =>
             return;
         }
 
-        updateUserPassword(JSON.parse(req.body["tutor"]), req.body["OldPassword"], req.body["NewPassword"]).then(result =>
+        updateUserPassword(req.body["tutor"], req.body["OldPassword"], req.body["NewPassword"]).then(result =>
         {
             // If no rows changed then error
             if (result.affectedRows == 0)
@@ -1283,13 +1580,19 @@ app.post('/:placeholder', (req, res) =>
             // If password updated
             if (result.affectedRows == 1)
             {
+                // Read in email html
+                var htmlData = fs.readFileSync(path.join(initalPath, "emailResetPassword.html"), "utf-8");
+
+                // Add tutor data to string
+                htmlData = htmlData.replace("P@ssword123", updatedPassword);
+
                 // Set email
                 var mailOptions =
                 {
                     from: "mindmantratutoring@gmail.com",
                     to: req.body["Email"],
                     subject: "Password Reset",
-                    text: "Your password has been reset to " + updatedPassword + ". Please log in and update it."
+                    html: htmlData
                 };
 
                 // Send email
@@ -1297,7 +1600,7 @@ app.post('/:placeholder', (req, res) =>
                 {
                     if (error)
                     {
-                        console.log('Error:', error);
+                        console.log(error);
                         res.sendFile(path.join(initalPath, "resetPasswordError.html"));
                     }
                     else

@@ -899,9 +899,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button id="sendInvoiceButton" type="button" class="btn btn-secondary" disabled onclick="sendInvoice();">Send Email</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1437,9 +1434,6 @@
         // Function to open invoice modal
         function openStudentInvoiceModal(studentId)
         {
-            // Reset text
-            document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
-
             // Update form submit action
             document.getElementById("getInvoiceForm").onsubmit = function() {return getStudentInvoice()};
 
@@ -1515,9 +1509,6 @@
         // Function to open invoice modal
         function openTutorInvoiceModal(tutorId)
         {
-            // Reset text
-            document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
-
             // Update form submit action
             document.getElementById("getInvoiceForm").onsubmit = function() {return getTutorInvoice()};
 
@@ -1569,48 +1560,6 @@
             setTimeout(function() {getTutorInvoice();}, asyncFunctionTimeout);
         }
         
-        // Function to send invoice as email
-        function sendInvoice()
-        {
-            // If empty table
-            if (adminInvoiceTableEmpty == 1)
-            {
-                errorMessage("Table is empty");
-                return false;
-            }
-
-            // Update text
-            document.getElementById("sendInvoiceButton").innerHTML = "Sending Invoice";
-
-            // Send invoice
-            request = new XMLHttpRequest();
-            request.open("POST", "sendInvoice", false);
-            request.setRequestHeader('Content-type', 'application/json');
-            request.onreadystatechange = function()
-            {
-                // Successful response
-                if (this.readyState == 4 && this.status == 200) 
-                {
-                    successMessage("Invoice sent.");
-                    document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
-                }
-                else
-                {
-                    errorMessage("Unable to send invoice.");
-                    document.getElementById("sendInvoiceButton").innerHTML = "Send Invoice";
-                }
-            };
-            setTimeout(function() {request.send(JSON.stringify(
-            {
-                "tutor": tutorData,
-                "Name": document.getElementById("modalInvoiceFullName").innerHTML,
-                "Email": document.getElementById("modalInvoiceEmail").innerHTML,
-                "StartDate": document.getElementById("invoiceStartDate").value,
-                "EndDate": document.getElementById("invoiceEndDate").value,
-                "Html": document.getElementById("invoiceTable").innerHTML
-            }));}, asyncFunctionTimeout);
-        }
-
         // Function to open contract modal
         function openContractModal(studentId)
         {
@@ -2276,7 +2225,7 @@
                             <th>${invoiceData[i]["TutorFirstName"]} ${invoiceData[i]["TutorLastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
                             <th>${invoiceData[i]["StartTime"].substring(0, 5)}</th>
                             <th>${invoiceData[i]["EndTime"].substring(0, 5)}</th>
-                            <th>$${invoiceData[i]["MoneyGenerated"]}</th>
+                            <th>$${Number(invoiceData[i]["MoneyGenerated"]).toFixed(2)}</th>
                         </tr>`;
 
                         // Add money generated to total price
@@ -2297,7 +2246,7 @@
                             <th></th>
                             <th></th>
                             <th>Total</th>
-                            <th>$${Number(totalPrice).toLocaleString('en')}</th>
+                            <th>$${Number(totalPrice).toFixed(2)}</th>
                         </tr>`;
                     }
                     // Empty
@@ -2383,7 +2332,7 @@
                             <th>${invoiceData[i]["StudentFirstName"]} ${invoiceData[i]["StudentLastName"]} ${invoiceData[i]["ClassName"]} ${invoiceData[i]["Level"]}</th>
                             <th>${invoiceData[i]["StartTime"].substring(0, 5)}</th>
                             <th>${invoiceData[i]["EndTime"].substring(0, 5)}</th>
-                            <th>$${invoiceData[i]["MoneyGenerated"]}</th>
+                            <th>$${Number(invoiceData[i]["MoneyGenerated"]).toFixed(2)}</th>
                         </tr>`;
 
                         // Add money generated to total price
@@ -2404,7 +2353,7 @@
                             <th></th>
                             <th></th>
                             <th>Total</th>
-                            <th>$${Number(totalPrice).toLocaleString('en')}</th>
+                            <th>$${Number(totalPrice).toFixed(2)}</th>
                         </tr>`;
                     }
                     // Empty
@@ -2519,9 +2468,9 @@
                     var outputsArray = JSON.parse(this.responseText);
 
                     // Update dashboard top 3 numbers
-                    document.getElementById("moneyEarned").innerHTML = `$${outputsArray["totalMoneyGenerated"]}`;
+                    document.getElementById("moneyEarned").innerHTML = `$${Number(outputsArray["totalMoneyGenerated"]).toFixed(2)}`;
                     document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
-                    document.getElementById("hoursTutored").innerHTML = outputsArray["totalHoursTutored"];
+                    document.getElementById("hoursTutored").innerHTML = Number(outputsArray["totalHoursTutored"]).toFixed(2);
 
                     // Update dashboard top 3 charts
                     moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
@@ -2586,9 +2535,9 @@
                     var tutorTotals = JSON.parse(this.responseText);
 
                     // Update dashboard elements
-                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${Number(tutorTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${Number(tutorTotals["TotalMoney"]).toFixed(2)}`;
                     document.getElementById("careerStudentsTaughtTotal").innerHTML = tutorTotals["TotalStudents"];
-                    document.getElementById("careerHoursTaughtTotal").innerHTML = tutorTotals["TotalHours"];
+                    document.getElementById("careerHoursTaughtTotal").innerHTML = Number(tutorTotals["TotalHours"]).toFixed(2);
                 }
                 else
                 {
@@ -2622,9 +2571,9 @@
                     var companyTotals = JSON.parse(this.responseText);
 
                     // Update dashboard elements
-                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${Number(companyTotals["TotalMoney"]).toLocaleString('en')}`;
+                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${Number(companyTotals["TotalMoney"]).toFixed(2)}`;
                     document.getElementById("companyStudentsTaughtTotal").innerHTML = companyTotals["TotalStudents"];
-                    document.getElementById("companyHoursTaughtTotal").innerHTML = companyTotals["TotalHours"];
+                    document.getElementById("companyHoursTaughtTotal").innerHTML = Number(companyTotals["TotalHours"]).toFixed(2);
                 }
                 else
                 {
