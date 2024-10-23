@@ -512,7 +512,7 @@ const getTutor = async (tutorId) =>
 
 const getTutorTotals = async (id) =>
 {
-    const QUERY = mysql.format("SELECT COUNT(*) as TotalStudents, SUM(MoneyGenerated) as TotalMoney, SUM(TIMESTAMPDIFF(MINUTE, StartTime, EndTime)/60) as TotalHours from Hours WHERE TutorId = ?", id);
+    const QUERY = mysql.format("SELECT COUNT(*) as TotalStudents, SUM(Hours.MoneyGenerated) * (Tutors.Percentage / 100) as TotalMoney, SUM(TIMESTAMPDIFF(MINUTE, Hours.StartTime, Hours.EndTime)/60) as TotalHours from Hours INNER JOIN Tutors ON Tutors.Id = Hours.TutorId WHERE Hours.TutorId = ?", id);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
     if (err) 
@@ -563,7 +563,7 @@ const getAllSessions = async (tutorData, queryLimit) =>
 
 const getHoursWithinDates = async (tutorData, startDate, endDate) =>
 {
-  const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
+  const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, Tutors.Percentage, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Tutors ON Tutors.Id = Hours.TutorId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, result) => 
   {
     if (err) 
@@ -1382,7 +1382,7 @@ app.post('/:placeholder', (req, res) =>
             {
                 var currentMoneyGenerated = 0;
                 var currentHoursTutored = 0;
-                currentMoneyGenerated = (result[j]["MoneyGenerated"] * req.body["Tutor"].Percentage / 100);
+                currentMoneyGenerated = (result[j]["MoneyGenerated"] * result[j]["Percentage"] / 100);
                 startTime = new Date(0, 0, 0, result[j]["StartTime"].split(":")[0], result[j]["StartTime"].split(":")[1]);
                 endTime = new Date(0, 0, 0, result[j]["EndTime"].split(":")[0], result[j]["EndTime"].split(":")[1]);
                 currentHoursTutored = (endTime - startTime) / 3600000;
