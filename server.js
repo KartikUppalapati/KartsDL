@@ -84,7 +84,7 @@ const checkLoginCredentials = async (email, password) =>
     // Ex1: admin"-- "
     // Ex2: admin" or "1"="1
     // Prevent sql injection by using prepared statement
-    const QUERY = mysql.format("SELECT Id, FirstName, LastName, Email, PhoneNumber, AuthToken, Admin FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
+    const QUERY = mysql.format("SELECT Id, FirstName, LastName, Email, PhoneNumber, Percentage, AuthToken, Admin FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
         if (err)
