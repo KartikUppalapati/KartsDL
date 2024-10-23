@@ -1,5 +1,4 @@
 // Import stuff
-const port = 3001;
 const fs = require('fs');
 require('dotenv').config();
 const http = require('http');
@@ -1948,7 +1947,6 @@ const certs =
 };
 
 // Start server
-http.createServer(app).listen(80);
 https.createServer(certs, app).listen(443);
 
 console.log("\n");
