@@ -12,6 +12,12 @@ const { error } = require('console');
 var nodemailer = require('nodemailer');
 let initalPath = path.join(__dirname, "public");
 
+// Check that env vars available
+if (process.env.ENV_VARS_LENGTH != 2)
+{
+    throw new Error("Missing Environment Variable");
+}
+
 // App stuff
 const app = express();
 app.use(express.json());
@@ -1933,29 +1939,17 @@ app.post('/:placeholder', (req, res) =>
     }
 })
 
-// Start listening on port
-// app.listen(port, () => 
-// {
-//     console.log("\n");
-//     console.log(`Listening on port: ${port}`);
-//     https.get({'host': 'api.ipify.org', 'port': 443, 'path': '/'}, function(resp)
-//     {
-//         resp.on('data', function(externalIp) 
-//         {
-//           console.log(`External access if port forwarded: ${externalIp}:${port}`)
-//         });
-//     });
-// })
 
+// Get keys
+const certs =
+{
+    key: fs.readFileSync(path.join(initalPath, "/sslStuff/private.key")),
+    cert: fs.readFileSync(path.join(initalPath, "/sslStuff/certificate.crt"))
+};
 
-// const certs =
-// {
-//     key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
-//     cert: fs.readFileSync(__dirname + '/public.cert', 'utf8')
-// };
-
-// https.createServer(certs, app).listen(443);
+// Start server
 http.createServer(app).listen(80);
+https.createServer(certs, app).listen(443);
 
 console.log("\n");
 console.log("Server started!");
