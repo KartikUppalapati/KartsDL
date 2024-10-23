@@ -5,6 +5,7 @@ const http = require('http');
 const path = require('path');
 const mysql = require('mysql');
 const https = require('https');
+const crypto = require('crypto');
 const cron = require('node-cron');
 const express = require('express');
 const { error } = require('console');
@@ -12,7 +13,7 @@ var nodemailer = require('nodemailer');
 let initalPath = path.join(__dirname, "public");
 
 // Check that env vars available
-if (process.env.ENV_VARS_LENGTH != 2)
+if (process.env.ENV_VARS_LENGTH != 3)
 {
     throw new Error("Missing Environment Variable");
 }
@@ -83,7 +84,7 @@ const checkLoginCredentials = async (email, password) =>
     // Ex1: admin"-- "
     // Ex2: admin" or "1"="1
     // Prevent sql injection by using prepared statement
-    const QUERY = mysql.format("SELECT * FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
+    const QUERY = mysql.format("SELECT Id, FirstName, LastName, Email, PhoneNumber, AuthToken, Admin FROM Tutors WHERE Email = ? and Password = ?", [email, password]);
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) =>
     {
         if (err)
@@ -287,9 +288,9 @@ const addStudent = async (studentData) =>
   }));
 }
 
-const addTutor = async (tutorData, tempPassword, newAuthToken) =>
+const addTutor = async (tutorData, tempPassword, newAuthToken, newSaltToken) =>
 {
-  const QUERY = mysql.format(`INSERT INTO Tutors VALUES("NULL", "?", "?", "?", "?", "?", "?", "?", 0`, [tutorData.FirstName, tutorData.LastName, tutorData.Email, tempPassword, tutorData.Percentage, tutorData.Phone, newAuthToken]);
+  const QUERY = mysql.format(`INSERT INTO Tutors VALUES("NULL", "?", "?", "?", "?", "?", "?", "?", "?", 0`, [tutorData.FirstName, tutorData.LastName, tutorData.Email, tempPassword, tutorData.Percentage, tutorData.Phone, newAuthToken, newSaltToken]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
   {
     if (err) 
@@ -990,7 +991,7 @@ Date.prototype.GetLastDayOfWeek = function()
 }
 
 // URL director for get
-app.get('/:placeholder', (req, res) => 
+app.get('/:placeholder', (req, res) =>
 {
     if (req.originalUrl == "/resetPassword")
     {
@@ -999,78 +1000,101 @@ app.get('/:placeholder', (req, res) =>
     // Not found
     else
     {
-        res.status(200).sendFile(path.join(initalPath, "error404.html"));
+        res.status(400).sendFile(path.join(initalPath, "error404.html"));
     }
 })
 
 // URL director for post
-app.post('/:placeholder', (req, res) => 
+app.post('/:placeholder', (req, res) =>
 {
     if (req.originalUrl == "/login")
-    {
-        checkLoginCredentials(req.body["Email"], req.body["Password"]).then(result =>
+    {        
+        // Get salt from database
+        checkTutorExists(req.body["Email"]).then(tutor =>
         {
-            // If login fail
-            if (result.length == 0)
+            // If not found
+            if (tutor.length != 1)
             {
-                res.sendFile(path.join(initalPath, "indexLoginError.html"));
+                res.status(400).sendFile(path.join(initalPath, "indexLoginError.html"));
             }
-        
-            // Else redirect
-            if (result.length == 1)
+            else
             {
-                // Dashboard file name as var
-                var dashboardFileToUse = "dashboard.html";
+                // Salt password
+                var saltedPassword = req.body["Password"] + tutor[0]["Salt"];
 
-                // Create copy of dashboard html and insert tutor user data
-                fs.copyFile(path.join(initalPath, dashboardFileToUse), path.join(initalPath, `dashboard${result[0]["Id"]}.html`), (err) =>
+                // Get hash
+                var hashedPassword = crypto.createHash('sha256').update(saltedPassword).digest("hex");
+
+                checkLoginCredentials(req.body["Email"], hashedPassword).then(result =>
                 {
-                    if (err) 
+                    // If login fail
+                    if (result.length == 0)
                     {
-                      console.log("Error with dashboard file copy:", err);
+                        res.status(400).sendFile(path.join(initalPath, "indexLoginError.html"));
                     }
-                    // Successful copy
-                    else
+                
+                    // Else redirect
+                    if (result.length == 1)
                     {
-                        // Get file as string
-                        var data = fs.readFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), "utf-8");
+                        // Dashboard file name as var
+                        var dashboardFileToUse = "dashboard.html";
 
-                        // Add tutor data to string
-                        data = data.replace("var tutorData = [];", `var tutorData = ${JSON.stringify(result[0])};`)
-
-                        // If user admin
-                        if (result[0]["Admin"] == 1)
+                        // Create copy of dashboard html and insert tutor user data
+                        fs.copyFile(path.join(initalPath, dashboardFileToUse), path.join(initalPath, `dashboard${result[0]["Id"]}.html`), (err) =>
                         {
-                            // Add admin button
-                            data = data.replace("</li putAdminButtonBelowHere>", 
-                            `</li>
-                            <li
-                                id="adminButton"
-                            >
-                                <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('adminDashboardArea', 'adminButton', 'adminDashboardFunction');">
-                                    <i class="mdi mdi-account-multiple-outline"></i>
-                                    <span class="nav-text">Admin Settings</span>
-                                </a>
-                            </li>`, "utf-8");
-                        }
-
-                        // Write changes
-                        fs.writeFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), data, "utf-8");
-
-                        // Send back file and delete
-                        res.sendFile(path.join(initalPath, `dashboard${result[0]["Id"]}.html`));
-                        res.on('finish', function()
-                        {
-                            try 
+                            if (err) 
                             {
-                              fs.unlinkSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`));
+                            console.log("Error with dashboard file copy:", err);
                             }
-                            catch(e) 
+                            // Successful copy
+                            else
                             {
-                              console.log("error removing ", path.join(initalPath, `dashboard${result[0]["Id"]}.html`)); 
+                                // Get file as string
+                                var data = fs.readFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), "utf-8");
+
+                                // Add tutor data to string
+                                data = data.replace("var tutorData = [];", `var tutorData = ${JSON.stringify(result[0])};`)
+
+                                // If user admin
+                                if (result[0]["Admin"] == 1)
+                                {
+                                    // Add admin button
+                                    data = data.replace("</li putAdminButtonBelowHere>", 
+                                    `</li>
+                                    <li
+                                        id="adminButton"
+                                    >
+                                        <a class="sidenav-item-link" style="cursor: pointer;" onclick="menuNav('adminDashboardArea', 'adminButton', 'adminDashboardFunction');">
+                                            <i class="mdi mdi-account-multiple-outline"></i>
+                                            <span class="nav-text">Admin Settings</span>
+                                        </a>
+                                    </li>`, "utf-8");
+                                }
+
+                                // Write changes
+                                fs.writeFileSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`), data, "utf-8");
+
+                                // Send back file and delete
+                                res.status(200).sendFile(path.join(initalPath, `dashboard${result[0]["Id"]}.html`));
+                                res.on('finish', function()
+                                {
+                                    try 
+                                    {
+                                    fs.unlinkSync(path.join(initalPath, `dashboard${result[0]["Id"]}.html`));
+                                    }
+                                    catch(e) 
+                                    {
+                                    console.log("error removing ", path.join(initalPath, `dashboard${result[0]["Id"]}.html`)); 
+                                    }
+                                });
                             }
                         });
                     }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).sendFile(path.join(initalPath, "indexLoginError.html"));
                 });
             }
         })
@@ -1078,7 +1102,7 @@ app.post('/:placeholder', (req, res) =>
         {
             console.log(errorWithQuery.message);
             res.sendFile(path.join(initalPath, "indexLoginError.html"));
-        })
+        });
     }
     else if (req.originalUrl == "/getStudents")
     {
@@ -1544,87 +1568,133 @@ app.post('/:placeholder', (req, res) =>
         // If new password not confirmed send back error
         if (req.body["NewPassword"] != req.body["NewPasswordAgain"])
         {
-            res.status(400).end("ERROR! New passwords don't match.")
+            res.status(400).end("Passwords don't match.")
             return;
         }
 
         // If new password and old password the same send back error
         if (req.body["NewPassword"] == req.body["OldPassword"])
         {
-            res.status(400).end("ERROR! New password is same as old password.")
+            res.status(400).end("Previous password used.")
             return;
         }
 
-        updateUserPassword(req.body["tutor"], req.body["OldPassword"], req.body["NewPassword"]).then(result =>
+        // Get salt from database
+        checkTutorExists(req.body["tutor"]["Email"]).then(tutor =>
         {
-            // If no rows changed then error
-            if (result.affectedRows == 0)
+            // If not found
+            if (tutor.length != 1)
             {
-                res.status(400).end("Old password incorrect.")
+                res.status(400).end("Can't find user.")
             }
             else
             {
-                // Else successfully changed password
-                res.status(200).end("Password updated.");
+                // Get old password as hash
+                var oldPassword = crypto.createHash('sha256').update(req.body["OldPassword"] + tutor[0]["Salt"]).digest("hex");
+
+                // Get new password as hash
+                var newPassword = crypto.createHash('sha256').update(req.body["NewPassword"] + tutor[0]["Salt"]).digest("hex");
+
+                updateUserPassword(req.body["tutor"], oldPassword, newPassword).then(result =>
+                {
+                    // If no rows changed then error
+                    if (result.affectedRows == 0)
+                    {
+                        res.status(400).end("Old password incorrect.")
+                    }
+                    else
+                    {
+                        // Else successfully changed password
+                        res.status(200).end("Password updated.");
+                    }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.status(400).end();
+                });
             }
         })
         .catch(errorWithQuery =>
         {
             console.log(errorWithQuery.message);
             res.status(400).end();
-        })
+        });
     }
     else if (req.originalUrl == "/updatePasswordReset")
     {
-        // Create random temp password
-        var updatedPassword = Math.random().toString(36).slice(2).substring(0, 10)
-
-        // Update password
-        updateUserPasswordReset(req.body["Email"], updatedPassword).then(result =>
+        // Get salt from database
+        checkTutorExists(req.body["Email"]).then(tutor =>
         {
-            // If password updated
-            if (result.affectedRows == 1)
+            // If not found
+            if (tutor.length != 1)
             {
-                // Read in email html
-                var htmlData = fs.readFileSync(path.join(initalPath, "emailResetPassword.html"), "utf-8");
-
-                // Add tutor data to string
-                htmlData = htmlData.replace("P@ssword123", updatedPassword);
-
-                // Set email
-                var mailOptions =
-                {
-                    from: "mindmantratutoring@gmail.com",
-                    to: req.body["Email"],
-                    subject: "Password Reset",
-                    html: htmlData
-                };
-
-                // Send email
-                emailer.sendMail(mailOptions, function(error, info)
-                {
-                    if (error)
-                    {
-                        console.log(error);
-                        res.sendFile(path.join(initalPath, "resetPasswordError.html"));
-                    }
-                    else
-                    {
-                        // Update page
-                        res.sendFile(path.join(initalPath, "resetPasswordSuccess.html"));
-                    }
-                });
+                res.status(400).sendFile(path.join(initalPath, "resetPasswordError.html"));
             }
             else
             {
-                res.sendFile(path.join(initalPath, "resetPasswordError.html"));
+                // Create random temp password
+                var updatedPassword = Math.random().toString(36).slice(2).substring(0, 10);
+
+                // Salt password
+                var saltedPassword = updatedPassword + tutor[0]["Salt"];
+
+                // Get hash
+                var hashedPassword = crypto.createHash('sha256').update(saltedPassword).digest("hex");
+
+                // Update password
+                updateUserPasswordReset(req.body["Email"], hashedPassword, updatedPassword).then(result =>
+                {
+                    // If password updated
+                    if (result.affectedRows == 1)
+                    {
+                        // Read in email html
+                        var htmlData = fs.readFileSync(path.join(initalPath, "emailResetPassword.html"), "utf-8");
+        
+                        // Add tutor data to string
+                        htmlData = htmlData.replace("P@ssword123", updatedPassword);
+        
+                        // Set email
+                        var mailOptions =
+                        {
+                            from: "mindmantratutoring@gmail.com",
+                            to: req.body["Email"],
+                            subject: "Password Reset",
+                            html: htmlData
+                        };
+        
+                        // Send email
+                        emailer.sendMail(mailOptions, function(error, info)
+                        {
+                            if (error)
+                            {
+                                console.log(error);
+                                res.status(400).sendFile(path.join(initalPath, "resetPasswordError.html"));
+                            }
+                            else
+                            {
+                                // Update page
+                                res.status(200).sendFile(path.join(initalPath, "resetPasswordSuccess.html"));
+                            }
+                        });
+                    }
+                    else
+                    {
+                        res.status(400).sendFile(path.join(initalPath, "resetPasswordError.html"));
+                    }
+                })
+                .catch(errorWithQuery =>
+                {
+                    console.log(errorWithQuery.message);
+                    res.sendFile(path.join(initalPath, "resetPasswordError.html"));
+                })
             }
         })
         .catch(errorWithQuery =>
         {
             console.log(errorWithQuery.message);
             res.sendFile(path.join(initalPath, "resetPasswordError.html"));
-        })
+        });
     }
     else if (req.originalUrl == "/updateStudent")
     {
@@ -1711,13 +1781,18 @@ app.post('/:placeholder', (req, res) =>
             {
                 checkTutorExists(req.body["Email"]).then(result =>
                 {
-                    if (result.length > 0)
+                    // If not empty
+                    if (result.length != 0)
                     {
                         res.status(400).end("Tutor already exists.");
                     }
                     
+                    // Generate random strings
+                    var newAuthToken = Math.random().toString(36).slice(2).substring(0, 10);
                     var tempPassword = Math.random().toString(36).slice(2).substring(0, 10);
-                    addTutor(req.body, tempPassword, Math.random().toString(36).slice(2).substring(0, 10)).then(result =>
+                    var newSaltToken = crypto.randomBytes(16).toString("hex").substring(0, 22);
+
+                    addTutor(req.body, tempPassword, newAuthToken, newSaltToken).then(result =>
                     {
                         if (result.affectedRows == 1)
                         {
@@ -1938,16 +2013,24 @@ app.post('/:placeholder', (req, res) =>
     }
 })
 
-
-// Get keys
-const certs =
-{
-    key: fs.readFileSync(path.join(initalPath, "/sslStuff/private.key")),
-    cert: fs.readFileSync(path.join(initalPath, "/sslStuff/certificate.crt"))
-};
-
 // Start server
-https.createServer(certs, app).listen(443);
+if (process.env.DEVELOPMENT_ENVIRONMENT == "yes")
+{
+    // Start http server
+    http.createServer(app).listen(80);
+}
+else
+{
+    // Get keys
+    const certs =
+    {
+        key: fs.readFileSync(path.join(initalPath, "/sslStuff/private.key")),
+        cert: fs.readFileSync(path.join(initalPath, "/sslStuff/certificate.crt"))
+    };
+
+    // Start https server
+    https.createServer(certs, app).listen(443);
+}
 
 console.log("\n");
 console.log("Server started!");
