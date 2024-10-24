@@ -1924,6 +1924,39 @@ app.post('/:placeholder', (req, res) =>
     }
     else if (req.originalUrl == "/addSession")
     {
+        console.log(req.body);
+        // Convert data to usuable types
+        tutorData = req.body["tutor"];
+        classData = JSON.parse(req.body["Class"]);
+        studentData = JSON.parse(req.body["Student"]);
+        startTime = new Date(0, 0, 0, req.body["startTime"].split(":")[0], req.body["startTime"].split(":")[1]);
+        endTime = new Date(0, 0, 0, req.body["endTime"].split(":")[0], req.body["endTime"].split(":")[1]);
+
+        // Check that end time not before start time
+        timeElapsed = endTime - startTime;
+        if (timeElapsed <= 0)
+        {
+            res.status(400).end("End time must be after start time.");
+            return;
+        }
+
+        // Calculate money generated and add hours
+        moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
+        addSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end("Session added.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/addAdminSession")
+    {
         // Convert data to usuable types
         tutorData = JSON.parse(req.body["Tutor"]);
         classData = JSON.parse(req.body["Class"]);
