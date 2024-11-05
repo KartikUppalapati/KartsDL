@@ -339,9 +339,26 @@ const addSession = async (tutorData, hoursData, studentData, classData, moneyGen
     }));
 }
 
-const updateSession = async (tutorData, hoursData, studentData, classData, moneyGenerated) =>
+const updateSession = async (tutorData, sessionData, studentData, classData, moneyGenerated) =>
 {
-    const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${hoursData["startTime"]}", EndTime = "${hoursData["endTime"]}", Date = "${hoursData["Date"]}", Notes = "${hoursData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${hoursData["prevStudentId"]} and ClassId = ${hoursData["prevClassId"]} and StartTime = "${hoursData["prevStartTime"]}" and EndTime = "${hoursData["prevEndTime"]}" and Date = "${hoursData["prevDate"]}" and Notes = "${hoursData["prevNotes"]}"`;
+    const QUERY = `UPDATE Hours SET TutorId = ${tutorData["Id"]}, StudentId = ${studentData["Id"]}, ClassId = ${classData["Id"]}, StartTime = "${sessionData["startTime"]}", EndTime = "${sessionData["endTime"]}", Date = "${sessionData["Date"]}", Notes = "${sessionData["Notes"]}", MoneyGenerated = ${moneyGenerated} WHERE TutorId = ${tutorData["Id"]} and StudentId = ${sessionData["prevStudentId"]} and ClassId = ${sessionData["prevClassId"]} and StartTime = "${sessionData["prevStartTime"]}" and EndTime = "${sessionData["prevEndTime"]}" and Date = "${sessionData["prevDate"]}" and Notes = "${sessionData["prevNotes"]}"`;
+    return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
+    {
+        if (err) 
+        {
+            reject(err);
+        }
+        else
+        {
+            resolve(results);
+            return results;
+        }
+    }));
+}
+
+const updateSessionDate = async (sessionData) =>
+{
+    const QUERY = `UPDATE Hours SET Date = "${sessionData["Date"]}" WHERE TutorId = ${sessionData["TutorId"]} and StudentId = ${sessionData["StudentId"]} and ClassId = ${sessionData["ClassId"]} and StartTime = "${sessionData["startTime"]}" and EndTime = "${sessionData["endTime"]}" and Date = "${sessionData["PrevDate"]}" and Notes = "${sessionData["Notes"]}"`;
     return new Promise((resolve, reject) => con.query(QUERY, (err, results) => 
     {
         if (err) 
@@ -561,7 +578,7 @@ const getAllSessions = async (tutorData, queryLimit) =>
     }));
 }
 
-const getHoursWithinDates = async (tutorData, startDate, endDate) =>
+const getSessionsWithinDates = async (tutorData, startDate, endDate) =>
 {
   const QUERY = mysql.format("SELECT Date, StudentId, Students.FirstName, Students.LastName, ClassId, Classes.Name as ClassName, Classes.Level, StartTime, EndTime, Tutors.Percentage, MoneyGenerated, Notes FROM Hours INNER JOIN Students ON Students.Id = Hours.StudentId INNER JOIN Tutors ON Tutors.Id = Hours.TutorId INNER JOIN Classes ON Classes.Id = Hours.ClassId WHERE TutorId = ? AND Date >= ? AND Date <= ?", [tutorData["Id"], startDate, endDate]);
   return new Promise((resolve, reject) => con.query(QUERY, (err, result) => 
@@ -1375,7 +1392,7 @@ app.post('/:placeholder', (req, res) =>
         year = today.getFullYear();
         var endDate = `${year}-${month}-${day}`;
 
-        getHoursWithinDates(req.body["Tutor"], startDate, endDate).then(result =>
+        getSessionsWithinDates(req.body["Tutor"], startDate, endDate).then(result =>
         {
             // Go through all hours logged for date range
             for (let j = 0; j < result.length; j++)
@@ -1766,6 +1783,56 @@ app.post('/:placeholder', (req, res) =>
             res.status(400).end();
         })
     }
+    else if (req.originalUrl == "/updateSession")
+    {
+        // Convert data to usuable types
+        tutorData = JSON.parse(req.body["Tutor"]);
+        classData = JSON.parse(req.body["Class"]);
+        studentData = JSON.parse(req.body["Student"]);
+        startTime = new Date(0, 0, 0, req.body["startTime"].split(":")[0], req.body["startTime"].split(":")[1]);
+        endTime = new Date(0, 0, 0, req.body["endTime"].split(":")[0], req.body["endTime"].split(":")[1]);
+        prevStartTime = new Date(0, 0, 0, req.body["prevStartTime"].split(":")[0], req.body["prevStartTime"].split(":")[1]);
+        prevEndTime = new Date(0, 0, 0, req.body["prevEndTime"].split(":")[0], req.body["prevEndTime"].split(":")[1]);
+
+        // Check that current end time not before start time
+        timeElapsed = endTime - startTime;
+        if (timeElapsed <= 0)
+        {
+            res.status(400).end("End time must be after start time.");
+            return;
+        }
+
+        // Calculate money generated and add hours
+        moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
+        updateSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end("Session updated.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
+    else if (req.originalUrl == "/updateSessionDate")
+    {
+        // Update date
+        updateSessionDate(req.body).then(result =>
+        {
+            if (result.affectedRows == 1)
+            {
+                res.status(200).end("Session updated.");
+            }
+        })
+        .catch(errorWithQuery =>
+        {
+            console.log(errorWithQuery.message);
+            res.status(400).end();
+        })
+    }
     else if (req.originalUrl == "/addTutor")
     {
         if (Number(req.body["Percentage"]) > 100)
@@ -1924,7 +1991,6 @@ app.post('/:placeholder', (req, res) =>
     }
     else if (req.originalUrl == "/addSession")
     {
-        console.log(req.body);
         // Convert data to usuable types
         tutorData = req.body["tutor"];
         classData = JSON.parse(req.body["Class"]);
@@ -1979,40 +2045,6 @@ app.post('/:placeholder', (req, res) =>
             if (result.affectedRows == 1)
             {
                 res.status(200).end("Session added.");
-            }
-        })
-        .catch(errorWithQuery =>
-        {
-            console.log(errorWithQuery.message);
-            res.status(400).end();
-        })
-    }
-    else if (req.originalUrl == "/updateSession")
-    {
-        // Convert data to usuable types
-        tutorData = JSON.parse(req.body["Tutor"]);
-        classData = JSON.parse(req.body["Class"]);
-        studentData = JSON.parse(req.body["Student"]);
-        startTime = new Date(0, 0, 0, req.body["startTime"].split(":")[0], req.body["startTime"].split(":")[1]);
-        endTime = new Date(0, 0, 0, req.body["endTime"].split(":")[0], req.body["endTime"].split(":")[1]);
-        prevStartTime = new Date(0, 0, 0, req.body["prevStartTime"].split(":")[0], req.body["prevStartTime"].split(":")[1]);
-        prevEndTime = new Date(0, 0, 0, req.body["prevEndTime"].split(":")[0], req.body["prevEndTime"].split(":")[1]);
-
-        // Check that current end time not before start time
-        timeElapsed = endTime - startTime;
-        if (timeElapsed <= 0)
-        {
-            res.status(400).end("End time must be after start time.");
-            return;
-        }
-
-        // Calculate money generated and add hours
-        moneyGenerated = studentData["Price"] * (timeElapsed / 3600000);
-        updateSession(tutorData, req.body, studentData, classData, moneyGenerated).then(result =>
-        {
-            if (result.affectedRows == 1)
-            {
-                res.status(200).end("Session updated.");
             }
         })
         .catch(errorWithQuery =>

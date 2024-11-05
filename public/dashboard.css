@@ -17475,10 +17475,30 @@ div.errorMessage
     color: var(--primary);
 }
 
+a.fc-event
+{
+    transition: 0s;
+    -webkit-transition: 0s;
+}
+
+.fc-event.fc-dragging:not(.fc-selected)
+{
+    opacity: 1;
+}
+
+.fc-highlight
+{
+    border-radius: 5px;
+    transform: scale(.95);
+    background-color: rgba(158, 109, 224, .5) !important;
+}
+
 .fc-day:hover
 {
     cursor: pointer;
-    background-color: var(--primary) !important;
+    border-radius: 5px;
+    transform: scale(.95);
+    background-color: rgba(158, 109, 224, .15) !important;
 }
 
 .fc-content-skeleton
@@ -17491,9 +17511,13 @@ div.errorMessage
     pointer-events: auto;
 }
 
+.fc-event.fc-dragging:not(.fc-selected) > .fc-content
+{
+    background-color: black;
+}
+
 .fc-content:hover
 {
-    cursor: pointer;
     border-radius: 3px;
     transform: scale(1.05);
     background-color: var(--primary);

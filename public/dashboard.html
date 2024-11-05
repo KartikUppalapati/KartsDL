@@ -970,6 +970,7 @@
     <!-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> -->
     <script src="plugins/fullcalendar/core-4.3.1/main.min.js"></script>
     <script src="plugins/fullcalendar/daygrid-4.3.0/main.min.js"></script>
+    <script src="plugins/fullcalendar/interactions-4.3.0/main.min.js"></script>
     <script src="plugins/toaster/toastr.min.js"></script>
     <script src="js/mono.js"></script>
     <script src="js/custom.js"></script>
@@ -977,7 +978,8 @@
     <script>
         // Init stuff
         var tutorData = [];
-        var currentEvent = [];
+        var currEvent = [];
+        var msgDivMsg = null;
         var currentAdminTutorId = 0;
         var currentAdminStudentId = 0;
         var adminInvoiceTableEmpty = 1;
@@ -1019,26 +1021,139 @@
         {
             firstDay: 1,
             height: 275,
-            plugins: ['dayGrid'],
+            editable: true,
+            eventDragMinDistance: 1,
             defaultView: 'dayGridWeek',
-            dayClick: function(date, jsEvent, view)
+            plugins: ['dayGrid', 'interaction'],
+            eventDrop: function (eventDropInfo)
             {
-                alert('Clicked on: ' + date.format());
+                // Get inputs
+                var inputsAsArray = {};
+
+                // Set start date in invoice
+                var today = eventDropInfo.event.start;
+                var day = String(today.getDate()).padStart(2, '0');
+                var month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var year = today.getFullYear();
+                var eventDate = `${year}-${month}-${day}`;
+
+                // Add all saved state data to input array
+                inputsAsArray["Date"] = eventDate;
+                inputsAsArray["TutorId"] = tutorData["Id"];
+                inputsAsArray["PrevDate"] = eventDropInfo.event._def.extendedProps["Date"];
+                inputsAsArray["ClassId"] = eventDropInfo.event._def.extendedProps["ClassId"];
+                inputsAsArray["StudentId"] = eventDropInfo.event._def.extendedProps["StudentId"];
+                inputsAsArray["startTime"] = eventDropInfo.event._def.extendedProps["StartTime"];
+                inputsAsArray["endTime"] = eventDropInfo.event._def.extendedProps["EndTime"];
+                inputsAsArray["Notes"] = eventDropInfo.event._def.extendedProps["Notes"];
+
+                // Send to server
+                request = new XMLHttpRequest();
+                request.open("POST", "updateSessionDate", false);
+                request.setRequestHeader('Content-type', 'application/json');
+                request.onreadystatechange = function()
+                {
+                    // Successful response
+                    if (this.readyState == 4 && this.status == 200) 
+                    {
+                        // Show server message
+                        successMessage(this.responseText);
+
+                        // Save event extended data
+                        eventDropInfo.event.setExtendedProp("Date", eventDate);
+
+                        // Send to server
+                        request = new XMLHttpRequest();
+                        request.open("POST", "getDashboard", false);
+                        request.setRequestHeader('Content-type', 'application/json');
+                        request.onreadystatechange = function()
+                        {
+                            // Successful response
+                            if (this.readyState == 4 && this.status == 200) 
+                            {
+                                // Parse output json
+                                var outputsArray = JSON.parse(this.responseText);
+
+                                // Update dashboard top 3 numbers
+                                document.getElementById("moneyEarned").innerHTML = `$${Number(outputsArray["totalMoneyGenerated"]).toFixed(2)}`;
+                                document.getElementById("studentsTutored").innerHTML = outputsArray["totalStudentsTutored"];
+                                document.getElementById("hoursTutored").innerHTML = Number(outputsArray["totalHoursTutored"]).toFixed(2);
+
+                                // Update dashboard top 3 charts
+                                moneyChart.updateSeries([{data: outputsArray["moneyGeneratedList"]}]);
+                                studentsChart.updateSeries([{data: outputsArray["studentsTutoredList"]}]);
+                                hoursChart.updateSeries([{data: outputsArray["hoursTutoredList"]}]);
+
+                                // Update calendar
+                                weekCalendar.removeAllEvents();
+                                var hours = outputsArray["calendarHours"];
+                                for (let i = 0; i < hours.length; i++)
+                                {
+                                    // Get date
+                                    var classDate = new Date(hours[i]["Date"].substring(0, 10));
+
+                                    // Add to calendar
+                                    weekCalendar.addEvent
+                                    (
+                                        {
+                                            title: `${hours[i]["FirstName"]} ${hours[i]["LastName"].charAt(0)}. ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
+                                            start: `${classDate.toISOString().split('T')[0]}`,
+                                            StudentId: `${hours[i]["StudentId"]}`,
+                                            ClassId: `${hours[i]["ClassId"]}`,
+                                            StartTime: `${hours[i]["StartTime"]}`,
+                                            EndTime: `${hours[i]["EndTime"]}`,
+                                            Date: `${classDate.toISOString().split('T')[0]}`,
+                                            Notes: `${hours[i]["Notes"]}`,
+                                            color: "#31343d"
+                                        }
+                                    );
+                                }
+                            }
+                            else
+                            {
+                                // Update dashboard top 3 numbers
+                                document.getElementById("moneyEarned").innerHTML = "Error";
+                                document.getElementById("studentsTutored").innerHTML = "Error";
+                                document.getElementById("hoursTutored").innerHTML = "Error";
+                            }
+                        };
+                        request.send(JSON.stringify({"StartDate": weekCalendar.getDate(), "Tutor": tutorData}));
+                    }
+                    // No response
+                    else if (this.status == 0)
+                    {
+                        // Show server message
+                        errorMessage("Couldn't reach server.");
+
+                        // Undo drag n drop
+                        eventDropInfo.revert();
+                    }
+                    // Error response
+                    else
+                    {
+                        // Show server message
+                        errorMessage(this.responseText);
+
+                        // Undo drag n drop
+                        eventDropInfo.revert();
+                    }
+                };
+                request.send(JSON.stringify(inputsAsArray));
             },
             eventClick: function(eventWrapper)
             {
                 // Get current event
-                currentEvent = eventWrapper.event;
+                currEvent = eventWrapper.event;
 
                 // Change delete back
                 document.getElementById("modalDeleteButton").innerHTML = "Delete";
                 document.getElementById("modalDeleteButton").onclick = eventDeleteConfirm;
 
                 // Set things in modal
-                document.getElementById("editSessionModalDateTutored").value = currentEvent._def.extendedProps["Date"];
-                document.getElementById("startTimeModalPicker").value = currentEvent._def.extendedProps["StartTime"];
-                document.getElementById("endTimeModalPicker").value = currentEvent._def.extendedProps["EndTime"];
-                document.getElementById("notesModalBox").value = currentEvent._def.extendedProps["Notes"];
+                document.getElementById("editSessionModalDateTutored").value = currEvent._def.extendedProps["Date"];
+                document.getElementById("startTimeModalPicker").value = currEvent._def.extendedProps["StartTime"];
+                document.getElementById("endTimeModalPicker").value = currEvent._def.extendedProps["EndTime"];
+                document.getElementById("notesModalBox").value = currEvent._def.extendedProps["Notes"];
 
                 // Clear dropdowns
                 document.getElementById("editSessionStudentsModalDropdown").innerHTML = `<option value="" disabled selected></option>`;
@@ -1071,9 +1186,9 @@
                                 document.getElementById("editSessionStudentsModalDropdown").options.add(new Option(`${sInfo["FirstName"]} ${sInfo["LastName"]} (${sInfo["Email"]})`, JSON.stringify(sInfo)));
 
                                 // If id matches set to index and stop searching
-                                if (sInfo["Id"] == currentEvent._def.extendedProps["StudentId"])
+                                if (sInfo["Id"] == currEvent._def.extendedProps["StudentId"])
                                 {
-                                    currentEvent.setExtendedProp("StudentPrice", sInfo["Price"])
+                                    currEvent.setExtendedProp("StudentPrice", sInfo["Price"])
                                     document.getElementById("editSessionStudentsModalDropdown").options.selectedIndex = i + 1;
                                 }
                             }
@@ -1097,7 +1212,7 @@
                                 document.getElementById("editSessionClassesModalDropdown").options.add(new Option(cInfo["Name"] + " (" + cInfo["Level"] + ")", JSON.stringify(cInfo)));
 
                                 // If id matches set to index and stop searching
-                                if (cInfo["Id"] == currentEvent._def.extendedProps["ClassId"])
+                                if (cInfo["Id"] == currEvent._def.extendedProps["ClassId"])
                                 {
                                     document.getElementById("editSessionClassesModalDropdown").options.selectedIndex = i + 1;
                                 }
@@ -1384,7 +1499,16 @@
             var msg = document.createElement("div");
             msg.setAttribute("class", "successMessage");
             msg.appendChild(document.createTextNode("Success! " + text));
+            
+            // Remove prev message
+            try
+            {
+                msgDiv.removeChild(msgDivMsg);
+            }
+            catch (error) {}
+            
             msgDiv.appendChild(msg);
+            msgDivMsg = msg;
 
             // Clear message
             setTimeout(function ()
@@ -1401,7 +1525,16 @@
             var msg = document.createElement("div");
             msg.setAttribute("class", "errorMessage");
             msg.appendChild(document.createTextNode("Error! " + text));
+
+            // Remove prev message
+            try
+            {
+                msgDiv.removeChild(msgDivMsg);
+            }
+            catch (error) {}
+            
             msgDiv.appendChild(msg);
+            msgDivMsg = msg;
 
             // Clear message
             setTimeout(function ()
@@ -1597,13 +1730,13 @@
 
             // Add all saved state data to input array
             inputsAsArray["Tutor"] = JSON.stringify(tutorData);
-            inputsAsArray["Date"] = currentEvent._def.extendedProps["Date"];
-            inputsAsArray["StudentId"] = currentEvent._def.extendedProps["StudentId"];
-            inputsAsArray["StudentPrice"] = currentEvent._def.extendedProps["StudentPrice"];
-            inputsAsArray["ClassId"] = currentEvent._def.extendedProps["ClassId"];
-            inputsAsArray["startTime"] = currentEvent._def.extendedProps["StartTime"];
-            inputsAsArray["endTime"] = currentEvent._def.extendedProps["EndTime"];
-            inputsAsArray["Notes"] = currentEvent._def.extendedProps["Notes"].trim();
+            inputsAsArray["Date"] = currEvent._def.extendedProps["Date"];
+            inputsAsArray["StudentId"] = currEvent._def.extendedProps["StudentId"];
+            inputsAsArray["StudentPrice"] = currEvent._def.extendedProps["StudentPrice"];
+            inputsAsArray["ClassId"] = currEvent._def.extendedProps["ClassId"];
+            inputsAsArray["startTime"] = currEvent._def.extendedProps["StartTime"];
+            inputsAsArray["endTime"] = currEvent._def.extendedProps["EndTime"];
+            inputsAsArray["Notes"] = currEvent._def.extendedProps["Notes"];
             
             // Send to server
             request = new XMLHttpRequest();
@@ -1650,13 +1783,13 @@
             // Add all saved state data as prev to input array
             inputsAsArray["Notes"] = document.getElementById("notesModalBox").value;
             inputsAsArray["Tutor"] = JSON.stringify(tutorData);
-            inputsAsArray["prevDate"] = currentEvent._def.extendedProps["Date"];
-            inputsAsArray["prevStudentId"] = currentEvent._def.extendedProps["StudentId"];
-            inputsAsArray["prevStudentPrice"] = currentEvent._def.extendedProps["StudentPrice"];
-            inputsAsArray["prevClassId"] = currentEvent._def.extendedProps["ClassId"];
-            inputsAsArray["prevStartTime"] = currentEvent._def.extendedProps["StartTime"];
-            inputsAsArray["prevEndTime"] = currentEvent._def.extendedProps["EndTime"];
-            inputsAsArray["prevNotes"] = currentEvent._def.extendedProps["Notes"].trim();
+            inputsAsArray["prevDate"] = currEvent._def.extendedProps["Date"];
+            inputsAsArray["prevStudentId"] = currEvent._def.extendedProps["StudentId"];
+            inputsAsArray["prevStudentPrice"] = currEvent._def.extendedProps["StudentPrice"];
+            inputsAsArray["prevClassId"] = currEvent._def.extendedProps["ClassId"];
+            inputsAsArray["prevStartTime"] = currEvent._def.extendedProps["StartTime"];
+            inputsAsArray["prevEndTime"] = currEvent._def.extendedProps["EndTime"];
+            inputsAsArray["prevNotes"] = currEvent._def.extendedProps["Notes"];
             
 
             // Send to server
@@ -1671,24 +1804,24 @@
                     // Set event data
                     var classData = JSON.parse(document.getElementById("editSessionClassesModalDropdown").value);
                     var studentData = JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value);
-                    currentEvent.setProp("title", `${studentData["FirstName"]} ${studentData["LastName"].charAt(0)}. ${classData["Name"]} ${classData["Level"]}`);
-                    currentEvent.setStart(document.getElementById("editSessionModalDateTutored").value, {maintainDuration: true});
+                    currEvent.setProp("title", `${studentData["FirstName"]} ${studentData["LastName"].charAt(0)}. ${classData["Name"]} ${classData["Level"]}`);
+                    currEvent.setStart(document.getElementById("editSessionModalDateTutored").value, {maintainDuration: true});
 
                     // Save event extended data
-                    currentEvent.setExtendedProp("Date", document.getElementById("editSessionModalDateTutored").value)
-                    currentEvent.setExtendedProp("StartTime", document.getElementById("startTimeModalPicker").value)
-                    currentEvent.setExtendedProp("EndTime", document.getElementById("endTimeModalPicker").value)
-                    currentEvent.setExtendedProp("Notes", document.getElementById("notesModalBox").value)
+                    currEvent.setExtendedProp("Date", document.getElementById("editSessionModalDateTutored").value);
+                    currEvent.setExtendedProp("StartTime", document.getElementById("startTimeModalPicker").value);
+                    currEvent.setExtendedProp("EndTime", document.getElementById("endTimeModalPicker").value);
+                    currEvent.setExtendedProp("Notes", document.getElementById("notesModalBox").value.trim());
 
                     // Save class and student id if not empty
                     if (document.getElementById("editSessionStudentsModalDropdown").value != "")
                     {
-                        currentEvent.setExtendedProp("StudentId", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Id"])   
-                        currentEvent.setExtendedProp("StudentPrice", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Price"])
+                        currEvent.setExtendedProp("StudentId", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Id"]);
+                        currEvent.setExtendedProp("StudentPrice", JSON.parse(document.getElementById("editSessionStudentsModalDropdown").value)["Price"]);
                     }
                     if (document.getElementById("editSessionClassesModalDropdown").value != "")
                     {
-                        currentEvent.setExtendedProp("ClassId", JSON.parse(document.getElementById("editSessionClassesModalDropdown").value)["Id"])
+                        currEvent.setExtendedProp("ClassId", JSON.parse(document.getElementById("editSessionClassesModalDropdown").value)["Id"]);
                     }
 
                     // Refresh stats
@@ -2492,7 +2625,6 @@
                                 title: `${hours[i]["FirstName"]} ${hours[i]["LastName"].charAt(0)}. ${hours[i]["ClassName"]} ${hours[i]["Level"]}`,
                                 start: `${classDate.toISOString().split('T')[0]}`,
                                 StudentId: `${hours[i]["StudentId"]}`,
-                                StudentPrice: 0,
                                 ClassId: `${hours[i]["ClassId"]}`,
                                 StartTime: `${hours[i]["StartTime"]}`,
                                 EndTime: `${hours[i]["EndTime"]}`,
@@ -2643,9 +2775,17 @@
                         ]).draw();
                     }
                 }
+                // No response
+                else if (this.status == 0)
+                {
+                    // Show server message
+                    errorMessage("Couldn't reach server.");
+                }
+                // Error response
                 else
                 {
-                    errorMessage("Couldn't get data.")
+                    // Show server message
+                    errorMessage(this.responseText);
                 }
             };
             request.send(JSON.stringify(inputsAsArray));
