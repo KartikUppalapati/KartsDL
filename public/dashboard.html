@@ -2667,9 +2667,9 @@
                     var tutorTotals = JSON.parse(this.responseText);
 
                     // Update dashboard elements
-                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${Number(tutorTotals["TotalMoney"]).toFixed(2)}`;
+                    document.getElementById("careerMoneyMadeTotal").innerHTML = `$${tutorTotals["TotalMoney"].toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
                     document.getElementById("careerStudentsTaughtTotal").innerHTML = tutorTotals["TotalStudents"];
-                    document.getElementById("careerHoursTaughtTotal").innerHTML = Number(tutorTotals["TotalHours"]).toFixed(2);
+                    document.getElementById("careerHoursTaughtTotal").innerHTML = tutorTotals["TotalHours"].toFixed(2);
                 }
                 else
                 {
@@ -2703,9 +2703,9 @@
                     var companyTotals = JSON.parse(this.responseText);
 
                     // Update dashboard elements
-                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${Number(companyTotals["TotalMoney"]).toFixed(2)}`;
+                    document.getElementById("companyMoneyMadeTotal").innerHTML = `$${companyTotals["TotalMoney"].toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
                     document.getElementById("companyStudentsTaughtTotal").innerHTML = companyTotals["TotalStudents"];
-                    document.getElementById("companyHoursTaughtTotal").innerHTML = Number(companyTotals["TotalHours"]).toFixed(2);
+                    document.getElementById("companyHoursTaughtTotal").innerHTML = companyTotals["TotalHours"].toFixed(2);
                 }
                 else
                 {

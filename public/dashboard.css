@@ -11503,16 +11503,6 @@ p {
   font-size: 0.98rem;
 }
 
-::-moz-selection {
-  background-color: #9e6de0;
-  color: #ffffff;
-}
-
-::selection {
-  background-color: #9e6de0;
-  color: #ffffff;
-}
-
 button,
 a {
   text-decoration: none;
