@@ -1,37 +1,189 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
     <head>
-        <title>MMT Login</title>
+        <title>KartsDL</title>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        
-        <link rel="stylesheet" href="index.css">
-        <link href="images/favicon.png" rel="shortcut icon"/>
+
+        <!-- GOOGLE FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Karla:400,700|Roboto" rel="stylesheet">
+        <link href="plugins/material/css/materialdesignicons.min.css" rel="stylesheet"/>
+        <link href="plugins/simplebar/simplebar.css" rel="stylesheet"/>
+
+        <!-- PLUGINS CSS STYLE -->
+        <link href="plugins/nprogress/nprogress.css" rel="stylesheet" />
+        <link href="plugins/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css" rel="stylesheet"/>
+        <link href="plugins/jvectormap/jquery-jvectormap-2.0.3.css" rel="stylesheet"/>
+        <link href="plugins/daterangepicker/daterangepicker.css" rel="stylesheet"/>
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="plugins/toaster/toastr.min.css" rel="stylesheet"/>
+        <link href="plugins/fullcalendar/core-4.3.1/main.min.css" rel="stylesheet">
+        <link href="plugins/fullcalendar/daygrid-4.3.0/main.min.css" rel="stylesheet">
+
+        <!-- MONO CSS -->
+        <link id="main-css-href" rel="stylesheet" href="index.css"/>
+
+        <!-- FAVICON -->
+        <!-- <link href="images/favicon.png" rel="shortcut icon"/> -->
+        <script src="plugins/nprogress/nprogress.js"></script>
     </head>
-    <body>
-        <div class="container">
-            <div class="loginBox">
-                <h1 style="font-size: 40px; padding-top: 15px;">Mind Mantra Tutoring</h1>
-                <div class="loginDiv">
-                    <form id="loginForm" class="loginForm" action="login" method="post">
-                        <input name="Email" placeholder="Email" required="" type="text" autofocus>
-                        <input name="Password" placeholder="Password" type = "Password" required="" type="text">
-                        <div>
-                            <button type="submit" class="btn btn-primary">Login</button>
+
+    <body class="navbar-fixed" id="body">
+        <!-- Main Areas -->
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="card card-default">
+                    <div class="card-body row">
+                        <!-- Left Area -->
+                        <div class="card col-8" style="height: 650px; overflow-y: scroll; overflow-x: hidden; border: none;">
+                            <div class="row mt-5">
+
+
+                                <div class="col-xl-6 col-sm-6">
+                                    <div class="card card-default songCard">
+                                        <div class="d-flex p-5 align-items-center row">
+                                            <div class="icon-md bg-success rounded-circle mb-2">
+                                                <i class="mdi mdi-coin"></i>
+                                            </div>
+                                            <div class="ml-5">
+                                                <span class="h2 d-block">Title</span>
+                                                <p>Artist</p>
+                                                <p>Album</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-sm-6">
+                                    <div class="card card-default songCard">
+                                        <div class="d-flex p-5 align-items-center row">
+                                            <div class="icon-md bg-success rounded-circle mb-2">
+                                                <i class="mdi mdi-coin"></i>
+                                            </div>
+                                            <div class="ml-5">
+                                                <span class="h2 d-block">Title</span>
+                                                <p>Artist</p>
+                                                <p>Album</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-sm-6">
+                                    <div class="card card-default songCard">
+                                        <div class="d-flex p-5 align-items-center row">
+                                            <div class="icon-md bg-success rounded-circle mb-2">
+                                                <i class="mdi mdi-coin"></i>
+                                            </div>
+                                            <div class="ml-5">
+                                                <span class="h2 d-block">Title</span>
+                                                <p>Artist</p>
+                                                <p>Album</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-sm-6">
+                                    <div class="card card-default songCard">
+                                        <div class="d-flex p-5 align-items-center row">
+                                            <div class="icon-md bg-success rounded-circle mb-2">
+                                                <i class="mdi mdi-coin"></i>
+                                            </div>
+                                            <div class="ml-5">
+                                                <span class="h2 d-block">Title</span>
+                                                <p>Artist</p>
+                                                <p>Album</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+
+                            </div>
                         </div>
-                    </form>
+
+                        <!-- Right Area -->
+                        <div class="card col-4">
+                            <div>
+                                
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <label class="forgotLabel" onclick="resetPassword()">Forgot Password?</label>
         </div>
     </body>
+  
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="plugins/simplebar/simplebar.min.js"></script>
+    <!-- <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script> -->
+    <script src="plugins/apexcharts/apexcharts.js"></script>
+    <script src="plugins/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js"></script>                  
+    <!-- <script src="plugins/jvectormap/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-world-mill.js"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-us-aea.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/moment.min.js"></script> -->
+    <!-- <script src="plugins/daterangepicker/daterangepicker.js"></script> -->
+    <!-- <script>
+        jQuery(document).ready(function() {
+            jQuery('input[name="dateRange"]').daterangepicker({
+            autoUpdateInput: false,
+            singleDatePicker: true,
+            locale: {
+            cancelLabel: 'Clear'
+            }
+        });
+            jQuery('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+            jQuery(this).val(picker.startDate.format('MM/DD/YYYY'));
+            });
+            jQuery('input[name="dateRange"]').on('cancel.daterangepicker', function (ev, picker) {
+            jQuery(this).val('');
+            });
+        });
+    </script> -->
+    <!-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> -->
+    
 
     <script>
-        // When user presses _ button
-        function resetPassword()
+        // Scroll for css
+        window.addEventListener('scroll', () =>
         {
-            window.location.href = "resetPassword";
+            document.body.style.setProperty('--scroll', window.pageYOffset / (document.body.offsetHeight - window.innerHeight));
+        }, false);
+
+        // Function to copy text to clipboard
+        function copyText(text)
+        {
+            navigator.clipboard.writeText(text);
+            message("Copied to clipboard!");
         }
+
+        // Display success message
+        function message(text)
+        {
+            // Create divs
+            var msgDiv = document.getElementById("message");
+            var msg = document.createElement("div");
+            msg.setAttribute("class", "successMessage");
+            msg.appendChild(document.createTextNode(text));
+            
+            // Remove prev message
+            try
+            {
+                msgDiv.removeChild(msgDivMsg);
+            }
+            catch (error) {}
+            
+            msgDiv.appendChild(msg);
+            msgDivMsg = msg;
+
+            // Clear message
+            setTimeout(function ()
+            {
+                msgDiv.removeChild(msg);
+            }, 1500);
+        };
     </script>
 </html>

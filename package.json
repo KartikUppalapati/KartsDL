@@ -1,5 +1,5 @@
 {
-  "name": "mmthours",
+  "name": "KartsDL",
   "version": "1.0.0",
   "description": "idk",
   "main": "server.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KartikUppalapati/mmtHours.git"
+    "url": "git+https://github.com/KartikUppalapati/KartsDL.git"
   },
   "author": "",
   "license": "ISC",
@@ -23,7 +23,7 @@
     "nodemon": "^2.0.22"
   },
   "bugs": {
-    "url": "https://github.com/KartikUppalapati/mmtHours/issues"
+    "url": "https://github.com/KartikUppalapati/KartsDL/issues"
   },
-  "homepage": "https://github.com/KartikUppalapati/mmtHours#readme"
+  "homepage": "https://github.com/KartikUppalapati/KartsDL#readme"
 }
